@@ -107,7 +107,7 @@ export default function RegisterStorePage() {
           observacoes: form.observacoes
         });
 
-        setSuccess("Solicitacao do plano gratis enviada. O super admin precisa aprovar antes do card aparecer na home.");
+        setSuccess("Solicitação do plano grátis enviada. O super admin precisa aprovar antes do card aparecer na home.");
         return;
       }
 
@@ -134,9 +134,9 @@ export default function RegisterStorePage() {
         paymentStatus: "approved"
       });
 
-      setSuccess(`Solicitacao enviada com sucesso. Protocolo interno: ${store.id}.`);
+      setSuccess(`Solicitação enviada com sucesso. Protocolo interno: ${store.id}.`);
     } catch (submitError) {
-      setError(submitError.message || "Nao foi possivel enviar o cadastro agora.");
+      setError(submitError.message || "Não foi possível enviar o cadastro agora.");
     } finally {
       setLoading(false);
     }
@@ -272,7 +272,7 @@ export default function RegisterStorePage() {
                   <strong>{PLAN_DETAILS.paid.label}</strong>
                   <span>{PLAN_DETAILS.paid.price}</span>
                 </div>
-                <p>Com o pagamento aprovado, o cadastro da conta e da loja  liberado imediatamente.</p>
+                <p>Com o pagamento aprovado, o cadastro da conta e da loja é liberado imediatamente.</p>
                 <ul className="register-v2-benefits">
                   <li>Banner da loja</li>
                   <li>Produtos e cardápio</li>

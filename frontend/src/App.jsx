@@ -22,8 +22,8 @@ function NotFound() {
   return (
     <main className="container page-space">
       <div className="empty-state">
-        <h2>Pgina no encontrada</h2>
-        <p>Confira o endereo ou volte para a Home.</p>
+        <h2>Página não encontrada</h2>
+        <p>Confira o endereço ou volte para a Home.</p>
       </div>
     </main>
   );

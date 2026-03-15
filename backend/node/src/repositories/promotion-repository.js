@@ -38,7 +38,7 @@ export class PromotionRepository {
       payload.button_label ?? "Ver oferta",
       String(payload.product_id),
       payload.sort_order ?? 0,
-      payload.active ?? 1,
+      payload.active ?? true,
       payload.date_start ?? new Date(),
       payload.date_end ?? new Date(Date.now() + 172800000)
     ];

@@ -47,11 +47,11 @@ export class OptionGroupRepository {
       payload.name,
       payload.description ?? null,
       payload.type ?? "single",
-      payload.required ?? 0,
+      payload.required ?? false,
       payload.min_select ?? 0,
       payload.max_select ?? 1,
       payload.sort_order ?? 0,
-      payload.active ?? 1
+      payload.active ?? true
     ];
 
     if (groupId) {
@@ -91,7 +91,7 @@ export class OptionGroupRepository {
           option.description ?? null,
           option.price_delta ?? 0,
           option.sort_order ?? 0,
-          option.active ?? 1
+          option.active ?? true
         ]
       );
     }

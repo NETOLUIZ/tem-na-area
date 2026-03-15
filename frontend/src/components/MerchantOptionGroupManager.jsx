@@ -67,19 +67,23 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
 
   async function submit(e) {
     e.preventDefault();
-    await actions.upsertOptionGroup(storeId, {
-      ...form,
-      minSelect: Number(form.minSelect || 0),
-      maxSelect: form.type === "text" ? 1 : Number(form.maxSelect || 1),
-      sortOrder: Number(form.sortOrder || 0),
-      options: form.type === "text"
-        ? []
-        : form.options.map((option, index) => ({
-            ...option,
-            sortOrder: Number(option.sortOrder || index + 1),
-            priceDelta: Number(option.priceDelta || 0)
-          }))
-    }, editingId);
+    await actions.upsertOptionGroup(
+      storeId,
+      {
+        ...form,
+        minSelect: Number(form.minSelect || 0),
+        maxSelect: form.type === "text" ? 1 : Number(form.maxSelect || 1),
+        sortOrder: Number(form.sortOrder || 0),
+        options: form.type === "text"
+          ? []
+          : form.options.map((option, index) => ({
+              ...option,
+              sortOrder: Number(option.sortOrder || index + 1),
+              priceDelta: Number(option.priceDelta || 0)
+            }))
+      },
+      editingId
+    );
     resetForm();
   }
 
@@ -118,7 +122,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
       <form className="menu-v2-card menu-v2-form menu-builder-form" onSubmit={submit}>
         <div className="menu-builder-form-head">
           <div>
-            <small>Configuracao por produto</small>
+            <small>Configuração por produto</small>
             <h3>{editingId ? "Editar grupo de montagem" : "Novo grupo de montagem"}</h3>
           </div>
           {editingId ? (
@@ -228,7 +232,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
         {form.type !== "text" ? (
           <div className="menu-builder-options">
             <div className="menu-builder-options-head">
-              <strong>Opcoes do grupo</strong>
+              <strong>Opções do grupo</strong>
               <button type="button" className="btn btn-outline" onClick={addOption}>
                 <MdAdd /> Adicionar opção
               </button>

@@ -56,9 +56,9 @@ export class CatalogRepository {
       payload.custo ?? null,
       payload.estoque_atual ?? 0,
       payload.estoque_minimo ?? 0,
-      payload.controla_estoque ?? 1,
-      payload.permite_venda_sem_estoque ?? 0,
-      payload.destaque_home ?? 0,
+      payload.controla_estoque ?? true,
+      payload.permite_venda_sem_estoque ?? false,
+      payload.destaque_home ?? false,
       payload.peso_gramas ?? null,
       payload.status_produto ?? "ATIVO"
     ];

@@ -224,7 +224,7 @@ export function createSeedState() {
     makeStore("s2", {
       nome: "Pizzaria Bella Massa",
       categoria: "comida",
-      descricaoCurta: "Pizzas artesanais com fermentacao natural.",
+      descricaoCurta: "Pizzas artesanais com fermentação natural.",
       whatsapp: "11988880002",
       telefone: "1130211002",
       senha: "123456",
@@ -319,7 +319,7 @@ export function createSeedState() {
     ...buildItemsForStore("s1", "Espeto", "https://images.unsplash.com/photo-1529692236671-f1dc99fe18ae?auto=format&fit=crop&w=900&q=80"),
     ...buildItemsForStore("s2", "Pizza", "https://images.unsplash.com/photo-1548365328-9f547fb0953c?auto=format&fit=crop&w=900&q=80"),
     ...buildItemsForStore("s3", "Burger", "https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=900&q=80"),
-    ...buildItemsForStore("s4", "Servico", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=900&q=80"),
+    ...buildItemsForStore("s4", "Serviço", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=900&q=80"),
     ...buildItemsForStore("s5", "Look", "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80"),
     ...buildItemsForStore("s6", "Essenza", "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=900&q=80")
   ];
@@ -329,7 +329,7 @@ export function createSeedState() {
       id: "promo-s1-1",
       storeId: "s1",
       itemId: "s1-4",
-      title: "Promo do dia saindo rapido",
+      title: "Promo do dia saindo rápido",
       subtitle: "Espetinho do Joao com oferta especial para hoje.",
       badge: "Oferta local",
       active: true,
@@ -341,7 +341,7 @@ export function createSeedState() {
       storeId: "s2",
       itemId: "s2-2",
       title: "Pizza especial em destaque",
-      subtitle: "Bella Massa com fermentacao natural e sabor premium.",
+      subtitle: "Bella Massa com fermentação natural e sabor premium.",
       badge: "Mais pedido",
       active: true,
       createdAt: nowIso(),

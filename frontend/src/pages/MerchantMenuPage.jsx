@@ -128,8 +128,8 @@ export default function MerchantMenuPage() {
     return (
       <main className="container page-space">
         <div className="empty-state">
-          <h3>Loja nao encontrada</h3>
-          <p>Nao foi possivel carregar o cardapio dessa loja.</p>
+          <h3>Loja não encontrada</h3>
+          <p>Não foi possível carregar o cardápio dessa loja.</p>
           <Link className="btn btn-primary" to="/">Voltar para Home</Link>
         </div>
       </main>
@@ -159,7 +159,7 @@ export default function MerchantMenuPage() {
           <button type="button" onClick={() => navigate(`/admin-loja/${storeId}`)} aria-label="Voltar">
             <MdArrowBack />
           </button>
-          <h1>Gerenciar cardapio</h1>
+          <h1>Gerenciar cardápio</h1>
         </div>
         <div className="menu-v2-tabs">
           <button type="button" className={activeTab === "form" ? "active" : ""} onClick={() => setActiveTab("form")}>
@@ -189,7 +189,7 @@ export default function MerchantMenuPage() {
             </select>
 
             <textarea
-              placeholder="Descricao"
+              placeholder="Descrição"
               value={form.descricao}
               onChange={(e) => setForm({ ...form, descricao: e.target.value })}
               rows={4}
@@ -215,7 +215,7 @@ export default function MerchantMenuPage() {
             </button>
 
             {editingId ? (
-              <button className="menu-v2-cancel" type="button" onClick={resetForm}>Cancelar edicao</button>
+              <button className="menu-v2-cancel" type="button" onClick={resetForm}>Cancelar edição</button>
             ) : null}
           </form>
         ) : activeTab === "list" ? (
@@ -278,7 +278,7 @@ export default function MerchantMenuPage() {
             <form className="menu-v2-card menu-v2-form" onSubmit={submitPromotion}>
               <div className="register-v2-note">
                 <strong>Regras da propaganda:</strong>
-                <span>Cada loja pode publicar no maximo 2 propagandas por dia. Cada campanha fica ativa por 48 horas e ja esta incluida no plano.</span>
+                <span>Cada loja pode publicar no máximo 2 propagandas por dia. Cada campanha fica ativa por 48 horas e já está incluída no plano.</span>
               </div>
 
               {promotionMessage ? <p className="success-text">{promotionMessage}</p> : null}
@@ -290,10 +290,10 @@ export default function MerchantMenuPage() {
                 ))}
               </select>
 
-              <input placeholder="Titulo da propaganda" value={promotionForm.title} onChange={(e) => setPromotionForm({ ...promotionForm, title: e.target.value })} required />
+              <input placeholder="Título da propaganda" value={promotionForm.title} onChange={(e) => setPromotionForm({ ...promotionForm, title: e.target.value })} required />
               <textarea
                 rows={4}
-                placeholder="Subtitulo curto para aparecer no carrossel"
+                placeholder="Subtítulo curto para aparecer no carrossel"
                 value={promotionForm.subtitle}
                 onChange={(e) => setPromotionForm({ ...promotionForm, subtitle: e.target.value })}
                 required
@@ -313,7 +313,7 @@ export default function MerchantMenuPage() {
               </button>
 
               {editingPromotionId ? (
-                <button className="menu-v2-cancel" type="button" onClick={resetPromotionForm}>Cancelar edicao</button>
+                <button className="menu-v2-cancel" type="button" onClick={resetPromotionForm}>Cancelar edição</button>
               ) : null}
             </form>
 

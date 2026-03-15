@@ -23,8 +23,8 @@ export default function CheckoutPage() {
 
   function validate() {
     if (form.nome.trim().length < 3) return "Informe o nome completo.";
-    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone invalido.";
-    if (form.enderecoEntrega.trim().length < 8) return "Informe o endereco de entrega.";
+    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone inválido.";
+    if (form.enderecoEntrega.trim().length < 8) return "Informe o endereço de entrega.";
     return "";
   }
 
@@ -41,7 +41,7 @@ export default function CheckoutPage() {
     setLoading(false);
 
     if (!order) {
-      setError("Nao foi possivel finalizar. Verifique sua sacola.");
+      setError("Não foi possível finalizar. Verifique sua sacola.");
       return;
     }
 
@@ -53,8 +53,8 @@ export default function CheckoutPage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Sacola vazia</h3>
-          <p>Voce precisa adicionar itens antes de finalizar.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <p>Você precisa adicionar itens antes de finalizar.</p>
+          <Link className="btn btn-primary" to="/">Voltar para a Home</Link>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ export default function CheckoutPage() {
 
       <header className="checkout-v2-header">
         <div className="checkout-v2-title-block">
-          <p className="checkout-v2-kicker">Confirmacao final no Tem na Area</p>
+          <p className="checkout-v2-kicker">Confirmação final no Tem na Área</p>
           <h1>Finalizar pedido</h1>
           <p>{cart.store?.nome}</p>
         </div>
@@ -83,12 +83,12 @@ export default function CheckoutPage() {
             <input placeholder="Nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
             <input placeholder="Telefone" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
             <input
-              placeholder="Endereco de entrega"
+              placeholder="Endereço de entrega"
               value={form.enderecoEntrega}
               onChange={(e) => setForm({ ...form, enderecoEntrega: e.target.value })}
             />
             <textarea
-              placeholder="Observacoes do pedido (opcional)"
+              placeholder="Observações do pedido (opcional)"
               value={form.observacoes}
               onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
               rows={3}

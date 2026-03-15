@@ -35,7 +35,7 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
         <div className="prompt-sidebar-brand">
           <div className="prompt-brand-mark" aria-hidden="true">T</div>
           <div>
-            <h2>Tem na Area</h2>
+            <h2>Tem na Área</h2>
             <p>{subtitle}</p>
           </div>
         </div>
@@ -47,10 +47,10 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
         </nav>
 
         <div className="prompt-sidebar-projects">
-          <p>AREAS</p>
-          <span>Operacao</span>
+          <p>ÁREAS</p>
+          <span>Operação</span>
           <span>Compliance</span>
-          <span>Expansao</span>
+          <span>Expansão</span>
         </div>
 
         <div className="prompt-sidebar-footer">

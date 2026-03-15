@@ -162,7 +162,7 @@ function mapPromotion(promotion, fallbackStoreId = null) {
     title: promotion.titulo_exibicao || "",
     subtitle: promotion.subtitulo_exibicao || "",
     badge: promotion.botao_label || "Destaque",
-    active: Number(promotion.ativo ?? 1) === 1,
+    active: typeof promotion.ativo === "boolean" ? promotion.ativo : Number(promotion.ativo ?? 1) === 1,
     createdAt: promotion.created_at || new Date().toISOString(),
     expiresAt: promotion.data_fim || new Date(Date.now() + 172800000).toISOString(),
     item: promotion.produto_id
@@ -184,11 +184,11 @@ function mapOptionGroup(group) {
     name: group.nome,
     description: group.descricao || "",
     type: group.tipo,
-    required: Number(group.obrigatorio || 0) === 1,
+    required: typeof group.obrigatorio === "boolean" ? group.obrigatorio : Number(group.obrigatorio || 0) === 1,
     minSelect: Number(group.minimo_selecoes || 0),
     maxSelect: Number(group.maximo_selecoes || 1),
     sortOrder: Number(group.ordem_exibicao || 0),
-    active: Number(group.ativo || 0) === 1,
+    active: typeof group.ativo === "boolean" ? group.ativo : Number(group.ativo || 0) === 1,
     productIds: Array.isArray(group.links) ? group.links.map((link) => String(link.product_id)) : [],
     options: Array.isArray(group.options)
       ? group.options.map((option) => ({
@@ -198,7 +198,7 @@ function mapOptionGroup(group) {
           description: option.descricao || "",
           priceDelta: toNumber(option.preco_adicional),
           sortOrder: Number(option.ordem_exibicao || 0),
-          active: Number(option.ativo || 0) === 1
+          active: typeof option.ativo === "boolean" ? option.ativo : Number(option.ativo || 0) === 1
         }))
       : []
   };
@@ -474,7 +474,7 @@ export function AppProvider({ children }) {
     },
 
     addToCart(storeId, itemId, configuration = {}) {
-      let result = { ok: false, message: "Nao foi possivel adicionar o item." };
+      let result = { ok: false, message: "Não foi possível adicionar o item." };
 
       setState((prev) => {
         const incomingStore = prev.stores.find((store) => store.id === storeId);
@@ -635,7 +635,7 @@ export function AppProvider({ children }) {
 
     async approveFreePlanLead(leadId) {
       const token = state.sessions.superAdminToken;
-      if (!token) return { ok: false, message: "Sessao do admin nao encontrada." };
+      if (!token) return { ok: false, message: "Sessão do admin não encontrada." };
 
       await api.approveAdminLead(token, leadId);
       await hydrateAdminSession(token);
@@ -685,7 +685,7 @@ export function AppProvider({ children }) {
 
     async updateMerchantStoreProfile(storeId, payload) {
       const token = state.sessions.merchantToken;
-      if (!token) throw new Error("Sessao do lojista nao encontrada.");
+      if (!token) throw new Error("Sessão do lojista não encontrada.");
 
       await api.updateMerchantSettings(token, {
         whatsapp: payload.whatsapp,
@@ -701,14 +701,14 @@ export function AppProvider({ children }) {
 
     async upsertHomePromotion(storeId, payload, promotionId = null) {
       const token = state.sessions.merchantToken;
-      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+      if (!token) return { ok: false, message: "Sessão do lojista não encontrada." };
 
       const body = {
         title: payload.title,
         subtitle: payload.subtitle,
         button_label: payload.badge,
         product_id: Number(payload.itemId),
-        active: payload.active ? 1 : 0
+        active: payload.active
       };
 
       if (promotionId) {
@@ -723,7 +723,7 @@ export function AppProvider({ children }) {
 
     async deleteHomePromotion(promotionId) {
       const token = state.sessions.merchantToken;
-      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+      if (!token) return { ok: false, message: "Sessão do lojista não encontrada." };
 
       await api.deleteMerchantPromotion(token, promotionId);
       await hydrateMerchantSession(token);
@@ -732,7 +732,7 @@ export function AppProvider({ children }) {
 
     async upsertMenuItem(storeId, payload, itemId = null) {
       const token = state.sessions.merchantToken;
-      if (!token) throw new Error("Sessao do lojista nao encontrada.");
+      if (!token) throw new Error("Sessão do lojista não encontrada.");
 
       const body = {
         nome: payload.nome,
@@ -753,7 +753,7 @@ export function AppProvider({ children }) {
 
     async deleteMenuItem(itemId) {
       const token = state.sessions.merchantToken;
-      if (!token) throw new Error("Sessao do lojista nao encontrada.");
+      if (!token) throw new Error("Sessão do lojista não encontrada.");
 
       await api.deleteMerchantProduct(token, itemId);
       await hydrateMerchantSession(token);
@@ -761,24 +761,24 @@ export function AppProvider({ children }) {
 
     async upsertOptionGroup(storeId, payload, groupId = null) {
       const token = state.sessions.merchantToken;
-      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+      if (!token) return { ok: false, message: "Sessão do lojista não encontrada." };
 
       const body = {
         name: payload.name,
         description: payload.description,
         type: payload.type,
-        required: payload.required ? 1 : 0,
+        required: payload.required,
         min_select: Number(payload.minSelect || 0),
         max_select: Number(payload.maxSelect || 1),
         sort_order: Number(payload.sortOrder || 0),
-        active: payload.active ? 1 : 0,
+        active: payload.active,
         product_ids: (payload.productIds || []).map((id) => Number(id)),
         options: (payload.options || []).map((option, index) => ({
           name: option.name,
           description: option.description,
           price_delta: Number(option.priceDelta || 0),
           sort_order: Number(option.sortOrder || index + 1),
-          active: option.active ? 1 : 0
+          active: option.active
         }))
       };
 
@@ -794,7 +794,7 @@ export function AppProvider({ children }) {
 
     async deleteOptionGroup(groupId) {
       const token = state.sessions.merchantToken;
-      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+      if (!token) return { ok: false, message: "Sessão do lojista não encontrada." };
 
       await api.deleteMerchantOptionGroup(token, groupId);
       await hydrateMerchantSession(token);

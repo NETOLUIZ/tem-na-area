@@ -21,7 +21,7 @@ const STATUS_LABEL = {
   ACEITO: "Aceito",
   EM_PREPARO: "Em preparo",
   SAIU_PARA_ENTREGA: "Saiu",
-  CONCLUIDO: "Concluido",
+  CONCLUIDO: "Concluído",
   CANCELADO: "Cancelado",
   RECUSADO: "Recusado"
 };
@@ -32,13 +32,13 @@ function getRelativeTime(value) {
   const min = Math.floor(diff / 60000);
 
   if (min < 1) return "Agora mesmo";
-  if (min < 60) return `Ha ${min} min`;
+  if (min < 60) return `Há ${min} min`;
 
   const hours = Math.floor(min / 60);
-  if (hours < 24) return `Ha ${hours} h`;
+  if (hours < 24) return `Há ${hours} h`;
 
   const days = Math.floor(hours / 24);
-  return `Ha ${days} dia${days > 1 ? "s" : ""}`;
+  return `Há ${days} dia${days > 1 ? "s" : ""}`;
 }
 
 function getNextStatus(status) {
@@ -93,8 +93,8 @@ export default function MerchantOrdersPage() {
     return (
       <main className="container page-space">
         <div className="empty-state">
-          <h3>Loja nao encontrada</h3>
-          <p>Nao foi possivel carregar os pedidos dessa loja.</p>
+          <h3>Loja não encontrada</h3>
+          <p>Não foi possível carregar os pedidos dessa loja.</p>
           <Link className="btn btn-primary" to="/">Voltar para Home</Link>
         </div>
       </main>
@@ -119,9 +119,9 @@ export default function MerchantOrdersPage() {
       <header className="orders-v2-header">
         <div className="orders-v2-title-wrap">
           <h1>Pedidos</h1>
-          <p>Tem na Area Admin</p>
+          <p>Tem na Área Admin</p>
         </div>
-        <button className="orders-v2-bell" type="button" aria-label="Notificacoes">
+        <button className="orders-v2-bell" type="button" aria-label="Notificações">
           <MdNotificationsNone />
         </button>
       </header>
@@ -144,7 +144,7 @@ export default function MerchantOrdersPage() {
           <span><MdSearch /></span>
           <input
             type="text"
-            placeholder="Buscar por cliente ou codigo..."
+            placeholder="Buscar por cliente ou código..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -155,7 +155,7 @@ export default function MerchantOrdersPage() {
             <div className="orders-v2-empty">
               <div><MdReceiptLong /></div>
               <h3>Nenhum pedido encontrado</h3>
-              <p>Parece que nao ha pedidos para este filtro no momento.</p>
+              <p>Parece que não há pedidos para este filtro no momento.</p>
             </div>
           ) : (
             filtered.map((order) => (
@@ -208,10 +208,10 @@ export default function MerchantOrdersPage() {
         </div>
       </section>
 
-      <nav className="orders-v2-nav" aria-label="Navegacao do painel">
+      <nav className="orders-v2-nav" aria-label="Navegação do painel">
         <NavLink to={`/admin-loja/${storeId}`} end className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdDashboard /></span>
-          <small>Inicio</small>
+          <small>Início</small>
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/pedidos`} className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdReceiptLong /></span>
@@ -219,7 +219,7 @@ export default function MerchantOrdersPage() {
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/cardapio`} className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdRestaurantMenu /></span>
-          <small>Cardapio</small>
+          <small>Cardápio</small>
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/ajustes`} className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdSettings /></span>

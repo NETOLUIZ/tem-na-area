@@ -25,19 +25,19 @@ export default function SuperAdminDashboardPage() {
   ];
 
   return (
-    <AdminLayout title="Painel estrategico" subtitle="Super Admin" links={links} onLogout={actions.logoutSuperAdmin}>
+    <AdminLayout title="Painel estratégico" subtitle="Super Admin" links={links} onLogout={actions.logoutSuperAdmin}>
       <div className="prompt-dashboard-grid">
         <div className="prompt-donut-row">
           <DonutCard value={summary.lojas_ativas || 0} tone="cyan" label="Lojas ativas" />
-          <DonutCard value={summary.lojas_pendentes || 0} tone="amber" label="Pendencias" />
+          <DonutCard value={summary.lojas_pendentes || 0} tone="amber" label="Pendências" />
           <DonutCard value={summary.pedidos_30_dias || 0} tone="lime" label="Pedidos 30 dias" />
-          <DonutCard value={summary.solicitacoes_abertas || 0} tone="cyan" label="Solicitacoes abertas" />
+          <DonutCard value={summary.solicitacoes_abertas || 0} tone="cyan" label="Solicitações abertas" />
           <DonutCard value={summary.total_lojas || 0} tone="amber" label="Total de lojas" />
         </div>
 
         <section className="dashboard-panel neon-gap">
           <div className="section-title">
-            <h3>Solicitacoes recentes</h3>
+            <h3>Solicitações recentes</h3>
             <span>{state.adminRecentRequests.length} registros</span>
           </div>
           <div className="dashboard-mini-list">
@@ -51,7 +51,7 @@ export default function SuperAdminDashboardPage() {
                 <small>{request.status_pagamento}</small>
               </article>
             ))}
-            {!state.adminRecentRequests.length ? <p className="muted">Nenhuma solicitacao recente.</p> : null}
+            {!state.adminRecentRequests.length ? <p className="muted">Nenhuma solicitação recente.</p> : null}
           </div>
         </section>
       </div>

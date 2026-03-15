@@ -41,8 +41,8 @@ export default function MerchantSettingsPage() {
     return (
       <main className="container page-space">
         <div className="empty-state">
-          <h3>Loja nao encontrada</h3>
-          <p>Nao foi possivel carregar os ajustes dessa loja.</p>
+          <h3>Loja não encontrada</h3>
+          <p>Não foi possível carregar os ajustes dessa loja.</p>
           <Link className="btn btn-primary" to="/">Voltar para Home</Link>
         </div>
       </main>
@@ -67,7 +67,7 @@ export default function MerchantSettingsPage() {
           <div className="merchant-ui-hero-copy">
             <small>PAINEL DA LOJA / AJUSTES</small>
             <h1>Ajustes da Loja</h1>
-            <p>Atualize a vitrine publica, o canal de contato e a capa exibida para o cliente.</p>
+            <p>Atualize a vitrine pública, o canal de contato e a capa exibida para o cliente.</p>
           </div>
 
           <div className="merchant-ui-hero-actions">
@@ -114,7 +114,7 @@ export default function MerchantSettingsPage() {
                 </label>
 
                 <label>
-                  <span>Descricao curta</span>
+                  <span>Descrição curta</span>
                   <input
                     type="text"
                     placeholder="Resumo da loja"
@@ -127,10 +127,10 @@ export default function MerchantSettingsPage() {
                 </label>
 
                 <label>
-                  <span>Horario de funcionamento</span>
+                  <span>Horário de funcionamento</span>
                   <input
                     type="text"
-                    placeholder="Seg-Dom 10h as 22h"
+                    placeholder="Seg-Dom 10h às 22h"
                     value={form.horarioFuncionamento}
                     onChange={(e) => {
                       setSavedMessage("");
