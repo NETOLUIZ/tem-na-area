@@ -53,6 +53,9 @@ const corsOrigin = env.corsOrigin.trim() === "*"
 app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
 
+// Netlify encaminha a API por /api/* via redirect para a function.
+app.set("trust proxy", 1);
+
 registerHealthRoutes(app);
 registerAuthRoutes(app, { authService });
 registerPublicRoutes(app, {

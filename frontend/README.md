@@ -30,6 +30,16 @@ VITE_API_BASE_URL=https://SUA-API.onrender.com/api/v1
 
 O arquivo [vercel.json](c:/Users/acer/Documents/hublocal/frontend/vercel.json) ja aplica rewrite para o SPA funcionar em rotas internas.
 
+## Deploy no Netlify
+
+Se o frontend e a API forem para o mesmo site no Netlify, configure:
+
+```env
+VITE_API_BASE_URL=/api/api/v1
+```
+
+O [netlify.toml](c:/Users/acer/Documents/hublocal/netlify.toml) redireciona `/api/*` para `/.netlify/functions/api/*`.
+
 ## Estrutura principal
 
 - `src/`: telas, componentes, contexto e utilitarios.

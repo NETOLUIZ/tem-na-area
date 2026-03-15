@@ -39,9 +39,9 @@ npm run dev
 
 O frontend usa por padrao a API em `http://127.0.0.1:3001/api/v1`.
 
-## Deploy no Render
+## Deploy
 
-O repositorio ja inclui [render.yaml](c:/Users/acer/Documents/hublocal/render.yaml) para subir:
+Opcao 1:
 
 - a API Node no Render
 - o frontend no Vercel
@@ -65,6 +65,26 @@ Frontend no Vercel:
 
 1. Importe a pasta `frontend/`.
 2. Configure `VITE_API_BASE_URL` com a URL da API do Render seguida de `/api/v1`.
+
+Opcao 2:
+
+- frontend e API no Netlify
+- banco no Supabase
+
+Arquivos:
+
+- [netlify.toml](c:/Users/acer/Documents/hublocal/netlify.toml)
+- [netlify/functions/api.mjs](c:/Users/acer/Documents/hublocal/netlify/functions/api.mjs)
+
+No Netlify:
+
+1. Importe o repositorio.
+2. Use o arquivo `netlify.toml` da raiz.
+3. Defina `DATABASE_URL` com a conexao do Supabase.
+4. Defina `TEM_NA_AREA_APP_ENV=production`.
+5. Defina `TEM_NA_AREA_APP_KEY` com uma chave longa.
+6. Defina `CORS_ORIGIN=*`.
+7. Defina `VITE_API_BASE_URL=/api/api/v1`.
 
 ## Variaveis de ambiente
 
