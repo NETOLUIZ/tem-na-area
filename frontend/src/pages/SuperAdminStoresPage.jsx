@@ -11,6 +11,8 @@ export default function SuperAdminStoresPage() {
   const [categoryFilter, setCategoryFilter] = useState("TODAS");
   const [cityFilter, setCityFilter] = useState("");
   const [modal, setModal] = useState(null);
+  const [leadLoadingId, setLeadLoadingId] = useState(null);
+  const [leadError, setLeadError] = useState("");
 
   const links = [
     { to: "/admin-temnaarea", label: "Dashboard" },
@@ -36,16 +38,28 @@ export default function SuperAdminStoresPage() {
     { key: "createdAt", label: "Criada", render: (row) => formatDate(row.createdAt) },
     {
       key: "actions",
-      label: "Acoes",
+      label: "Ações",
       render: (row) => (
         <div className="inline-actions">
           {row.status === "PENDENTE" ? (
-            <button className="btn btn-primary" onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovação manual")}>Aprovar</button>
+            <button
+              className="btn btn-primary"
+              onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovação manual")}
+            >
+              Aprovar
+            </button>
           ) : null}
           {row.status === "BLOQUEADA" ? (
-            <button className="btn btn-outline" onClick={() => actions.superAdminAction("DESBLOQUEAR", row.id, "Desbloqueio")}>Desbloquear</button>
+            <button
+              className="btn btn-outline"
+              onClick={() => actions.superAdminAction("DESBLOQUEAR", row.id, "Desbloqueio")}
+            >
+              Desbloquear
+            </button>
           ) : (
-            <button className="btn btn-outline" onClick={() => setModal({ type: "BLOQUEAR", row })}>Bloquear</button>
+            <button className="btn btn-outline" onClick={() => setModal({ type: "BLOQUEAR", row })}>
+              Bloquear
+            </button>
           )}
         </div>
       )
@@ -66,8 +80,22 @@ export default function SuperAdminStoresPage() {
         row.publishedAsCard ? (
           <button className="btn btn-outline" disabled>Publicado</button>
         ) : (
-          <button className="btn btn-primary" onClick={() => actions.approveFreePlanLead(row.id)}>
-            Aprovar plano grátis
+          <button
+            className="btn btn-primary"
+            disabled={leadLoadingId === row.id}
+            onClick={async () => {
+              setLeadError("");
+              setLeadLoadingId(row.id);
+              try {
+                await actions.approveFreePlanLead(row.id);
+              } catch (error) {
+                setLeadError(error.message || "Não foi possível aprovar o plano grátis.");
+              } finally {
+                setLeadLoadingId(null);
+              }
+            }}
+          >
+            {leadLoadingId === row.id ? "Aprovando..." : "Aprovar plano grátis"}
           </button>
         )
       )
@@ -130,6 +158,7 @@ export default function SuperAdminStoresPage() {
           <h3>Solicitações do plano grátis</h3>
           <span>{state.contactLeads.length} pedidos</span>
         </div>
+        {leadError ? <p className="error-text">{leadError}</p> : null}
         <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitação do plano grátis cadastrada." />
       </section>
 

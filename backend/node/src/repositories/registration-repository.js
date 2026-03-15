@@ -150,7 +150,7 @@ export class RegistrationRepository {
           endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro, endereco_cidade, endereco_estado,
           horario_funcionamento, modo_operacao, status_loja, destaque_home, aceita_pedidos,
           aprovado_por_admin_id, aprovado_em
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'WHATSAPP_ONLY', 'ATIVA', 0, 0, ?, NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'WHATSAPP_ONLY', 'ATIVA', FALSE, FALSE, ?, NOW())
       `,
       [
         uuid(),
@@ -183,7 +183,7 @@ export class RegistrationRepository {
         INSERT INTO cards_home (
           loja_id, titulo_exibicao, subtitulo_exibicao, descricao_curta, imagem_url,
           botao_label, link_destino, tipo_card, ordem_exibicao, ativo, data_inicio
-        ) VALUES (?, ?, ?, ?, ?, 'Chamar no WhatsApp', ?, 'WHATSAPP', 0, 1, NOW())
+        ) VALUES (?, ?, ?, ?, ?, 'Chamar no WhatsApp', ?, 'WHATSAPP', 0, TRUE, NOW())
       `,
       [
         storeId,
