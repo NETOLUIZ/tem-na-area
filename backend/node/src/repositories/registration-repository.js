@@ -1,6 +1,10 @@
 import { protocol, slugify, uuid } from "../lib/strings.js";
 import crypto from "node:crypto";
 
+function getInsertedId(result) {
+  return result?.insertId != null ? Number(result.insertId) : null;
+}
+
 export class RegistrationRepository {
   constructor(db) {
     this.db = db;
@@ -108,6 +112,7 @@ export class RegistrationRepository {
             uuid, nome, email, telefone, whatsapp, senha_hash, tipo_usuario, status,
             email_verificado_em, telefone_verificado_em
           ) VALUES (?, ?, ?, ?, ?, ?, 'DONO_LOJA', 'ATIVO', NOW(), NOW())
+          RETURNING id
         `,
         [
           uuid(),
@@ -118,7 +123,11 @@ export class RegistrationRepository {
           crypto.createHash("sha256").update(protocol("TMP")).digest("hex")
         ]
       );
-      ownerUserId = userResult.insertId;
+      ownerUserId = getInsertedId(userResult);
+    }
+
+    if (!ownerUserId) {
+      throw new Error("Falha ao criar o usuario do responsavel para este lead.");
     }
 
     const [ownerRows] = await connection.execute("SELECT id FROM donos_loja WHERE usuario_id = ? LIMIT 1", [ownerUserId]);
@@ -128,10 +137,15 @@ export class RegistrationRepository {
         `
           INSERT INTO donos_loja (usuario_id, nome_fantasia, razao_social, cpf_cnpj, data_adesao)
           VALUES (?, ?, ?, ?, NOW())
+          RETURNING id
         `,
         [ownerUserId, lead.nome_empresa, lead.nome_empresa, lead.cpf_cnpj || null]
       );
-      ownerId = ownerResult.insertId;
+      ownerId = getInsertedId(ownerResult);
+    }
+
+    if (!ownerId) {
+      throw new Error("Falha ao criar o cadastro do dono da loja.");
     }
 
     const slugBase = slugify(lead.nome_empresa);
@@ -151,6 +165,7 @@ export class RegistrationRepository {
           horario_funcionamento, modo_operacao, status_loja, destaque_home, aceita_pedidos,
           aprovado_por_admin_id, aprovado_em
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'WHATSAPP_ONLY', 'ATIVA', FALSE, FALSE, ?, NOW())
+        RETURNING id
       `,
       [
         uuid(),
@@ -176,7 +191,11 @@ export class RegistrationRepository {
         adminId
       ]
     );
-    const storeId = storeResult.insertId;
+    const storeId = getInsertedId(storeResult);
+
+    if (!storeId) {
+      throw new Error("Falha ao criar a loja ao aprovar o lead.");
+    }
 
     await connection.execute(
       `
