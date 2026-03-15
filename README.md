@@ -3,7 +3,7 @@
 Projeto separado em duas partes:
 
 - `frontend/`: aplicacao React com Vite.
-- `backend/`: API Node.js, API PHP legada e scripts SQL do MySQL.
+- `backend/`: API Node.js e scripts SQL do MySQL.
 
 ## Estrutura
 
@@ -16,7 +16,6 @@ hublocal/
     vite.config.js
   backend/
     node/
-    php/
     database/
 ```
 
@@ -44,7 +43,6 @@ O frontend usa por padrao a API em `http://127.0.0.1:3001/api/v1`.
 
 - `frontend/.env.example`
 - `backend/node/.env.example`
-- `backend/php/.env.example`
 
 ## Banco
 
@@ -66,9 +64,5 @@ O arquivo `tem_na_area_addons.sql` adiciona os recursos novos do painel:
 
 Em `.github/workflows`:
 
-- `ci.yml`: build do frontend, validacao do backend Node e lint do PHP
+- `ci.yml`: build do frontend e validacao do backend Node
 - `frontend-pages.yml`: deploy opcional do frontend estatico via GitHub Pages
-
-## Observacao
-
-Os arquivos `project-export.*` e `merchant-admin-export.*` foram mantidos na raiz como material de referencia do projeto.

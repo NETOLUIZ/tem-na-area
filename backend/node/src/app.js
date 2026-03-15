@@ -21,7 +21,7 @@ import { CatalogService } from "./services/catalog-service.js";
 import { OrderService } from "./services/order-service.js";
 import { RegistrationService } from "./services/registration-service.js";
 
-// A aplicacao usa os mesmos contratos do backend PHP para reduzir impacto no frontend.
+// A aplicacao preserva os contratos da API atual para reduzir impacto no frontend.
 const authToken = new AuthToken(env.appKey);
 const auth = createAuthMiddleware(authToken);
 

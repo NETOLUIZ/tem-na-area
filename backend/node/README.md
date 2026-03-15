@@ -1,6 +1,6 @@
 # Tem na Area Node API
 
-Backend em Node.js para o projeto `Tem na Area`, mantendo as mesmas rotas `/api/v1` do backend PHP e o mesmo banco MySQL.
+Backend em Node.js para o projeto `Tem na Area`, mantendo as rotas `/api/v1` usadas pelo frontend e o mesmo banco MySQL.
 
 ## Comandos
 

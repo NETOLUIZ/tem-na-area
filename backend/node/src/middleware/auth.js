@@ -12,14 +12,6 @@ export function createAuthMiddleware(token) {
   }
 
   return {
-    requireUser(req, _res, next) {
-      try {
-        req.auth = readUser(req);
-        next();
-      } catch (error) {
-        next(error);
-      }
-    },
     requireRole(...roles) {
       return (req, _res, next) => {
         try {
