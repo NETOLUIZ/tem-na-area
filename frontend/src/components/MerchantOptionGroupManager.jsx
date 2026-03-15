@@ -139,10 +139,10 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
         </label>
 
         <label className="menu-builder-field">
-          <span>Descricao para o cliente</span>
+          <span>Descrição para o cliente</span>
           <textarea
             rows={3}
-            placeholder="Ex: selecione uma opcao"
+            placeholder="Ex: selecione uma opção"
             value={form.description}
             onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
           />
@@ -159,7 +159,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
           </label>
 
           <label className="menu-builder-field">
-            <span>Ordem de exibicao</span>
+            <span>Ordem de exibição</span>
             <input
               type="number"
               min="0"
@@ -173,21 +173,21 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
         {form.type !== "text" ? (
           <div className="menu-v2-grid2">
             <label className="menu-builder-field">
-              <span>Quantidade minima</span>
+              <span>Quantidade mínima</span>
               <input
                 type="number"
                 min="0"
-                placeholder="Minimo de escolhas"
+                placeholder="Mínimo de escolhas"
                 value={form.minSelect}
                 onChange={(e) => setForm((prev) => ({ ...prev, minSelect: e.target.value }))}
               />
             </label>
             <label className="menu-builder-field">
-              <span>Quantidade maxima</span>
+              <span>Quantidade máxima</span>
               <input
                 type="number"
                 min="1"
-                placeholder="Maximo de escolhas"
+                placeholder="Máximo de escolhas"
                 value={form.maxSelect}
                 onChange={(e) => setForm((prev) => ({ ...prev, maxSelect: e.target.value }))}
               />
@@ -197,7 +197,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
 
         <div className="menu-builder-toggles">
           <label className="menu-v2-toggle">
-            <span>Obrigatorio</span>
+            <span>Obrigatório</span>
             <input type="checkbox" checked={form.required} onChange={(e) => setForm((prev) => ({ ...prev, required: e.target.checked }))} />
             <small />
           </label>
@@ -230,7 +230,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
             <div className="menu-builder-options-head">
               <strong>Opcoes do grupo</strong>
               <button type="button" className="btn btn-outline" onClick={addOption}>
-                <MdAdd /> Adicionar opcao
+                <MdAdd /> Adicionar opção
               </button>
             </div>
 
@@ -238,7 +238,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
               <div key={`${option.id || "new"}-${index}`} className="menu-builder-option-card">
                 <div className="menu-v2-grid2">
                   <label className="menu-builder-field">
-                    <span>Nome da opcao</span>
+                    <span>Nome da opção</span>
                     <input
                       placeholder="Ex: Grande"
                       value={option.name}
@@ -247,7 +247,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
                     />
                   </label>
                   <label className="menu-builder-field">
-                    <span>Preco adicional</span>
+                    <span>Preço adicional</span>
                     <input
                       type="number"
                       step="0.01"
@@ -259,7 +259,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
                 </div>
 
                 <label className="menu-builder-field">
-                  <span>Descricao curta da opcao</span>
+                  <span>Descrição curta da opção</span>
                   <input
                     placeholder="Ex: serve 2 pessoas"
                     value={option.description}
@@ -269,7 +269,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
 
                 <div className="menu-v2-grid2">
                   <label className="menu-builder-field">
-                    <span>Ordem da opcao</span>
+                    <span>Ordem da opção</span>
                     <input
                       type="number"
                       min="1"
@@ -291,7 +291,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
 
                 {form.options.length > 1 ? (
                   <button type="button" className="menu-builder-remove-option" onClick={() => removeOption(index)}>
-                    <MdDelete /> Remover opcao
+                    <MdDelete /> Remover opção
                   </button>
                 ) : null}
               </div>
@@ -326,7 +326,7 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
                 <div className="menu-builder-group-headline">
                   <div>
                     <h3>{group.name}</h3>
-                    <p>{GROUP_TYPE_LABEL[group.type]} · {group.required ? "Obrigatorio" : "Opcional"}</p>
+                    <p>{GROUP_TYPE_LABEL[group.type]} · {group.required ? "Obrigatório" : "Opcional"}</p>
                   </div>
                   <span className="tag">{group.productIds.length} produto(s)</span>
                 </div>

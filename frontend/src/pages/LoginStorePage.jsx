@@ -78,7 +78,7 @@ export default function LoginStorePage() {
         <div className="login-v2-hero" />
 
         <h2>Bem-vindo de volta</h2>
-        <p>Gerencie sua presenca local com a identidade do seu bairro.</p>
+        <p>Gerencie sua presença local com a identidade do seu bairro.</p>
 
         {error ? <p className="error-text">{error}</p> : null}
 
@@ -131,7 +131,7 @@ export default function LoginStorePage() {
         </div>
 
         <p className="login-v2-foot">
-          Nao tem cadastro? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar loja</Link>
+          Não tem cadastro? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar loja</Link>
         </p>
       </section>
     </main>

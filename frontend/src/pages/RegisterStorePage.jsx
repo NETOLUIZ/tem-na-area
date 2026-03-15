@@ -15,7 +15,7 @@ const initial = {
   rua: "",
   bairro: "",
   cidade: "",
-  horarioFuncionamento: "Seg-Dom 10h s 22h",
+  horarioFuncionamento: "Seg-Dom 10h às 22h",
   logo: "",
   capa: "",
   observacoes: ""
@@ -23,16 +23,16 @@ const initial = {
 
 const PLAN_DETAILS = {
   free: {
-    label: "Plano grtis",
-    price: "R$ 0/ms",
+    label: "Plano grátis",
+    price: "R$ 0/mês",
     description: "Card simples na home com clique direto no WhatsApp.",
-    benefits: ["Cadastro rpido", "Aprovao pelo super admin", "Publicao como card de WhatsApp"]
+    benefits: ["Cadastro rápido", "Aprovação pelo super admin", "Publicação como card de WhatsApp"]
   },
   paid: {
     label: "Plano pago",
-    price: "R$ 49,90/ms",
-    description: "Loja completa com painel, produtos, banner e cardpio.",
-    benefits: ["Painel administrativo", "Cadastro de produtos e promoes", "Loja publicada na plataforma"]
+    price: "R$ 49,90/mês",
+    description: "Loja completa com painel, produtos, banner e cardápio.",
+    benefits: ["Painel administrativo", "Cadastro de produtos e promoções", "Loja publicada na plataforma"]
   }
 };
 
@@ -42,11 +42,11 @@ function getTotalSteps(mode) {
 
 function getStepTitle(mode, step) {
   if (mode === "free") {
-    return step === 1 ? "Escolha do plano" : "Dados bsicos";
+    return step === 1 ? "Escolha do plano" : "Dados básicos";
   }
 
   if (step === 1) return "Escolha do plano";
-  if (step === 2) return "Confirmao do pagamento";
+  if (step === 2) return "Confirmação do pagamento";
   if (step === 3) return "Conta da empresa";
   return "Dados da loja";
 }
@@ -165,11 +165,11 @@ export default function RegisterStorePage() {
       </section>
 
       <main className="register-v2-main">
-        <h2>{form.mode === "paid" ? "Escolha um plano" : "Plano grtis"}</h2>
+        <h2>{form.mode === "paid" ? "Escolha um plano" : "Plano grátis"}</h2>
         <p>
           {form.mode === "paid"
             ? "No plano pago a empresa confirma o pagamento, cria a conta e depois configura a loja completa no painel."
-            : "No plano grtis a empresa envia uma solicitao simples. Depois da aprovao, o sistema publica um card com clique direto no WhatsApp."}
+            : "No plano grátis a empresa envia uma solicitação simples. Depois da aprovação, o sistema publica um card com clique direto no WhatsApp."}
         </p>
 
         {success ? (
@@ -228,7 +228,7 @@ export default function RegisterStorePage() {
           {form.mode === "free" && currentStep === 2 ? (
             <>
               <label>
-                <span>Nome do negcio</span>
+                <span>Nome do negócio</span>
                 <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
               </label>
 
@@ -237,7 +237,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Servio</option>
+                    <option value="servico">Serviço</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -253,13 +253,13 @@ export default function RegisterStorePage() {
                   <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} />
                 </label>
                 <label>
-                  <span>Descrio rpida</span>
+                  <span>Descrição rápida</span>
                   <input value={form.observacoes} onChange={(event) => updateField("observacoes", event.target.value)} />
                 </label>
               </div>
 
               <div className="register-v2-note">
-                <strong>Fluxo do plano grtis:</strong>
+                <strong>Fluxo do plano grátis:</strong>
                 <span>O super admin aprova o pedido e o sistema cria automaticamente um card simples na home. O clique nesse card abre o WhatsApp.</span>
               </div>
             </>
@@ -275,7 +275,7 @@ export default function RegisterStorePage() {
                 <p>Com o pagamento aprovado, o cadastro da conta e da loja  liberado imediatamente.</p>
                 <ul className="register-v2-benefits">
                   <li>Banner da loja</li>
-                  <li>Produtos e cardpio</li>
+                  <li>Produtos e cardápio</li>
                   <li>Painel administrativo da empresa</li>
                 </ul>
               </div>
@@ -321,7 +321,7 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Descrio curta</span>
+                <span>Descrição curta</span>
                 <textarea value={form.descricaoCurta} onChange={(event) => updateField("descricaoCurta", event.target.value)} required />
               </label>
             </>
@@ -334,7 +334,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Servio</option>
+                    <option value="servico">Serviço</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -356,7 +356,7 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Horrio de funcionamento</span>
+                <span>Horário de funcionamento</span>
                 <input value={form.horarioFuncionamento} onChange={(event) => updateField("horarioFuncionamento", event.target.value)} />
               </label>
 
@@ -384,11 +384,11 @@ export default function RegisterStorePage() {
                 onClick={handleAdvance}
                 disabled={loading || (form.mode === "paid" && currentStep === 2 && !paymentConfirmed)}
               >
-                Avanar <MdArrowForward />
+                Avançar <MdArrowForward />
               </button>
             ) : (
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Enviando..." : form.mode === "free" ? "Enviar solicitao" : "Criar conta da empresa"}
+                {loading ? "Enviando..." : form.mode === "free" ? "Enviar solicitação" : "Criar conta da empresa"}
               </button>
             )}
           </div>
