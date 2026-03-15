@@ -1,0 +1,41 @@
+import { Navigate, Outlet, useParams } from "react-router-dom";
+import { useApp } from "../store/AppContext";
+
+// Resolve a entrada curta do admin da loja e redireciona para a loja logada.
+export function MerchantEntryRoute() {
+  const { state } = useApp();
+
+  if (!state.sessions.merchantStoreId) {
+    return <Navigate to="/login-loja" replace />;
+  }
+
+  return <Navigate to={`/admin-loja/${state.sessions.merchantStoreId}`} replace />;
+}
+
+// Garante que a rota privada da loja so abra para a sessao correta.
+export function MerchantProtectedRoute() {
+  const { state } = useApp();
+  const params = useParams();
+
+  if (!state.sessions.merchantStoreId) {
+    return <Navigate to="/login-loja" replace />;
+  }
+
+  if (params.storeId && params.storeId !== state.sessions.merchantStoreId) {
+    return <Navigate to={`/admin-loja/${state.sessions.merchantStoreId}`} replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Bloqueia o painel global ate o super admin autenticar.
+export function SuperAdminProtectedRoute() {
+  const { state } = useApp();
+
+  if (!state.sessions.superAdmin) {
+    return <Navigate to="/admin-temnaarea/login" replace />;
+  }
+
+  return <Outlet />;
+}
+
