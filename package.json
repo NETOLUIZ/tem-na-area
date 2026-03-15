@@ -4,6 +4,9 @@
   "engines": {
     "node": "20.x"
   },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
+  },
   "workspaces": [
     "frontend",
     "backend/node"
