@@ -1,0 +1,12 @@
+{
+  "name": "tem-na-area-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend/node"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace frontend",
+    "check:api": "npm run check --workspace backend/node"
+  }
+}
