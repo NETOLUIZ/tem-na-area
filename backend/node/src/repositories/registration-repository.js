@@ -1,4 +1,5 @@
 import { protocol, slugify, uuid } from "../lib/strings.js";
+import crypto from "node:crypto";
 
 export class RegistrationRepository {
   constructor(db) {
@@ -106,7 +107,7 @@ export class RegistrationRepository {
           INSERT INTO usuarios (
             uuid, nome, email, telefone, whatsapp, senha_hash, tipo_usuario, status,
             email_verificado_em, telefone_verificado_em
-          ) VALUES (?, ?, ?, ?, ?, SHA2(?, 256), 'DONO_LOJA', 'ATIVO', NOW(), NOW())
+          ) VALUES (?, ?, ?, ?, ?, ?, 'DONO_LOJA', 'ATIVO', NOW(), NOW())
         `,
         [
           uuid(),
@@ -114,7 +115,7 @@ export class RegistrationRepository {
           lead.email || `lead-${leadId}@temnaarea.local`,
           lead.telefone || lead.whatsapp,
           lead.whatsapp,
-          protocol("TMP")
+          crypto.createHash("sha256").update(protocol("TMP")).digest("hex")
         ]
       );
       ownerUserId = userResult.insertId;

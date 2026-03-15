@@ -14,7 +14,11 @@ export class PromotionRepository {
           p.preco,
           p.preco_promocional
         FROM cards_home ch
-        LEFT JOIN produtos p ON p.id = CAST(ch.link_destino AS UNSIGNED)
+        LEFT JOIN produtos p
+          ON p.id = CASE
+            WHEN ch.link_destino ~ '^[0-9]+$' THEN CAST(ch.link_destino AS BIGINT)
+            ELSE NULL
+          END
         WHERE ch.loja_id = ?
           AND ch.tipo_card = 'PROMOCAO'
         ORDER BY ch.created_at DESC, ch.id DESC

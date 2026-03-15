@@ -112,10 +112,9 @@ export class OptionGroupRepository {
   async delete(storeId, groupId) {
     await this.db.execute(
       `
-        DELETE pog
-        FROM product_option_groups pog
-        WHERE pog.id = ?
-          AND pog.loja_id = ?
+        DELETE FROM product_option_groups
+        WHERE id = ?
+          AND loja_id = ?
       `,
       [groupId, storeId]
     );

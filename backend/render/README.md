@@ -2,11 +2,10 @@
 
 Arquivos usados no deploy:
 
-- `../../render.yaml`: blueprint com MySQL, API Node e frontend.
-- `./mysql/Dockerfile`: imagem do MySQL 8 com import inicial do schema.
+- `../../render.yaml`: blueprint com Postgres gratis, API Node e frontend.
+- `../../backend/database/tem_na_area_postgres.sql`: schema inicial usado no bootstrap da API.
 
 ## Observacoes
 
-- O MySQL carrega os arquivos SQL apenas na primeira inicializacao do volume.
-- Se recriar o banco do zero, apague o service e o disk para forcar uma nova inicializacao.
-- A API Node recebe host, porta e credenciais do banco via `fromService` no Blueprint.
+- A API sobe e garante o schema minimo no primeiro start.
+- O blueprint atual foi ajustado para caber no plano gratis usando Postgres gerenciado do Render.

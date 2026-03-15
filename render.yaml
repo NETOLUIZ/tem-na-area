@@ -1,28 +1,14 @@
-services:
-  - type: pserv
-    name: tem-na-area-mysql-netoluiz
-    runtime: docker
-    dockerfilePath: ./backend/render/mysql/Dockerfile
-    dockerContext: .
-    envVars:
-      - key: PORT
-        value: "3306"
-      - key: MYSQL_DATABASE
-        value: tem_na_area
-      - key: MYSQL_USER
-        value: tem_na_area_user
-      - key: MYSQL_PASSWORD
-        generateValue: true
-      - key: MYSQL_ROOT_PASSWORD
-        generateValue: true
-    disk:
-      name: mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 10
+databases:
+  - name: tem-na-area-db-netoluiz
+    databaseName: tem_na_area
+    user: tem_na_area_user
+    plan: free
 
+services:
   - type: web
     name: tem-na-area-api-netoluiz
     runtime: node
+    plan: free
     rootDir: backend/node
     buildCommand: npm ci
     startCommand: npm start
@@ -34,28 +20,10 @@ services:
         value: https://tem-na-area-api-netoluiz.onrender.com
       - key: TEM_NA_AREA_APP_KEY
         generateValue: true
-      - key: TEM_NA_AREA_DB_HOST
-        fromService:
-          type: pserv
-          name: tem-na-area-mysql-netoluiz
-          property: host
-      - key: TEM_NA_AREA_DB_PORT
-        value: "3306"
-      - key: TEM_NA_AREA_DB_NAME
-        fromService:
-          type: pserv
-          name: tem-na-area-mysql-netoluiz
-          envVarKey: MYSQL_DATABASE
-      - key: TEM_NA_AREA_DB_USER
-        fromService:
-          type: pserv
-          name: tem-na-area-mysql-netoluiz
-          envVarKey: MYSQL_USER
-      - key: TEM_NA_AREA_DB_PASS
-        fromService:
-          type: pserv
-          name: tem-na-area-mysql-netoluiz
-          envVarKey: MYSQL_PASSWORD
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tem-na-area-db-netoluiz
+          property: connectionString
       - key: CORS_ORIGIN
         value: "*"
 

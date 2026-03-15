@@ -1,6 +1,6 @@
 # Tem na Area Node API
 
-Backend em Node.js para o projeto `Tem na Area`, mantendo as rotas `/api/v1` usadas pelo frontend e o mesmo banco MySQL.
+Backend em Node.js para o projeto `Tem na Area`, mantendo as rotas `/api/v1` usadas pelo frontend e usando Postgres.
 
 ## Comandos
 
@@ -13,11 +13,7 @@ npm start
 ## Variaveis de ambiente
 
 ```env
-TEM_NA_AREA_DB_HOST=127.0.0.1
-TEM_NA_AREA_DB_PORT=3306
-TEM_NA_AREA_DB_NAME=tem_na_area
-TEM_NA_AREA_DB_USER=root
-TEM_NA_AREA_DB_PASS=
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/tem_na_area
 TEM_NA_AREA_APP_ENV=local
 TEM_NA_AREA_APP_URL=http://127.0.0.1:3001
 TEM_NA_AREA_APP_KEY=troque-esta-chave
@@ -62,10 +58,8 @@ CORS_ORIGIN=http://localhost:5173
 
 ## Banco
 
-Importe nesta ordem:
+O backend inicializa automaticamente o schema minimo do Postgres usando:
 
 ```txt
-../database/tem_na_area_mysql.sql
-../database/tem_na_area_seed.sql
-../database/tem_na_area_addons.sql
+../database/tem_na_area_postgres.sql
 ```

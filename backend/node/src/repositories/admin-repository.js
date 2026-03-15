@@ -10,8 +10,8 @@ export class AdminRepository {
         (SELECT COUNT(*) FROM lojas WHERE status_loja = 'ATIVA' AND deleted_at IS NULL) AS lojas_ativas,
         (SELECT COUNT(*) FROM lojas WHERE status_loja = 'PENDENTE' AND deleted_at IS NULL) AS lojas_pendentes,
         (SELECT COUNT(*) FROM solicitacoes_cadastro WHERE status_solicitacao IN ('PENDENTE', 'EM_ANALISE', 'AGUARDANDO_PAGAMENTO')) AS solicitacoes_abertas,
-        (SELECT COUNT(*) FROM pedidos WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS pedidos_30_dias,
-        (SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS faturamento_30_dias
+        (SELECT COUNT(*) FROM pedidos WHERE created_at >= NOW() - INTERVAL '30 days') AS pedidos_30_dias,
+        (SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE created_at >= NOW() - INTERVAL '30 days') AS faturamento_30_dias
     `);
 
     const [recentRows] = await this.db.query(`
