@@ -1,8 +1,16 @@
 import { protocol, slugify, uuid } from "../lib/strings.js";
 import crypto from "node:crypto";
 
-function getInsertedId(result) {
-  return result?.insertId != null ? Number(result.insertId) : null;
+function getInsertedId(rows, meta) {
+  if (Array.isArray(rows) && rows[0]?.id != null) {
+    return Number(rows[0].id);
+  }
+
+  if (meta?.insertId != null) {
+    return Number(meta.insertId);
+  }
+
+  return null;
 }
 
 export class RegistrationRepository {
@@ -106,7 +114,7 @@ export class RegistrationRepository {
     // Ao aprovar um lead gratis, a API cria a cadeia minima usuario > dono > loja.
     let ownerUserId = lead.usuario_id ? Number(lead.usuario_id) : null;
     if (!ownerUserId) {
-      const [userResult] = await connection.execute(
+      const [userRows, userMeta] = await connection.execute(
         `
           INSERT INTO usuarios (
             uuid, nome, email, telefone, whatsapp, senha_hash, tipo_usuario, status,
@@ -123,7 +131,7 @@ export class RegistrationRepository {
           crypto.createHash("sha256").update(protocol("TMP")).digest("hex")
         ]
       );
-      ownerUserId = getInsertedId(userResult);
+      ownerUserId = getInsertedId(userRows, userMeta);
     }
 
     if (!ownerUserId) {
@@ -133,7 +141,7 @@ export class RegistrationRepository {
     const [ownerRows] = await connection.execute("SELECT id FROM donos_loja WHERE usuario_id = ? LIMIT 1", [ownerUserId]);
     let ownerId = ownerRows[0]?.id || null;
     if (!ownerId) {
-      const [ownerResult] = await connection.execute(
+      const [ownerRowsInserted, ownerMeta] = await connection.execute(
         `
           INSERT INTO donos_loja (usuario_id, nome_fantasia, razao_social, cpf_cnpj, data_adesao)
           VALUES (?, ?, ?, ?, NOW())
@@ -141,7 +149,7 @@ export class RegistrationRepository {
         `,
         [ownerUserId, lead.nome_empresa, lead.nome_empresa, lead.cpf_cnpj || null]
       );
-      ownerId = getInsertedId(ownerResult);
+      ownerId = getInsertedId(ownerRowsInserted, ownerMeta);
     }
 
     if (!ownerId) {
@@ -156,7 +164,7 @@ export class RegistrationRepository {
       counter += 1;
     }
 
-    const [storeResult] = await connection.execute(
+    const [storeRows, storeMeta] = await connection.execute(
       `
         INSERT INTO lojas (
           uuid, dono_loja_id, plano_id, solicitacao_cadastro_id, nome, slug, categoria_principal,
@@ -191,7 +199,7 @@ export class RegistrationRepository {
         adminId
       ]
     );
-    const storeId = getInsertedId(storeResult);
+    const storeId = getInsertedId(storeRows, storeMeta);
 
     if (!storeId) {
       throw new Error("Falha ao criar a loja ao aprovar o lead.");
