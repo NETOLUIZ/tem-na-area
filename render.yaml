@@ -1,0 +1,77 @@
+services:
+  - type: pserv
+    name: tem-na-area-mysql-netoluiz
+    runtime: docker
+    dockerfilePath: ./backend/render/mysql/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PORT
+        value: "3306"
+      - key: MYSQL_DATABASE
+        value: tem_na_area
+      - key: MYSQL_USER
+        value: tem_na_area_user
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+
+  - type: web
+    name: tem-na-area-api-netoluiz
+    runtime: node
+    rootDir: backend/node
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: TEM_NA_AREA_APP_ENV
+        value: production
+      - key: TEM_NA_AREA_APP_URL
+        value: https://tem-na-area-api-netoluiz.onrender.com
+      - key: TEM_NA_AREA_APP_KEY
+        generateValue: true
+      - key: TEM_NA_AREA_DB_HOST
+        fromService:
+          type: pserv
+          name: tem-na-area-mysql-netoluiz
+          property: host
+      - key: TEM_NA_AREA_DB_PORT
+        value: "3306"
+      - key: TEM_NA_AREA_DB_NAME
+        fromService:
+          type: pserv
+          name: tem-na-area-mysql-netoluiz
+          envVarKey: MYSQL_DATABASE
+      - key: TEM_NA_AREA_DB_USER
+        fromService:
+          type: pserv
+          name: tem-na-area-mysql-netoluiz
+          envVarKey: MYSQL_USER
+      - key: TEM_NA_AREA_DB_PASS
+        fromService:
+          type: pserv
+          name: tem-na-area-mysql-netoluiz
+          envVarKey: MYSQL_PASSWORD
+      - key: CORS_ORIGIN
+        value: "*"
+
+  - type: web
+    name: tem-na-area-frontend-netoluiz
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && VITE_API_BASE_URL=https://$API_HOST/api/v1 npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: API_HOST
+        fromService:
+          type: web
+          name: tem-na-area-api-netoluiz
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

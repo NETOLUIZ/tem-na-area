@@ -39,6 +39,29 @@ npm run dev
 
 O frontend usa por padrao a API em `http://127.0.0.1:3001/api/v1`.
 
+## Deploy no Render
+
+O repositório já inclui [render.yaml](c:/Users/acer/Documents/hublocal/render.yaml) para subir:
+
+- um MySQL privado com disco persistente
+- a API Node
+- o frontend estático
+
+Arquivos de apoio:
+
+- [render.yaml](c:/Users/acer/Documents/hublocal/render.yaml)
+- [backend/render/mysql/Dockerfile](c:/Users/acer/Documents/hublocal/backend/render/mysql/Dockerfile)
+
+No Render:
+
+1. Conecte este repositório em `Blueprints`.
+2. Revise os nomes dos serviços e confirme a criação.
+3. Aguarde primeiro o MySQL inicializar com o schema.
+4. Depois valide a API em `/api/v1/health`.
+
+O setup usa MySQL em `private service` com disco persistente, conforme a documentação oficial do Render.
+O frontend recebe o hostname externo da API pelo próprio Blueprint e monta `https://.../api/v1` no build.
+
 ## Variaveis de ambiente
 
 - `frontend/.env.example`

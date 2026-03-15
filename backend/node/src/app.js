@@ -46,7 +46,11 @@ const adminService = new AdminService(storeRepository);
 
 export const app = express();
 
-app.use(cors({ origin: env.corsOrigin.split(",").map((item) => item.trim()) }));
+const corsOrigin = env.corsOrigin.trim() === "*"
+  ? true
+  : env.corsOrigin.split(",").map((item) => item.trim());
+
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
 
 registerHealthRoutes(app);
