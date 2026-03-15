@@ -8,7 +8,7 @@ export class StoreRepository {
       SELECT id, codigo, nome, descricao, tipo_exibicao, preco_mensal, permite_cardapio,
              permite_produtos, permite_pedidos, permite_relatorios, limite_produtos, limite_banners
       FROM planos
-      WHERE ativo = 1
+      WHERE ativo = TRUE
       ORDER BY preco_mensal ASC, nome ASC
     `);
     return rows;
@@ -35,7 +35,7 @@ export class StoreRepository {
         l.whatsapp
       FROM cards_home ch
       INNER JOIN lojas l ON l.id = ch.loja_id
-      WHERE ch.ativo = 1
+      WHERE ch.ativo = TRUE
         AND l.deleted_at IS NULL
         AND (ch.data_inicio IS NULL OR ch.data_inicio <= NOW())
         AND (ch.data_fim IS NULL OR ch.data_fim >= NOW())

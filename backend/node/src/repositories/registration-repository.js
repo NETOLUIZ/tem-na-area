@@ -7,7 +7,7 @@ export class RegistrationRepository {
   }
 
   async planByCode(code) {
-    const [rows] = await this.db.execute("SELECT * FROM planos WHERE codigo = ? AND ativo = 1 LIMIT 1", [code]);
+    const [rows] = await this.db.execute("SELECT * FROM planos WHERE codigo = ? AND ativo = TRUE LIMIT 1", [code]);
     return rows[0] || null;
   }
 
