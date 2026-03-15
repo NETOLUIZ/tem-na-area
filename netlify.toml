@@ -1,5 +1,5 @@
 [build]
-  command = "npm ci --include=optional && npm run build"
+  command = "npm ci && npm ci --include=optional --prefix frontend && npm run build --workspace frontend"
   publish = "frontend/dist"
   functions = "netlify/functions"
 
