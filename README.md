@@ -43,23 +43,28 @@ O frontend usa por padrao a API em `http://127.0.0.1:3001/api/v1`.
 
 O repositorio ja inclui [render.yaml](c:/Users/acer/Documents/hublocal/render.yaml) para subir:
 
-- um Postgres gratis do Render
-- a API Node
-- o frontend estatico
+- a API Node no Render
+- o frontend no Vercel
+- o banco no Supabase
 
 Arquivos de apoio:
 
 - [render.yaml](c:/Users/acer/Documents/hublocal/render.yaml)
 - [backend/database/tem_na_area_postgres.sql](c:/Users/acer/Documents/hublocal/backend/database/tem_na_area_postgres.sql)
+- [frontend/vercel.json](c:/Users/acer/Documents/hublocal/frontend/vercel.json)
 
-No Render:
+API no Render:
 
 1. Conecte este repositorio em `Blueprints`.
-2. Revise os nomes dos servicos e confirme a criacao.
-3. Aguarde o Postgres e a API terminarem o bootstrap.
-4. Valide a API em `/api/v1/health`.
+2. Crie apenas o servico `tem-na-area-api-netoluiz`.
+3. Preencha manualmente `DATABASE_URL` com a conexao do Supabase.
+4. Preencha `CORS_ORIGIN` com a URL do frontend no Vercel.
+5. Valide a API em `/api/v1/health`.
 
-O setup atual usa `Render Postgres` no plano gratis. O frontend recebe o hostname externo da API pelo proprio Blueprint e monta `https://.../api/v1` no build.
+Frontend no Vercel:
+
+1. Importe a pasta `frontend/`.
+2. Configure `VITE_API_BASE_URL` com a URL da API do Render seguida de `/api/v1`.
 
 ## Variaveis de ambiente
 
@@ -74,7 +79,7 @@ Para Postgres, use:
 backend/database/tem_na_area_postgres.sql
 ```
 
-Os arquivos MySQL antigos podem continuar como referencia, mas o backend Node e o deploy atual usam Postgres.
+Importe esse arquivo no SQL Editor do Supabase antes de subir a API.
 
 ## Workflows
 

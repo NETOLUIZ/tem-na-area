@@ -2,10 +2,11 @@
 
 Arquivos usados no deploy:
 
-- `../../render.yaml`: blueprint com Postgres gratis, API Node e frontend.
-- `../../backend/database/tem_na_area_postgres.sql`: schema inicial usado no bootstrap da API.
+- `../../render.yaml`: blueprint da API Node no Render.
+- `../../backend/database/tem_na_area_postgres.sql`: schema inicial para importar no Supabase.
 
 ## Observacoes
 
-- A API sobe e garante o schema minimo no primeiro start.
-- O blueprint atual foi ajustado para caber no plano gratis usando Postgres gerenciado do Render.
+- Defina `DATABASE_URL` manualmente no Render com a string do Supabase.
+- Defina `CORS_ORIGIN` com a URL do frontend no Vercel.
+- O banco agora fica fora do Render.
