@@ -46,8 +46,8 @@ function EyeIcon({ open }) {
 export default function SuperAdminLoginPage() {
   const navigate = useNavigate();
   const { actions } = useApp();
-  const [user, setUser] = useState("admin");
-  const [pass, setPass] = useState("admin");
+  const [user, setUser] = useState("admin@temnaarea.com");
+  const [pass, setPass] = useState("admin123");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,12 +55,16 @@ export default function SuperAdminLoginPage() {
   async function submit(e) {
     e.preventDefault();
     setLoading(true);
+    setError("");
+
     const ok = await actions.loginSuperAdmin(user, pass);
     setLoading(false);
+
     if (!ok) {
-      setError("Credenciais invlidas.");
+      setError("Credenciais inválidas.");
       return;
     }
+
     navigate("/admin-temnaarea");
   }
 
@@ -72,7 +76,7 @@ export default function SuperAdminLoginPage() {
             <HubIcon />
           </div>
           <div className="super-admin-brand-copy">
-            <h1>Tem na area</h1>
+            <h1>Tem na Área</h1>
             <small>Central administrativa</small>
           </div>
         </div>
@@ -82,20 +86,20 @@ export default function SuperAdminLoginPage() {
           <strong>Controle total da plataforma</strong>
         </div>
 
-        <h2>Painel Super Admin</h2>
-        <p>Controle lojas, bloqueios, aprovações e campanhas em um só lugar.</p>
+        <h2>Login do admin</h2>
+        <p>Gerencie aprovações, bloqueios, campanhas e a operação global com a mesma identidade visual do site.</p>
 
         <div className="super-admin-login-grid">
           <div className="super-admin-login-hint">
-            <strong>Acesso padro</strong>
-            <span>Login: admin</span>
-            <span>Senha: admin</span>
+            <strong>Acesso padrão</strong>
+            <span>Login: admin@temnaarea.com</span>
+            <span>Senha: admin123</span>
           </div>
 
           <div className="super-admin-login-hint super-admin-login-hint-alt">
             <strong>Fluxo</strong>
-            <span>Aprovar lojas</span>
-            <span>Monitorar pedidos e operao</span>
+            <span>Aprovar lojas e leads</span>
+            <span>Monitorar pedidos e operação</span>
           </div>
         </div>
 
@@ -107,7 +111,13 @@ export default function SuperAdminLoginPage() {
             <span className="login-v2-input-icon" aria-hidden="true">
               <UserIcon />
             </span>
-            <input value={user} onChange={(e) => setUser(e.target.value)} required />
+            <input
+              type="email"
+              placeholder="admin@temnaarea.com"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+              required
+            />
           </div>
 
           <label>Senha</label>
@@ -115,7 +125,13 @@ export default function SuperAdminLoginPage() {
             <span className="login-v2-input-icon" aria-hidden="true">
               <LockIcon />
             </span>
-            <input type={showPassword ? "text" : "password"} value={pass} onChange={(e) => setPass(e.target.value)} required />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Digite sua senha"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+              required
+            />
             <button type="button" className="login-v2-eye" onClick={() => setShowPassword((v) => !v)}>
               <EyeIcon open={showPassword} />
             </button>
@@ -130,4 +146,3 @@ export default function SuperAdminLoginPage() {
     </main>
   );
 }
-
