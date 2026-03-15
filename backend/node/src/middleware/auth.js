@@ -1,0 +1,38 @@
+import { ApiError } from "../lib/api-error.js";
+
+export function createAuthMiddleware(token) {
+  function readUser(req) {
+    const header = req.headers.authorization;
+    const match = typeof header === "string" ? header.match(/^Bearer\s+(.+)$/i) : null;
+    if (!match) {
+      throw new ApiError("Token de acesso nao informado.", 401);
+    }
+
+    return token.decode(match[1]);
+  }
+
+  return {
+    requireUser(req, _res, next) {
+      try {
+        req.auth = readUser(req);
+        next();
+      } catch (error) {
+        next(error);
+      }
+    },
+    requireRole(...roles) {
+      return (req, _res, next) => {
+        try {
+          const user = readUser(req);
+          if (roles.length > 0 && !roles.includes(user.role)) {
+            throw new ApiError("Usuario sem permissao para este recurso.", 403);
+          }
+          req.auth = user;
+          next();
+        } catch (error) {
+          next(error);
+        }
+      };
+    }
+  };
+}
