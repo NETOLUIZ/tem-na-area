@@ -58,6 +58,7 @@ export default function RegisterStorePage() {
   const [form, setForm] = useState(initial);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const totalSteps = getTotalSteps(form.mode);
@@ -73,6 +74,7 @@ export default function RegisterStorePage() {
     setStep(1);
     setPaymentConfirmed(false);
     setSuccess("");
+    setError("");
   }
 
   function handleBack() {
@@ -91,47 +93,53 @@ export default function RegisterStorePage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    setError("");
+    setSuccess("");
     setLoading(true);
 
-    if (form.mode === "free") {
-      await actions.registerContactLead({
+    try {
+      if (form.mode === "free") {
+        await actions.registerContactLead({
+          nome: form.nome,
+          whatsapp: form.whatsapp,
+          cidade: form.cidade,
+          categoria: form.categoria,
+          observacoes: form.observacoes
+        });
+
+        setSuccess("Solicitacao do plano gratis enviada. O super admin precisa aprovar antes do card aparecer na home.");
+        return;
+      }
+
+      const store = await actions.registerStore({
         nome: form.nome,
-        whatsapp: form.whatsapp,
-        cidade: form.cidade,
         categoria: form.categoria,
-        observacoes: form.observacoes
+        descricaoCurta: form.descricaoCurta,
+        whatsapp: form.whatsapp,
+        telefone: form.telefone,
+        senha: form.senha,
+        endereco: {
+          rua: form.rua,
+          bairro: form.bairro,
+          cidade: form.cidade
+        },
+        horarioFuncionamento: form.horarioFuncionamento,
+        logo:
+          form.logo ||
+          "https://images.unsplash.com/photo-1523275335684-37898b6baf30auto=format&fit=crop&w=700&q=80",
+        capa:
+          form.capa ||
+          "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17auto=format&fit=crop&w=1200&q=80",
+        planType: "paid",
+        paymentStatus: "approved"
       });
 
-      setSuccess("Solicitao do plano grtis enviada. O super admin precisa aprovar antes do card aparecer na home.");
+      setSuccess(`Solicitacao enviada com sucesso. Protocolo interno: ${store.id}.`);
+    } catch (submitError) {
+      setError(submitError.message || "Nao foi possivel enviar o cadastro agora.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const store = await actions.registerStore({
-      nome: form.nome,
-      categoria: form.categoria,
-      descricaoCurta: form.descricaoCurta,
-      whatsapp: form.whatsapp,
-      telefone: form.telefone,
-      senha: form.senha,
-      endereco: {
-        rua: form.rua,
-        bairro: form.bairro,
-        cidade: form.cidade
-      },
-      horarioFuncionamento: form.horarioFuncionamento,
-      logo:
-        form.logo ||
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30auto=format&fit=crop&w=700&q=80",
-      capa:
-        form.capa ||
-        "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17auto=format&fit=crop&w=1200&q=80",
-      planType: "paid",
-      paymentStatus: "approved"
-    });
-
-    setSuccess(`Solicitacao enviada com sucesso. Protocolo interno: ${store.id}.`);
-    setLoading(false);
   }
 
   const selectedPlan = PLAN_DETAILS[form.mode];
@@ -181,6 +189,8 @@ export default function RegisterStorePage() {
             </div>
           </div>
         ) : null}
+
+        {error ? <p className="error-text">{error}</p> : null}
 
         <form className="register-v2-form" onSubmit={handleSubmit}>
           {currentStep === 1 ? (
@@ -372,12 +382,12 @@ export default function RegisterStorePage() {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleAdvance}
-                disabled={form.mode === "paid" && currentStep === 2 && !paymentConfirmed}
+                disabled={loading || (form.mode === "paid" && currentStep === 2 && !paymentConfirmed)}
               >
                 Avanar <MdArrowForward />
               </button>
             ) : (
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? "Enviando..." : form.mode === "free" ? "Enviar solicitao" : "Criar conta da empresa"}
               </button>
             )}
