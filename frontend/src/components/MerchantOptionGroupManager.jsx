@@ -65,9 +65,9 @@ export default function MerchantOptionGroupManager({ storeId, items, groups, act
     });
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    actions.upsertOptionGroup(storeId, {
+    await actions.upsertOptionGroup(storeId, {
       ...form,
       minSelect: Number(form.minSelect || 0),
       maxSelect: form.type === "text" ? 1 : Number(form.maxSelect || 1),

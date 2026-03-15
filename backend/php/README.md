@@ -33,6 +33,12 @@ TEM_NA_AREA_APP_KEY=troque-esta-chave
 php -S 127.0.0.1:8000 php/router.php
 ```
 
+## Banco
+
+- Estrutura principal: `../database/tem_na_area_mysql.sql`
+- Seed inicial: `../database/tem_na_area_seed.sql`
+- Recursos extras do painel: `../database/tem_na_area_addons.sql`
+
 ## Endpoints principais
 
 ### Publico
@@ -62,6 +68,14 @@ php -S 127.0.0.1:8000 php/router.php
 - `DELETE /api/v1/merchant/products/{id}`
 - `GET /api/v1/merchant/settings`
 - `PUT /api/v1/merchant/settings`
+- `GET /api/v1/merchant/option-groups`
+- `POST /api/v1/merchant/option-groups`
+- `PUT /api/v1/merchant/option-groups/{id}`
+- `DELETE /api/v1/merchant/option-groups/{id}`
+- `GET /api/v1/merchant/promotions`
+- `POST /api/v1/merchant/promotions`
+- `PUT /api/v1/merchant/promotions/{id}`
+- `DELETE /api/v1/merchant/promotions/{id}`
 
 ### Super admin
 
@@ -69,6 +83,8 @@ php -S 127.0.0.1:8000 php/router.php
 - `GET /api/v1/admin/stores`
 - `PATCH /api/v1/admin/stores/{id}/status`
 - `GET /api/v1/admin/logs`
+- `GET /api/v1/admin/leads`
+- `PATCH /api/v1/admin/leads/{id}/approve`
 
 ## Exemplos
 

@@ -28,6 +28,7 @@ function initialState() {
     orders: [],
     logs: [],
     homePromotions: [],
+    productOptionGroups: [],
     contactLeads: [],
     adminStores: [],
     adminSummary: null,
@@ -153,6 +154,69 @@ function mapOrder(order) {
   };
 }
 
+function mapPromotion(promotion, fallbackStoreId = null) {
+  return {
+    id: String(promotion.id),
+    storeId: String(promotion.loja_id || fallbackStoreId || ""),
+    itemId: String(promotion.produto_id || promotion.link_destino || ""),
+    title: promotion.titulo_exibicao || "",
+    subtitle: promotion.subtitulo_exibicao || "",
+    badge: promotion.botao_label || "Destaque",
+    active: Number(promotion.ativo ?? 1) === 1,
+    createdAt: promotion.created_at || new Date().toISOString(),
+    expiresAt: promotion.data_fim || new Date(Date.now() + 172800000).toISOString(),
+    item: promotion.produto_id
+      ? {
+          id: String(promotion.produto_id),
+          nome: promotion.produto_nome,
+          imagem: promotion.produto_imagem_url || "",
+          preco: toNumber(promotion.preco_promocional ?? promotion.preco),
+          precoAntigo: promotion.preco_promocional != null ? toNumber(promotion.preco) : null
+        }
+      : null
+  };
+}
+
+function mapOptionGroup(group) {
+  return {
+    id: String(group.id),
+    storeId: String(group.loja_id),
+    name: group.nome,
+    description: group.descricao || "",
+    type: group.tipo,
+    required: Number(group.obrigatorio || 0) === 1,
+    minSelect: Number(group.minimo_selecoes || 0),
+    maxSelect: Number(group.maximo_selecoes || 1),
+    sortOrder: Number(group.ordem_exibicao || 0),
+    active: Number(group.ativo || 0) === 1,
+    productIds: Array.isArray(group.links) ? group.links.map((link) => String(link.product_id)) : [],
+    options: Array.isArray(group.options)
+      ? group.options.map((option) => ({
+          id: String(option.id),
+          groupId: String(option.group_id),
+          name: option.nome,
+          description: option.descricao || "",
+          priceDelta: toNumber(option.preco_adicional),
+          sortOrder: Number(option.ordem_exibicao || 0),
+          active: Number(option.ativo || 0) === 1
+        }))
+      : []
+  };
+}
+
+function mapLead(lead) {
+  return {
+    id: String(lead.id),
+    nome: lead.nome_empresa,
+    categoria: lead.categoria_principal || "",
+    cidade: lead.cidade || "",
+    whatsapp: lead.whatsapp || "",
+    status: lead.status_solicitacao,
+    publishedAsCard: lead.status_solicitacao === "APROVADA",
+    createdAt: lead.created_at || new Date().toISOString()
+  };
+}
+
 function uniqueById(items) {
   const map = new Map();
   items.forEach((item) => {
@@ -248,10 +312,14 @@ export function AppProvider({ children }) {
   async function loadHome() {
     const data = await api.publicHome();
     const stores = (data.stores || []).map(mapStore);
+    const homePromotions = (data.cards || [])
+      .filter((card) => card.tipo_card === "PROMOCAO")
+      .map((card) => mapPromotion(card, card.loja_id));
 
     setState((prev) => ({
       ...prev,
-      stores
+      stores,
+      homePromotions
     }));
 
     return stores;
@@ -261,10 +329,15 @@ export function AppProvider({ children }) {
     const data = await api.publicStore(slug);
     const mappedStore = mapStore(data.store);
     const mappedProducts = (data.products || []).map(mapProduct);
+    const productOptionGroups = (data.option_groups || []).map(mapOptionGroup);
 
     setState((prev) => ({
       ...prev,
       stores: uniqueById([...prev.stores.filter((item) => item.id !== mappedStore.id), mappedStore]),
+      productOptionGroups: [
+        ...prev.productOptionGroups.filter((entry) => entry.storeId !== mappedStore.id),
+        ...productOptionGroups
+      ],
       items: uniqueById([
         ...prev.items.filter((item) => item.storeId !== mappedStore.id),
         ...mappedProducts
@@ -273,27 +346,40 @@ export function AppProvider({ children }) {
 
     return {
       store: mappedStore,
-      products: mappedProducts
+      products: mappedProducts,
+      optionGroups: productOptionGroups
     };
   }
 
   async function hydrateMerchantSession(token) {
-    const [dashboard, ordersPayload, productsPayload, settingsPayload] = await Promise.all([
+    const [dashboard, ordersPayload, productsPayload, settingsPayload, groupsPayload, promotionsPayload] = await Promise.all([
       api.merchantDashboard(token),
       api.merchantOrders(token),
       api.merchantProducts(token),
-      api.merchantSettings(token)
+      api.merchantSettings(token),
+      api.merchantOptionGroups(token),
+      api.merchantPromotions(token)
     ]);
 
     const store = mapStore(settingsPayload.store || dashboard.store || {});
     const items = (productsPayload.products || []).map(mapProduct);
     const orders = (ordersPayload.orders || []).map(mapOrder);
+    const productOptionGroups = (groupsPayload.groups || []).map(mapOptionGroup);
+    const homePromotions = (promotionsPayload.promotions || []).map((promotion) => mapPromotion(promotion, store.id));
 
     setState((prev) => ({
       ...prev,
       stores: uniqueById([...prev.stores.filter((entry) => entry.id !== store.id), store]),
       items: uniqueById([...prev.items.filter((entry) => entry.storeId !== store.id), ...items]),
       orders: uniqueById([...prev.orders.filter((entry) => entry.storeId !== store.id), ...orders]),
+      productOptionGroups: [
+        ...prev.productOptionGroups.filter((entry) => entry.storeId !== store.id),
+        ...productOptionGroups
+      ],
+      homePromotions: [
+        ...prev.homePromotions.filter((entry) => entry.storeId !== store.id),
+        ...homePromotions
+      ],
       sessions: {
         ...prev.sessions,
         merchantToken: token,
@@ -301,14 +387,15 @@ export function AppProvider({ children }) {
       }
     }));
 
-    return { store, orders, items, dashboard };
+    return { store, orders, items, dashboard, productOptionGroups, homePromotions };
   }
 
   async function hydrateAdminSession(token) {
-    const [dashboard, storesPayload, logsPayload] = await Promise.all([
+    const [dashboard, storesPayload, logsPayload, leadsPayload] = await Promise.all([
       api.adminDashboard(token),
       api.adminStores(token),
-      api.adminLogs(token)
+      api.adminLogs(token),
+      api.adminLeads(token)
     ]);
 
     const adminStores = (storesPayload.stores || []).map(mapStore);
@@ -327,6 +414,7 @@ export function AppProvider({ children }) {
       adminSummary: dashboard.summary || null,
       adminRecentRequests: dashboard.recent_requests || [],
       logs,
+      contactLeads: (leadsPayload.leads || []).map(mapLead),
       sessions: {
         ...prev.sessions,
         superAdminToken: token,
@@ -397,7 +485,8 @@ export function AppProvider({ children }) {
           return prev;
         }
 
-        const validated = validateConfiguration(product, [], configuration);
+        const groups = prev.productOptionGroups.filter((group) => group.productIds.includes(String(itemId)) && group.active);
+        const validated = validateConfiguration(product, groups, configuration);
         if (!validated.ok) {
           result = { ok: false, message: validated.errors[0] || "Revise a montagem do pedido." };
           return prev;
@@ -544,8 +633,13 @@ export function AppProvider({ children }) {
       return lead;
     },
 
-    approveFreePlanLead() {
-      return { ok: false, message: "Fluxo de aprovacao do plano gratis ainda nao foi exposto pela API." };
+    async approveFreePlanLead(leadId) {
+      const token = state.sessions.superAdminToken;
+      if (!token) return { ok: false, message: "Sessao do admin nao encontrada." };
+
+      await api.approveAdminLead(token, leadId);
+      await hydrateAdminSession(token);
+      return { ok: true };
     },
 
     async loginMerchant(login, senha) {
@@ -605,12 +699,35 @@ export function AppProvider({ children }) {
       await hydrateMerchantSession(token);
     },
 
-    upsertHomePromotion() {
-      return { ok: false, message: "Propagandas da home ainda nao possuem endpoint dedicado na API." };
+    async upsertHomePromotion(storeId, payload, promotionId = null) {
+      const token = state.sessions.merchantToken;
+      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+
+      const body = {
+        title: payload.title,
+        subtitle: payload.subtitle,
+        button_label: payload.badge,
+        product_id: Number(payload.itemId),
+        active: payload.active ? 1 : 0
+      };
+
+      if (promotionId) {
+        await api.updateMerchantPromotion(token, promotionId, body);
+      } else {
+        await api.createMerchantPromotion(token, body);
+      }
+
+      await hydrateMerchantSession(token);
+      return { ok: true, message: promotionId ? "Propaganda atualizada com sucesso." : "Propaganda publicada com sucesso." };
     },
 
-    deleteHomePromotion() {
-      return { ok: false, message: "Propagandas da home ainda nao possuem endpoint dedicado na API." };
+    async deleteHomePromotion(promotionId) {
+      const token = state.sessions.merchantToken;
+      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+
+      await api.deleteMerchantPromotion(token, promotionId);
+      await hydrateMerchantSession(token);
+      return { ok: true };
     },
 
     async upsertMenuItem(storeId, payload, itemId = null) {
@@ -642,12 +759,46 @@ export function AppProvider({ children }) {
       await hydrateMerchantSession(token);
     },
 
-    upsertOptionGroup() {
-      return { ok: false, message: "Montagem de produtos ainda nao possui endpoint dedicado na API." };
+    async upsertOptionGroup(storeId, payload, groupId = null) {
+      const token = state.sessions.merchantToken;
+      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+
+      const body = {
+        name: payload.name,
+        description: payload.description,
+        type: payload.type,
+        required: payload.required ? 1 : 0,
+        min_select: Number(payload.minSelect || 0),
+        max_select: Number(payload.maxSelect || 1),
+        sort_order: Number(payload.sortOrder || 0),
+        active: payload.active ? 1 : 0,
+        product_ids: (payload.productIds || []).map((id) => Number(id)),
+        options: (payload.options || []).map((option, index) => ({
+          name: option.name,
+          description: option.description,
+          price_delta: Number(option.priceDelta || 0),
+          sort_order: Number(option.sortOrder || index + 1),
+          active: option.active ? 1 : 0
+        }))
+      };
+
+      if (groupId) {
+        await api.updateMerchantOptionGroup(token, groupId, body);
+      } else {
+        await api.createMerchantOptionGroup(token, body);
+      }
+
+      await hydrateMerchantSession(token);
+      return { ok: true };
     },
 
-    deleteOptionGroup() {
-      return { ok: false, message: "Montagem de produtos ainda nao possui endpoint dedicado na API." };
+    async deleteOptionGroup(groupId) {
+      const token = state.sessions.merchantToken;
+      if (!token) return { ok: false, message: "Sessao do lojista nao encontrada." };
+
+      await api.deleteMerchantOptionGroup(token, groupId);
+      await hydrateMerchantSession(token);
+      return { ok: true };
     },
 
     async updateOrderStatus(storeId, orderId, nextStatus) {
@@ -728,17 +879,34 @@ export function AppProvider({ children }) {
     allItemsByStore(storeId) {
       return state.items.filter((item) => item.storeId === storeId);
     },
-    optionGroupsByStore() {
-      return [];
+    optionGroupsByStore(storeId) {
+      return state.productOptionGroups
+        .filter((group) => group.storeId === storeId)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
     },
-    optionGroupsByProduct() {
-      return [];
+    optionGroupsByProduct(productId) {
+      return state.productOptionGroups
+        .filter((group) => group.productIds.includes(String(productId)) && group.active)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
     },
     homePromotionsByStore(storeId) {
       return state.homePromotions.filter((promotion) => promotion.storeId === storeId);
     },
     activeHomePromotions() {
-      return state.homePromotions;
+      return state.homePromotions
+        .filter((promotion) => promotion.active)
+        .map((promotion) => {
+          const store = state.stores.find((entry) => entry.id === promotion.storeId);
+          const item = promotion.item || state.items.find((entry) => entry.id === promotion.itemId);
+          if (!store || !item) return null;
+
+          return {
+            ...promotion,
+            store,
+            item
+          };
+        })
+        .filter(Boolean);
     },
     ordersByStore(storeId) {
       return state.orders.filter((order) => order.storeId === storeId);

@@ -52,6 +52,28 @@ export default function SuperAdminStoresPage() {
     }
   ];
 
+  const leadColumns = [
+    { key: "nome", label: "Negocio" },
+    { key: "categoria", label: "Categoria" },
+    { key: "cidade", label: "Cidade" },
+    { key: "whatsapp", label: "WhatsApp" },
+    { key: "createdAt", label: "Solicitacao", render: (row) => formatDate(row.createdAt) },
+    { key: "status", label: "Status" },
+    {
+      key: "approve",
+      label: "Acoes",
+      render: (row) => (
+        row.publishedAsCard ? (
+          <button className="btn btn-outline" disabled>Publicado</button>
+        ) : (
+          <button className="btn btn-primary" onClick={() => actions.approveFreePlanLead(row.id)}>
+            Aprovar plano gratis
+          </button>
+        )
+      )
+    }
+  ];
+
   async function confirmModal() {
     if (!modal) return;
     await actions.superAdminAction(modal.type, modal.row.id, `${modal.type} via painel`);
@@ -101,6 +123,14 @@ export default function SuperAdminStoresPage() {
         </div>
 
         <Table columns={columns} rows={rows} emptyText="Nenhuma loja encontrada com esses filtros." />
+      </section>
+
+      <section className="dashboard-panel neon-gap">
+        <div className="section-title">
+          <h3>Solicitacoes do plano gratis</h3>
+          <span>{state.contactLeads.length} pedidos</span>
+        </div>
+        <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitacao do plano gratis cadastrada." />
       </section>
 
       <ModalConfirm

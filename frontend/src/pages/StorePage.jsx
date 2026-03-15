@@ -123,8 +123,13 @@ export default function StorePage() {
               <ProductCard
                 key={item.id}
                 item={item}
-                hasCustomization={false}
+                hasCustomization={selectors.optionGroupsByProduct(item.id).length > 0}
                 onAdd={() => {
+                  if (selectors.optionGroupsByProduct(item.id).length > 0) {
+                    setSelectedItem(item);
+                    return;
+                  }
+
                   const result = actions.addToCart(store.id, item.id, {});
                   if (result.ok) {
                     setHighlightedCartItemId(result.cartItemId);
@@ -139,7 +144,7 @@ export default function StorePage() {
 
       <ProductCustomizationModal
         item={selectedItem}
-        groups={[]}
+        groups={selectedItem ? selectors.optionGroupsByProduct(selectedItem.id) : []}
         open={Boolean(selectedItem)}
         onClose={() => setSelectedItem(null)}
         onSubmit={(configuration) => {

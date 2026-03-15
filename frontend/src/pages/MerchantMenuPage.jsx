@@ -105,9 +105,9 @@ export default function MerchantMenuPage() {
     setActiveTab("form");
   }
 
-  function submitPromotion(e) {
+  async function submitPromotion(e) {
     e.preventDefault();
-    const result = actions.upsertHomePromotion(storeId, promotionForm, editingPromotionId);
+    const result = await actions.upsertHomePromotion(storeId, promotionForm, editingPromotionId);
     setPromotionMessage(result.message);
     if (result.ok) resetPromotionForm();
   }
@@ -332,7 +332,7 @@ export default function MerchantMenuPage() {
                   </div>
                   <div className="menu-v2-item-actions">
                     <button type="button" onClick={() => editPromotion(promotion)}>Editar</button>
-                    <button type="button" onClick={() => actions.deleteHomePromotion(promotion.id)}>Excluir</button>
+                    <button type="button" onClick={async () => actions.deleteHomePromotion(promotion.id)}>Excluir</button>
                   </div>
                 </article>
               ))}

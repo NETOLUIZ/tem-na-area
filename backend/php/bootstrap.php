@@ -12,6 +12,8 @@ use App\Repositories\AdminRepository;
 use App\Repositories\AuthRepository;
 use App\Repositories\CatalogRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\OptionGroupRepository;
+use App\Repositories\PromotionRepository;
 use App\Repositories\RegistrationRepository;
 use App\Repositories\StoreRepository;
 use App\Services\AdminService;
@@ -46,6 +48,8 @@ $authRepository = new AuthRepository($pdo);
 $storeRepository = new StoreRepository($pdo);
 $catalogRepository = new CatalogRepository($pdo);
 $orderRepository = new OrderRepository($pdo);
+$optionGroupRepository = new OptionGroupRepository($pdo);
+$promotionRepository = new PromotionRepository($pdo);
 $registrationRepository = new RegistrationRepository($pdo);
 $adminRepository = new AdminRepository($pdo);
 
@@ -57,9 +61,9 @@ $adminService = new AdminService($adminRepository, $storeRepository);
 
 $healthController = new HealthController();
 $authController = new AuthController($authService);
-$publicController = new PublicController($storeRepository, $catalogRepository, $registrationService, $orderService);
-$merchantController = new MerchantController($auth, $storeRepository, $catalogRepository, $orderRepository, $catalogService, $orderService);
-$adminController = new AdminController($auth, $adminRepository, $storeRepository, $adminService);
+$publicController = new PublicController($storeRepository, $catalogRepository, $optionGroupRepository, $registrationService, $orderService);
+$merchantController = new MerchantController($auth, $storeRepository, $catalogRepository, $orderRepository, $optionGroupRepository, $promotionRepository, $catalogService, $orderService);
+$adminController = new AdminController($auth, $adminRepository, $registrationRepository, $storeRepository, $adminService);
 
 $router = new Router();
 
@@ -94,11 +98,21 @@ $register('PUT', '/api/v1/merchant/products/{id}', static fn ($request, $params)
 $register('DELETE', '/api/v1/merchant/products/{id}', static fn ($request, $params) => $merchantController->deleteProduct($request, $params));
 $register('GET', '/api/v1/merchant/settings', static fn ($request) => $merchantController->settings($request));
 $register('PUT', '/api/v1/merchant/settings', static fn ($request) => $merchantController->updateSettings($request));
+$register('GET', '/api/v1/merchant/option-groups', static fn ($request) => $merchantController->optionGroups($request));
+$register('POST', '/api/v1/merchant/option-groups', static fn ($request) => $merchantController->createOptionGroup($request));
+$register('PUT', '/api/v1/merchant/option-groups/{id}', static fn ($request, $params) => $merchantController->updateOptionGroup($request, $params));
+$register('DELETE', '/api/v1/merchant/option-groups/{id}', static fn ($request, $params) => $merchantController->deleteOptionGroup($request, $params));
+$register('GET', '/api/v1/merchant/promotions', static fn ($request) => $merchantController->promotions($request));
+$register('POST', '/api/v1/merchant/promotions', static fn ($request) => $merchantController->createPromotion($request));
+$register('PUT', '/api/v1/merchant/promotions/{id}', static fn ($request, $params) => $merchantController->updatePromotion($request, $params));
+$register('DELETE', '/api/v1/merchant/promotions/{id}', static fn ($request, $params) => $merchantController->deletePromotion($request, $params));
 
 $register('GET', '/api/v1/admin/dashboard', static fn ($request) => $adminController->dashboard($request));
 $register('GET', '/api/v1/admin/stores', static fn ($request) => $adminController->stores($request));
 $register('PATCH', '/api/v1/admin/stores/{id}/status', static fn ($request, $params) => $adminController->updateStoreStatus($request, $params));
 $register('GET', '/api/v1/admin/logs', static fn ($request) => $adminController->logs($request));
+$register('GET', '/api/v1/admin/leads', static fn ($request) => $adminController->leads($request));
+$register('PATCH', '/api/v1/admin/leads/{id}/approve', static fn ($request, $params) => $adminController->approveLead($request, $params));
 
 return [
     'config' => $config,

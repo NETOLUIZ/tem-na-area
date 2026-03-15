@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Http\Request;
 use App\Repositories\CatalogRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\OptionGroupRepository;
+use App\Repositories\PromotionRepository;
 use App\Repositories\StoreRepository;
 use App\Services\CatalogService;
 use App\Services\OrderService;
@@ -20,6 +22,8 @@ final class MerchantController
         private readonly StoreRepository $storeRepository,
         private readonly CatalogRepository $catalogRepository,
         private readonly OrderRepository $orderRepository,
+        private readonly OptionGroupRepository $optionGroupRepository,
+        private readonly PromotionRepository $promotionRepository,
         private readonly CatalogService $catalogService,
         private readonly OrderService $orderService
     ) {
@@ -119,6 +123,98 @@ final class MerchantController
 
         return [
             'store' => $this->storeRepository->merchantSettings($storeId),
+        ];
+    }
+
+    public function optionGroups(Request $request): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+
+        return [
+            'groups' => $this->optionGroupRepository->byStore($storeId),
+        ];
+    }
+
+    public function createOptionGroup(Request $request): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $groupId = $this->optionGroupRepository->upsert($storeId, $request->input());
+
+        return [
+            'group_id' => $groupId,
+            'groups' => $this->optionGroupRepository->byStore($storeId),
+        ];
+    }
+
+    public function updateOptionGroup(Request $request, array $params): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $groupId = $this->optionGroupRepository->upsert($storeId, $request->input(), (int) $params['id']);
+
+        return [
+            'group_id' => $groupId,
+            'groups' => $this->optionGroupRepository->byStore($storeId),
+        ];
+    }
+
+    public function deleteOptionGroup(Request $request, array $params): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $this->optionGroupRepository->delete($storeId, (int) $params['id']);
+
+        return [
+            'deleted' => true,
+            'groups' => $this->optionGroupRepository->byStore($storeId),
+        ];
+    }
+
+    public function promotions(Request $request): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+
+        return [
+            'promotions' => $this->promotionRepository->byStore($storeId),
+        ];
+    }
+
+    public function createPromotion(Request $request): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $promotionId = $this->promotionRepository->upsert($storeId, $request->input());
+
+        return [
+            'promotion_id' => $promotionId,
+            'promotions' => $this->promotionRepository->byStore($storeId),
+        ];
+    }
+
+    public function updatePromotion(Request $request, array $params): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $promotionId = $this->promotionRepository->upsert($storeId, $request->input(), (int) $params['id']);
+
+        return [
+            'promotion_id' => $promotionId,
+            'promotions' => $this->promotionRepository->byStore($storeId),
+        ];
+    }
+
+    public function deletePromotion(Request $request, array $params): array
+    {
+        $user = $this->auth->userWithRole($request, 'merchant');
+        $storeId = (int) ($user['store_id'] ?? 0);
+        $this->promotionRepository->delete($storeId, (int) $params['id']);
+
+        return [
+            'deleted' => true,
+            'promotions' => $this->promotionRepository->byStore($storeId),
         ];
     }
 }

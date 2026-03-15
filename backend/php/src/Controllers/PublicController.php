@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Http\Request;
 use App\Repositories\CatalogRepository;
+use App\Repositories\OptionGroupRepository;
 use App\Repositories\StoreRepository;
 use App\Services\OrderService;
 use App\Services\RegistrationService;
@@ -16,6 +17,7 @@ final class PublicController
     public function __construct(
         private readonly StoreRepository $storeRepository,
         private readonly CatalogRepository $catalogRepository,
+        private readonly OptionGroupRepository $optionGroupRepository,
         private readonly RegistrationService $registrationService,
         private readonly OrderService $orderService
     ) {
@@ -50,6 +52,7 @@ final class PublicController
         return [
             'store' => $store,
             'products' => $this->catalogRepository->productsByStore((int) $store['id'], true),
+            'option_groups' => $this->optionGroupRepository->byStore((int) $store['id']),
         ];
     }
 

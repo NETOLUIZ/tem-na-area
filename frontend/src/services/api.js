@@ -70,6 +70,52 @@ export const api = {
   merchantSettings(token) {
     return request("/merchant/settings", { token });
   },
+  merchantOptionGroups(token) {
+    return request("/merchant/option-groups", { token });
+  },
+  createMerchantOptionGroup(token, body) {
+    return request("/merchant/option-groups", {
+      method: "POST",
+      token,
+      body
+    });
+  },
+  updateMerchantOptionGroup(token, id, body) {
+    return request(`/merchant/option-groups/${id}`, {
+      method: "PUT",
+      token,
+      body
+    });
+  },
+  deleteMerchantOptionGroup(token, id) {
+    return request(`/merchant/option-groups/${id}`, {
+      method: "DELETE",
+      token
+    });
+  },
+  merchantPromotions(token) {
+    return request("/merchant/promotions", { token });
+  },
+  createMerchantPromotion(token, body) {
+    return request("/merchant/promotions", {
+      method: "POST",
+      token,
+      body
+    });
+  },
+  updateMerchantPromotion(token, id, body) {
+    return request(`/merchant/promotions/${id}`, {
+      method: "PUT",
+      token,
+      body
+    });
+  },
+  deleteMerchantPromotion(token, id) {
+    return request(`/merchant/promotions/${id}`, {
+      method: "DELETE",
+      token
+    });
+  },
   updateMerchantSettings(token, body) {
     return request("/merchant/settings", {
       method: "PUT",
@@ -125,6 +171,16 @@ export const api = {
   },
   adminLogs(token) {
     return request("/admin/logs", { token });
+  },
+  adminLeads(token) {
+    return request("/admin/leads", { token });
+  },
+  approveAdminLead(token, id) {
+    return request(`/admin/leads/${id}/approve`, {
+      method: "PATCH",
+      token,
+      body: {}
+    });
   },
   updateAdminStoreStatus(token, id, status, motivo) {
     return request(`/admin/stores/${id}/status`, {
