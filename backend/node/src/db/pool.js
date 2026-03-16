@@ -3,6 +3,38 @@ import { env } from "../config/env.js";
 
 const { Pool } = pg;
 
+function createPoolConfig() {
+  if (!env.databaseUrl) {
+    return {
+      host: env.dbHost,
+      port: env.dbPort,
+      database: env.dbName,
+      user: env.dbUser,
+      password: env.dbPass
+    };
+  }
+
+  const url = new URL(env.databaseUrl);
+  const sslMode = env.dbSslMode || url.searchParams.get("sslmode");
+
+  // The Supabase pooler commonly presents a chain that Node/pg rejects by default.
+  if (sslMode) {
+    url.searchParams.delete("sslmode");
+  }
+
+  const config = {
+    connectionString: url.toString()
+  };
+
+  if (sslMode && sslMode !== "disable") {
+    config.ssl = {
+      rejectUnauthorized: env.dbSslRejectUnauthorized
+    };
+  }
+
+  return config;
+}
+
 function toPgSql(sql) {
   let index = 0;
   return sql.replace(/\?/g, () => {
@@ -64,20 +96,7 @@ class PgConnection {
 
 class PgPoolAdapter {
   constructor() {
-    this.pool = new Pool(
-      env.databaseUrl
-        ? {
-            connectionString: env.databaseUrl,
-            ssl: env.databaseUrl.includes("sslmode=require") ? { rejectUnauthorized: false } : false
-          }
-        : {
-            host: env.dbHost,
-            port: env.dbPort,
-            database: env.dbName,
-            user: env.dbUser,
-            password: env.dbPass
-          }
-    );
+    this.pool = new Pool(createPoolConfig());
 
     Object.assign(this, wrapExecutor(this.pool));
   }

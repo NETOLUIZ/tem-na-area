@@ -126,6 +126,13 @@ Voce precisa ver pelo menos:
 - `frontend/`
 - `backend/`
 
+Se a conexao com Supabase falhar por certificado SSL, adicione tambem no arquivo `backend/node/.env`:
+
+```env
+TEM_NA_AREA_DB_SSLMODE=require
+TEM_NA_AREA_DB_SSL_REJECT_UNAUTHORIZED=false
+```
+
 ## Variaveis de ambiente
 
 - `frontend/.env.example`
