@@ -86,6 +86,46 @@ No Netlify:
 6. Defina `CORS_ORIGIN=*`.
 7. Defina `VITE_API_BASE_URL=/api/api/v1`.
 
+## Hostinger
+
+Se voce for subir a API Node na Hostinger via SSH, rode os comandos na raiz do repositorio clonado, onde existe o arquivo `package.json`.
+
+Exemplo:
+
+```bash
+cd /var/www/tem-na-area-api
+git pull origin main
+npm install
+npm start
+```
+
+Se voce quiser rodar apenas a API manualmente pela subpasta do backend, use:
+
+```bash
+cd /var/www/tem-na-area-api/backend/node
+npm install
+npm start
+```
+
+O erro `ENOENT: no such file or directory, open '/var/www/tem-na-area-api/package.json'` significa que uma destas condicoes aconteceu:
+
+- o repositorio nao foi clonado nessa pasta
+- os arquivos foram enviados para outra pasta
+- voce executou `npm` antes de entrar na pasta correta
+
+Para confirmar no servidor:
+
+```bash
+cd /var/www/tem-na-area-api
+ls -la
+```
+
+Voce precisa ver pelo menos:
+
+- `package.json`
+- `frontend/`
+- `backend/`
+
 ## Variaveis de ambiente
 
 - `frontend/.env.example`

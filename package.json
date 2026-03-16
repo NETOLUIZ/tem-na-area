@@ -12,7 +12,11 @@
     "backend/node"
   ],
   "scripts": {
+    "dev": "npm run dev --workspace backend/node",
     "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend/node",
+    "start:api": "npm run start --workspace backend/node",
+    "dev:api": "npm run dev --workspace backend/node",
     "check:api": "npm run check --workspace backend/node"
   }
 }
