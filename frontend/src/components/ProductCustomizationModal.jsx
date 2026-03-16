@@ -109,7 +109,7 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
               <div className="customization-group-head">
                 <div>
                   <h3>{group.name}</h3>
-                  <p>{GROUP_TYPE_LABEL[group.type]} {group.required ? "· Obrigatorio" : "· Opcional"}</p>
+                  <p>{GROUP_TYPE_LABEL[group.type]} {group.required ? "· Obrigatório" : "· Opcional"}</p>
                 </div>
                 {group.type !== "text" ? (
                   <span>
@@ -158,14 +158,14 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
             </section>
           )) : (
             <div className="customization-empty">
-              <p>Este produto nao possui grupos de montagem. Ajuste a quantidade e adicione ao carrinho.</p>
+              <p>Este produto não possui grupos de montagem. Ajuste a quantidade e adicione ao carrinho.</p>
             </div>
           )}
 
           <section className="customization-group-card">
             <div className="customization-group-head">
               <div>
-                <h3>Observacao do cliente</h3>
+                <h3>Observação do cliente</h3>
                 <p>Campo adicional para recados ao estabelecimento</p>
               </div>
             </div>

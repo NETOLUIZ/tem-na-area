@@ -62,7 +62,7 @@ export default function StorePage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Carregando loja</h3>
-          <p>Buscando os dados do catalogo no servidor.</p>
+          <p>Buscando os dados do catálogo no servidor.</p>
         </div>
       </div>
     );
@@ -72,8 +72,8 @@ export default function StorePage() {
     return (
       <div className="container page-space">
         <div className="empty-state">
-          <h3>Loja indisponivel</h3>
-          <p>{error || "Esta loja esta temporariamente inacessivel no Tem na Area."}</p>
+          <h3>Loja indisponível</h3>
+          <p>{error || "Esta loja está temporariamente inacessível no Tem na Área."}</p>
           <Link className="btn btn-primary" to="/">Voltar para a home</Link>
         </div>
       </div>
@@ -108,14 +108,14 @@ export default function StorePage() {
 
       <main className="container page-space">
         <div className="section-title">
-          <h3>Cardapio</h3>
+          <h3>Cardápio</h3>
           <span>{items.length} itens</span>
         </div>
 
         {!items.length ? (
           <div className="empty-state">
-            <h4>Cardapio vazio</h4>
-            <p>Esta loja ainda nao cadastrou produtos.</p>
+            <h4>Cardápio vazio</h4>
+            <p>Esta loja ainda não cadastrou produtos.</p>
           </div>
         ) : (
           <div className="menu-grid">

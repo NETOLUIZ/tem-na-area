@@ -12,7 +12,7 @@ export function MerchantEntryRoute() {
   return <Navigate to={`/admin-loja/${state.sessions.merchantStoreId}`} replace />;
 }
 
-// Garante que a rota privada da loja so abra para a sessao correta.
+// Garante que a rota privada da loja só abra para a sessão correta.
 export function MerchantProtectedRoute() {
   const { state } = useApp();
   const params = useParams();
@@ -28,7 +28,7 @@ export function MerchantProtectedRoute() {
   return <Outlet />;
 }
 
-// Bloqueia o painel global ate o super admin autenticar.
+// Bloqueia o painel global até o super admin autenticar.
 export function SuperAdminProtectedRoute() {
   const { state } = useApp();
 
@@ -38,4 +38,3 @@ export function SuperAdminProtectedRoute() {
 
   return <Outlet />;
 }
-
