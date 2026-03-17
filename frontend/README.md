@@ -12,7 +12,10 @@ npm run build
 
 ## API
 
-Por padrao, o frontend consome `http://127.0.0.1:3001/api/v1`.
+Por padrao:
+
+- em desenvolvimento, o frontend consome `http://127.0.0.1:3001/api/v1`
+- em producao no mesmo host da API, o frontend consome `/api/v1`
 
 Se precisar mudar, crie um `.env` em `frontend/`:
 
