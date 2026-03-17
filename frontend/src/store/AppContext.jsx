@@ -69,6 +69,9 @@ function mapStore(store) {
     status: store.status_loja || store.status || "PENDENTE",
     cardMode: store.modo_operacao || "LOJA_COMPLETA",
     planType: store.plano_codigo || "",
+    planName: store.plano_nome || "",
+    requestStatus: store.status_solicitacao || "",
+    paymentStatus: store.status_pagamento || "",
     metrics: {
       cliquesWhatsapp: 0,
       cliquesSite: 0,

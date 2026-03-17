@@ -8,7 +8,8 @@ export default function SuperAdminLogsPage() {
   const links = [
     { to: "/admin-temnaarea", label: "Dashboard" },
     { to: "/admin-temnaarea/lojas", label: "Lojas" },
-    { to: "/admin-temnaarea/logs", label: "Logs" }
+    { to: "/admin-temnaarea/logs", label: "Logs" },
+    { to: "/admin-temnaarea/financeiro", label: "Financeiro" }
   ];
 
   return (

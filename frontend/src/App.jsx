@@ -14,6 +14,7 @@ import PrintTicketPage from "./pages/PrintTicketPage";
 import RegisterStorePage from "./pages/RegisterStorePage";
 import StorePage from "./pages/StorePage";
 import SuperAdminDashboardPage from "./pages/SuperAdminDashboardPage";
+import SuperAdminFinancePage from "./pages/SuperAdminFinancePage";
 import SuperAdminLoginPage from "./pages/SuperAdminLoginPage";
 import SuperAdminLogsPage from "./pages/SuperAdminLogsPage";
 import SuperAdminStoresPage from "./pages/SuperAdminStoresPage";
@@ -40,6 +41,7 @@ function getPageTitle(pathname) {
   if (pathname === "/admin-temnaarea/login") return "Tem na Area | /admin-temnaarea/login";
   if (pathname === "/admin-temnaarea/lojas") return "Tem na Area | /admin-temnaarea/lojas";
   if (pathname === "/admin-temnaarea/logs") return "Tem na Area | /admin-temnaarea/logs";
+  if (pathname === "/admin-temnaarea/financeiro") return "Tem na Area | /admin-temnaarea/financeiro";
   if (/^\/loja\/[^/]+$/.test(pathname)) return "Tem na Area | /loja";
   if (/^\/admin-loja\/[^/]+$/.test(pathname)) return "Tem na Area | /admin-loja";
   if (/^\/admin-loja\/[^/]+\/pedidos$/.test(pathname)) return "Tem na Area | /admin-loja/pedidos";
@@ -83,6 +85,7 @@ export default function App() {
         <Route path="/admin-temnaarea" element={<SuperAdminDashboardPage />} />
         <Route path="/admin-temnaarea/lojas" element={<SuperAdminStoresPage />} />
         <Route path="/admin-temnaarea/logs" element={<SuperAdminLogsPage />} />
+        <Route path="/admin-temnaarea/financeiro" element={<SuperAdminFinancePage />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

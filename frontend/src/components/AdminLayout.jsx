@@ -20,12 +20,13 @@ function SidebarItem({ to, label }) {
 }
 
 export default function AdminLayout({ title, subtitle, links, onLogout, children }) {
+  const getLink = (label, fallback = null) => links.find((item) => item.label === label)?.to || fallback;
   const primaryLinks = [
-    { label: "Dashboard", to: links[0].to },
-    { label: "Lojas", to: links[1].to || links[0].to },
-    { label: "Logs", to: links[2].to || links[0].to },
+    { label: "Dashboard", to: getLink("Dashboard", links[0]?.to || "/admin-temnaarea") },
+    { label: "Lojas", to: getLink("Lojas", getLink("Dashboard", "/admin-temnaarea")) },
+    { label: "Logs", to: getLink("Logs", getLink("Dashboard", "/admin-temnaarea")) },
     { label: "Campanhas", to: null },
-    { label: "Financeiro", to: null },
+    { label: "Financeiro", to: getLink("Financeiro", null) },
     { label: "Ajustes", to: null }
   ];
 
