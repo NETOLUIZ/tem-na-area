@@ -15,3 +15,12 @@ export function merchantStoreId(auth) {
 
   return storeId;
 }
+
+export function requireIntegerId(value, field = "id") {
+  const normalized = Number(value);
+  if (!Number.isInteger(normalized) || normalized <= 0) {
+    throw new ApiError(`${field} invalido.`, 422, { [field]: value });
+  }
+
+  return normalized;
+}

@@ -24,7 +24,7 @@ export class RegistrationRepository {
   }
 
   async createLead(payload, plan) {
-    const [result] = await this.db.execute(
+    const [, meta] = await this.db.execute(
       `
         INSERT INTO solicitacoes_cadastro (
           protocolo, tipo_solicitacao, nome_empresa, nome_responsavel, email, telefone, whatsapp,
@@ -61,7 +61,7 @@ export class RegistrationRepository {
       ]
     );
 
-    return result.insertId;
+    return meta.insertId;
   }
 
   async freeLeads() {

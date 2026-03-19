@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
@@ -12,7 +12,9 @@ const initial = {
   telefone: "",
   email: "",
   senha: "",
+  cep: "",
   rua: "",
+  numero: "",
   bairro: "",
   cidade: "",
   horarioFuncionamento: "Seg-Dom 10h às 22h",
@@ -60,6 +62,8 @@ export default function RegisterStorePage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState("");
 
   const totalSteps = getTotalSteps(form.mode);
   const currentStep = Math.min(step, totalSteps);
@@ -68,6 +72,66 @@ export default function RegisterStorePage() {
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
+
+  useEffect(() => {
+    const cepDigits = String(form.cep || "").replace(/\D+/g, "");
+    if (!cepDigits) {
+      setCepError("");
+      setCepLoading(false);
+      return undefined;
+    }
+
+    if (cepDigits.length < 8) {
+      setCepError("");
+      setCepLoading(false);
+      return undefined;
+    }
+
+    if (cepDigits.length !== 8) {
+      setCepLoading(false);
+      setCepError("CEP invalido.");
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(async () => {
+      try {
+        setCepLoading(true);
+        setCepError("");
+
+        const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`, {
+          signal: controller.signal
+        });
+        const payload = await response.json();
+
+        if (!response.ok || payload.erro) {
+          throw new Error("CEP nao encontrado.");
+        }
+
+        setForm((prev) => ({
+          ...prev,
+          cep: cepDigits,
+          rua: payload.logradouro || prev.rua,
+          bairro: payload.bairro || prev.bairro,
+          cidade: payload.localidade || prev.cidade
+        }));
+      } catch (lookupError) {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setCepError(lookupError.message || "Nao foi possivel buscar o CEP.");
+      } finally {
+        if (!controller.signal.aborted) {
+          setCepLoading(false);
+        }
+      }
+    }, 250);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [form.cep]);
 
   function handleModeChange(mode) {
     setForm((prev) => ({ ...prev, mode }));
@@ -102,6 +166,10 @@ export default function RegisterStorePage() {
         await actions.registerContactLead({
           nome: form.nome,
           whatsapp: form.whatsapp,
+          cep: form.cep,
+          rua: form.rua,
+          numero: form.numero,
+          bairro: form.bairro,
           cidade: form.cidade,
           categoria: form.categoria,
           observacoes: form.observacoes
@@ -119,7 +187,9 @@ export default function RegisterStorePage() {
         telefone: form.telefone,
         senha: form.senha,
         endereco: {
+          cep: form.cep,
           rua: form.rua,
+          numero: form.numero,
           bairro: form.bairro,
           cidade: form.cidade
         },
@@ -249,6 +319,31 @@ export default function RegisterStorePage() {
 
               <div className="register-v2-two">
                 <label>
+                  <span>CEP</span>
+                  <input value={form.cep} onChange={(event) => updateField("cep", event.target.value)} />
+                </label>
+                <label>
+                  <span>Bairro</span>
+                  <input value={form.bairro} onChange={(event) => updateField("bairro", event.target.value)} />
+                </label>
+              </div>
+
+              {cepLoading ? <p className="register-v2-helper">Buscando CEP...</p> : null}
+              {cepError ? <p className="error-text">{cepError}</p> : null}
+
+              <div className="register-v2-two">
+                <label>
+                  <span>Rua</span>
+                  <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} />
+                </label>
+                <label>
+                  <span>Número</span>
+                  <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} />
+                </label>
+              </div>
+
+              <div className="register-v2-two">
+                <label>
                   <span>Cidade</span>
                   <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} />
                 </label>
@@ -331,6 +426,17 @@ export default function RegisterStorePage() {
             <>
               <div className="register-v2-two">
                 <label>
+                  <span>CEP</span>
+                  <input value={form.cep} onChange={(event) => updateField("cep", event.target.value)} required />
+                </label>
+                <div />
+              </div>
+
+              {cepLoading ? <p className="register-v2-helper">Buscando CEP...</p> : null}
+              {cepError ? <p className="error-text">{cepError}</p> : null}
+
+              <div className="register-v2-two">
+                <label>
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
@@ -350,8 +456,19 @@ export default function RegisterStorePage() {
                   <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} required />
                 </label>
                 <label>
+                  <span>Número</span>
+                  <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} required />
+                </label>
+              </div>
+
+              <div className="register-v2-two">
+                <label>
                   <span>Bairro</span>
                   <input value={form.bairro} onChange={(event) => updateField("bairro", event.target.value)} required />
+                </label>
+                <label>
+                  <span>Cidade</span>
+                  <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} required />
                 </label>
               </div>
 

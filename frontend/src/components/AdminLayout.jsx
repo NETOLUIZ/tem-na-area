@@ -24,10 +24,7 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
   const primaryLinks = [
     { label: "Dashboard", to: getLink("Dashboard", links[0]?.to || "/admin-temnaarea") },
     { label: "Lojas", to: getLink("Lojas", getLink("Dashboard", "/admin-temnaarea")) },
-    { label: "Logs", to: getLink("Logs", getLink("Dashboard", "/admin-temnaarea")) },
-    { label: "Campanhas", to: null },
-    { label: "Financeiro", to: getLink("Financeiro", null) },
-    { label: "Ajustes", to: null }
+    { label: "Logs", to: getLink("Logs", getLink("Dashboard", "/admin-temnaarea")) }
   ];
 
   return (

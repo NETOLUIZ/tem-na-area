@@ -2,7 +2,7 @@ import { ApiError } from "../lib/api-error.js";
 import { asyncHandler } from "../lib/async-handler.js";
 import { sendData } from "../lib/http.js";
 import { runInTransaction } from "../lib/transactions.js";
-import { requireFields } from "../lib/validators.js";
+import { requireFields, requireIntegerId } from "../lib/validators.js";
 
 export function registerAdminRoutes(app, dependencies) {
   const {
@@ -26,9 +26,10 @@ export function registerAdminRoutes(app, dependencies) {
 
   app.patch("/api/v1/admin/stores/:id/status", auth.requireRole("admin"), asyncHandler(async (req, res) => {
     requireFields(req.body, ["status"]);
+    const storeId = requireIntegerId(req.params.id, "storeId");
     sendData(res, {
       store: await adminService.updateStoreStatus(
-        Number(req.params.id),
+        storeId,
         req.body.status,
         req.auth.admin_id ? Number(req.auth.admin_id) : null,
         req.body.motivo ?? null
@@ -45,8 +46,9 @@ export function registerAdminRoutes(app, dependencies) {
   }));
 
   app.patch("/api/v1/admin/leads/:id/approve", auth.requireRole("admin"), asyncHandler(async (req, res) => {
+    const leadId = requireIntegerId(req.params.id, "leadId");
     const approval = await runInTransaction(pool, async (connection) => {
-      const result = await registrationRepository.approveFreeLead(connection, Number(req.params.id), Number(req.auth.admin_id || 0));
+      const result = await registrationRepository.approveFreeLead(connection, leadId, Number(req.auth.admin_id || 0));
       if (!result) {
         throw new ApiError("Lead nao encontrado ou invalido.", 404);
       }

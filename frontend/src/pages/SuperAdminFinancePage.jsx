@@ -18,8 +18,7 @@ export default function SuperAdminFinancePage() {
   const links = [
     { to: "/admin-temnaarea", label: "Dashboard" },
     { to: "/admin-temnaarea/lojas", label: "Lojas" },
-    { to: "/admin-temnaarea/logs", label: "Logs" },
-    { to: "/admin-temnaarea/financeiro", label: "Financeiro" }
+    { to: "/admin-temnaarea/logs", label: "Logs" }
   ];
 
   const paidStores = useMemo(

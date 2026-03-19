@@ -593,8 +593,11 @@ export function AppProvider({ children }) {
         whatsapp: payload.whatsapp,
         categoria_principal: payload.categoria,
         descricao_resumida: payload.descricaoCurta,
+        cep: payload.endereco?.cep,
         cidade: payload.endereco?.cidade,
         endereco_logradouro: payload.endereco?.rua,
+        endereco_numero: payload.endereco?.numero,
+        endereco_bairro: payload.endereco?.bairro,
         horario_funcionamento: payload.horarioFuncionamento,
         logo_url: payload.logo,
         capa_url: payload.capa,
@@ -613,6 +616,10 @@ export function AppProvider({ children }) {
         nome_responsavel: payload.nome,
         whatsapp: payload.whatsapp,
         categoria_principal: payload.categoria || "servico",
+        cep: payload.cep,
+        endereco_logradouro: payload.rua,
+        endereco_numero: payload.numero,
+        endereco_bairro: payload.bairro,
         cidade: payload.cidade,
         observacoes: payload.observacoes || ""
       });

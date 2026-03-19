@@ -78,7 +78,7 @@ export class CatalogRepository {
       return productId;
     }
 
-    const [result] = await this.db.execute(
+    const [, meta] = await this.db.execute(
       `
         INSERT INTO produtos (
           loja_id, categoria_id, cardapio_id, sku, nome, slug, descricao, descricao_curta, imagem_url,
@@ -89,7 +89,7 @@ export class CatalogRepository {
       [storeId].concat(params)
     );
 
-    return result.insertId;
+    return meta.insertId;
   }
 
   async deleteProduct(storeId, productId) {

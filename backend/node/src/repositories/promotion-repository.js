@@ -57,7 +57,7 @@ export class PromotionRepository {
       return promotionId;
     }
 
-    const [result] = await this.db.execute(
+    const [, meta] = await this.db.execute(
       `
         INSERT INTO cards_home (
           loja_id, titulo_exibicao, subtitulo_exibicao, descricao_curta, imagem_url,
@@ -67,7 +67,7 @@ export class PromotionRepository {
       [storeId].concat(params)
     );
 
-    return result.insertId;
+    return meta.insertId;
   }
 
   async delete(storeId, promotionId) {

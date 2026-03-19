@@ -87,7 +87,7 @@ export default function SuperAdminLoginPage() {
         </div>
 
         <h2>Login do admin</h2>
-        <p>Gerencie aprovações, bloqueios, campanhas e a operação global com a mesma identidade visual do site.</p>
+        <p>Gerencie aprovações, bloqueios e a operação global com a mesma identidade visual do site.</p>
 
         <div className="super-admin-login-grid">
           <div className="super-admin-login-hint">

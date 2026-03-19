@@ -65,7 +65,7 @@ export class OptionGroupRepository {
         groupParams.concat([groupId, storeId])
       );
     } else {
-      const [result] = await this.db.execute(
+      const [, meta] = await this.db.execute(
         `
           INSERT INTO product_option_groups (
             loja_id, nome, descricao, tipo, obrigatorio, minimo_selecoes, maximo_selecoes, ordem_exibicao, ativo
@@ -73,7 +73,7 @@ export class OptionGroupRepository {
         `,
         [storeId].concat(groupParams)
       );
-      groupId = result.insertId;
+      groupId = meta.insertId;
     }
 
     await this.db.execute("DELETE FROM product_option_items WHERE group_id = ?", [groupId]);
