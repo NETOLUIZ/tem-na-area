@@ -78,7 +78,7 @@ export class StoreRepository {
     }
 
     if (search) {
-      sql += " AND (l.nome LIKE ? OR l.descricao_curta LIKE ? OR l.categoria_principal LIKE ?)";
+      sql += " AND (l.nome ILIKE ? OR l.descricao_curta ILIKE ? OR l.categoria_principal ILIKE ?)";
       const term = `%${search}%`;
       params.push(term, term, term);
     }

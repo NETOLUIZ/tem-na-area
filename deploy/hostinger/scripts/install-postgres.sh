@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+
+sudo systemctl enable postgresql
+sudo systemctl start postgresql
+
+echo "PostgreSQL instalado. Agora execute o script create-postgres-app-db.sh informando a senha da aplicação."

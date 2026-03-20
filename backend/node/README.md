@@ -1,6 +1,11 @@
 # Tem na Area Node API
 
-Backend em Node.js para o projeto `Tem na Area`, mantendo as rotas `/api/v1` usadas pelo frontend e usando Postgres.
+API central em Node.js + Express para o ecossistema `Tem na Area`, com:
+
+- frontend principal em `temnaarea.site`
+- frontend PDV em `pdv.temnaarea.site`
+- API central em `api.temnaarea.site`
+- PostgreSQL unico compartilhado
 
 ## Comandos
 
@@ -15,17 +20,29 @@ npm start
 ```env
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/tem_na_area
 TEM_NA_AREA_APP_ENV=local
+TEM_NA_AREA_SITE_URL=https://temnaarea.site
+TEM_NA_AREA_SITE_WWW_URL=https://www.temnaarea.site
+TEM_NA_AREA_PDV_URL=https://pdv.temnaarea.site
+TEM_NA_AREA_API_URL=https://api.temnaarea.site
 TEM_NA_AREA_APP_URL=http://127.0.0.1:3001
 TEM_NA_AREA_APP_KEY=troque-esta-chave
 TEM_NA_AREA_PORT=3001
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=https://temnaarea.site,https://www.temnaarea.site,https://pdv.temnaarea.site
 ```
 
 ## Rotas
 
 - `GET /api/v1/health`
+- `GET /api/v1/health/db`
 - `POST /api/v1/auth/merchant/login`
 - `POST /api/v1/auth/admin/login`
+- `GET /api/v1/stores`
+- `GET /api/v1/products`
+- `GET /api/v1/orders`
+- `POST /api/v1/orders`
+- `PATCH /api/v1/orders/:id/status`
+- `GET /api/v1/payments`
+- `GET /api/v1/sales`
 - `POST /api/v1/pdv/auth/login`
 - `GET /api/v1/pdv/bootstrap`
 - `GET /api/v1/pdv/products`
@@ -67,11 +84,17 @@ CORS_ORIGIN=http://localhost:5173
 
 ## Banco
 
-O backend inicializa automaticamente o schema minimo do Postgres usando:
+Schema PostgreSQL oficial:
 
 ```txt
 ../database/tem_na_area_postgres.sql
 ```
+
+Em producao, use:
+
+- `TEM_NA_AREA_BOOTSTRAP_DB=false`
+- importacao explicita do schema antes de subir a API
+- `GET /api/v1/health/db` para validar conexao real com o banco
 
 ## API do PDV
 
