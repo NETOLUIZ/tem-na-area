@@ -244,7 +244,7 @@ export default function RegisterStorePage() {
         paymentStatus: "approved"
       });
 
-      setSuccess(`Solicitação enviada com sucesso. Protocolo interno: ${store.id}.`);
+      setSuccess(`Solicitação enviada com sucesso. Aguarde autorização do admin. Protocolo: ${store.id}.`);
     } catch (submitError) {
       setError(submitError.message || "Não foi possível enviar o cadastro agora.");
     } finally {

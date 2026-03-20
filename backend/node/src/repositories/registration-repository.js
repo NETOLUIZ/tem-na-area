@@ -1,6 +1,5 @@
 import { protocol, slugify, uuid } from "../lib/strings.js";
 import crypto from "node:crypto";
-import { ApiError } from "../lib/api-error.js";
 
 function getInsertedId(rows, meta) {
   if (Array.isArray(rows) && rows[0]?.id != null) {
@@ -57,37 +56,16 @@ export class RegistrationRepository {
         payload.capa_url ?? null,
         payload.observacoes ?? null,
         plan.id,
-        plan.codigo === "FREE" ? "PENDENTE" : "AGUARDANDO_PAGAMENTO",
-        plan.codigo === "FREE" ? "NAO_APLICAVEL" : "PENDENTE"
+        plan.codigo === "FREE"
+          ? "PENDENTE"
+          : (String(payload.status_pagamento || "").toUpperCase() === "APROVADO" ? "EM_ANALISE" : "AGUARDANDO_PAGAMENTO"),
+        plan.codigo === "FREE"
+          ? "NAO_APLICAVEL"
+          : (String(payload.status_pagamento || "").toUpperCase() === "APROVADO" ? "APROVADO" : "PENDENTE")
       ]
     );
 
     return meta.insertId;
-  }
-
-  async findExistingOwnerUser({ email = null, telefone = null, whatsapp = null }) {
-    const candidates = [email, telefone, whatsapp]
-      .map((value) => (typeof value === "string" ? value.trim() : ""))
-      .filter(Boolean);
-
-    if (!candidates.length) {
-      return null;
-    }
-
-    const placeholders = candidates.map(() => "?").join(", ");
-    const [rows] = await this.db.execute(
-      `
-        SELECT id, email, telefone, whatsapp
-        FROM usuarios
-        WHERE email IN (${placeholders})
-           OR COALESCE(telefone, '') IN (${placeholders})
-           OR COALESCE(whatsapp, '') IN (${placeholders})
-        LIMIT 1
-      `,
-      candidates.concat(candidates, candidates)
-    );
-
-    return rows[0] || null;
   }
 
   async freeLeads() {
@@ -121,149 +99,6 @@ export class RegistrationRepository {
     return Boolean(rows[0]);
   }
 
-  async createPaidLeadAndActivate(connection, payload, plan) {
-    const existingUser = await this.findExistingOwnerUser({
-      email: payload.email,
-      telefone: payload.telefone,
-      whatsapp: payload.whatsapp
-    });
-
-    if (existingUser) {
-      throw new ApiError("Ja existe uma conta cadastrada com este e-mail ou telefone.", 409);
-    }
-
-    const normalizedEmail = payload.email?.trim().toLowerCase() || `${protocol("USR").toLowerCase()}@temnaarea.local`;
-    const normalizedPhone = payload.telefone?.trim() || payload.whatsapp?.trim() || null;
-    const normalizedWhatsapp = payload.whatsapp?.trim() || normalizedPhone;
-    const passwordHash = crypto.createHash("sha256").update(String(payload.senha)).digest("hex");
-
-    const [userRows, userMeta] = await connection.execute(
-      `
-        INSERT INTO usuarios (
-          uuid, nome, email, telefone, whatsapp, senha_hash, tipo_usuario, status,
-          email_verificado_em, telefone_verificado_em
-        ) VALUES (?, ?, ?, ?, ?, ?, 'DONO_LOJA', 'ATIVO', NOW(), NOW())
-        RETURNING id
-      `,
-      [
-        uuid(),
-        payload.nome_responsavel || payload.nome_empresa,
-        normalizedEmail,
-        normalizedPhone,
-        normalizedWhatsapp,
-        passwordHash
-      ]
-    );
-    const userId = getInsertedId(userRows, userMeta);
-
-    const [ownerRows, ownerMeta] = await connection.execute(
-      `
-        INSERT INTO donos_loja (usuario_id, nome_fantasia, razao_social, cpf_cnpj, data_adesao)
-        VALUES (?, ?, ?, ?, NOW())
-        RETURNING id
-      `,
-      [userId, payload.nome_empresa, payload.nome_empresa, payload.cpf_cnpj ?? null]
-    );
-    const ownerId = getInsertedId(ownerRows, ownerMeta);
-
-    const [leadRows, leadMeta] = await connection.execute(
-      `
-        INSERT INTO solicitacoes_cadastro (
-          protocolo, tipo_solicitacao, nome_empresa, nome_responsavel, email, telefone, whatsapp,
-          cpf_cnpj, categoria_principal, descricao_resumida, cidade, estado, endereco_logradouro,
-          endereco_numero, endereco_bairro, endereco_complemento, cep, horario_funcionamento,
-          logo_url, capa_url, observacoes, plano_id, usuario_id, dono_loja_id,
-          status_solicitacao, status_pagamento, analisado_em
-        ) VALUES (?, 'LOJA_PAGA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APROVADA', 'APROVADO', NOW())
-        RETURNING id
-      `,
-      [
-        protocol("SOL"),
-        payload.nome_empresa,
-        payload.nome_responsavel || payload.nome_empresa,
-        normalizedEmail,
-        normalizedPhone,
-        normalizedWhatsapp,
-        payload.cpf_cnpj ?? null,
-        payload.categoria_principal,
-        payload.descricao_resumida ?? null,
-        payload.cidade ?? null,
-        payload.estado ?? null,
-        payload.endereco_logradouro ?? null,
-        payload.endereco_numero ?? null,
-        payload.endereco_bairro ?? null,
-        payload.endereco_complemento ?? null,
-        payload.cep ?? null,
-        payload.horario_funcionamento ?? null,
-        payload.logo_url ?? null,
-        payload.capa_url ?? null,
-        payload.observacoes ?? null,
-        plan.id,
-        userId,
-        ownerId
-      ]
-    );
-    const leadId = getInsertedId(leadRows, leadMeta);
-
-    const slugBase = slugify(payload.nome_empresa);
-    let slug = slugBase;
-    let counter = 2;
-    while (await this.slugExists(slug)) {
-      slug = `${slugBase}-${counter}`;
-      counter += 1;
-    }
-
-    const [storeRows, storeMeta] = await connection.execute(
-      `
-        INSERT INTO lojas (
-          uuid, dono_loja_id, plano_id, solicitacao_cadastro_id, nome, slug, categoria_principal,
-          descricao_curta, email_contato, telefone, whatsapp, logo_url, capa_url,
-          endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro, endereco_cidade, endereco_estado,
-          horario_funcionamento, modo_operacao, status_loja, destaque_home, aceita_pedidos, aprovado_em
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'LOJA_COMPLETA', 'ATIVA', FALSE, TRUE, NOW())
-        RETURNING id
-      `,
-      [
-        uuid(),
-        ownerId,
-        plan.id,
-        leadId,
-        payload.nome_empresa,
-        slug,
-        payload.categoria_principal,
-        payload.descricao_resumida ?? "Loja completa cadastrada pelo plano pago.",
-        normalizedEmail,
-        normalizedPhone,
-        normalizedWhatsapp,
-        payload.logo_url ?? null,
-        payload.capa_url ?? null,
-        payload.cep ?? null,
-        payload.endereco_logradouro ?? null,
-        payload.endereco_numero ?? null,
-        payload.endereco_bairro ?? null,
-        payload.cidade ?? null,
-        payload.estado ?? null,
-        payload.horario_funcionamento ?? null
-      ]
-    );
-    const storeId = getInsertedId(storeRows, storeMeta);
-
-    await connection.execute(
-      `
-        INSERT INTO configuracoes_loja (
-          loja_id, taxa_entrega_padrao, pedido_minimo, aceita_retirada, aceita_entrega, exibir_produtos_esgotados, exibir_whatsapp
-        ) VALUES (?, 0, 0, TRUE, TRUE, FALSE, TRUE)
-      `,
-      [storeId]
-    );
-
-    return {
-      lead_id: leadId,
-      store_id: storeId,
-      user_id: userId,
-      slug
-    };
-  }
 
   async approveFreeLead(connection, leadId, adminId) {
     const [leadRows] = await connection.execute(
