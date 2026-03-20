@@ -81,4 +81,21 @@ export function registerAdminRoutes(app, dependencies) {
       paid_leads: await registrationRepository.paidLeads()
     });
   }));
+
+  app.patch("/api/v1/admin/leads/:id/approve-paid", auth.requireRole("admin"), asyncHandler(async (req, res) => {
+    const leadId = requireIntegerId(req.params.id, "leadId");
+    const approval = await runInTransaction(pool, async (connection) => {
+      const result = await registrationRepository.approvePaidLead(connection, leadId, Number(req.auth.admin_id || 0));
+      if (!result) {
+        throw new ApiError("Solicitacao paga nao encontrada ou invalida.", 404);
+      }
+      return result;
+    });
+
+    sendData(res, {
+      approval,
+      paid_leads: await registrationRepository.paidLeads(),
+      stores: await storeRepository.adminStores()
+    });
+  }));
 }

@@ -193,6 +193,13 @@ export const api = {
       body: {}
     });
   },
+  approveAdminPaidLead(token, id) {
+    return request(`/admin/leads/${id}/approve-paid`, {
+      method: "PATCH",
+      token,
+      body: {}
+    });
+  },
   updateAdminStoreStatus(token, id, status, motivo) {
     return request(`/admin/stores/${id}/status`, {
       method: "PATCH",

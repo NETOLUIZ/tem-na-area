@@ -596,6 +596,7 @@ export function AppProvider({ children }) {
         email: payload.email,
         telefone: payload.telefone,
         whatsapp: payload.whatsapp,
+        senha: payload.senha,
         categoria_principal: payload.categoria,
         descricao_resumida: payload.descricaoCurta,
         cep: payload.endereco?.cep,
@@ -663,6 +664,15 @@ export function AppProvider({ children }) {
       if (!token) return { ok: false, message: "Sessao do admin nao encontrada." };
 
       await api.confirmAdminPaidLead(token, leadId);
+      await hydrateAdminSession(token);
+      return { ok: true };
+    },
+
+    async approvePaidPlanLead(leadId) {
+      const token = state.sessions.superAdminToken;
+      if (!token) return { ok: false, message: "Sessao do admin nao encontrada." };
+
+      await api.approveAdminPaidLead(token, leadId);
       await hydrateAdminSession(token);
       return { ok: true };
     },

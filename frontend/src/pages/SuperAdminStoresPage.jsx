@@ -116,8 +116,26 @@ export default function SuperAdminStoresPage() {
       key: "approve",
       label: "Ações",
       render: (row) => (
-        row.paymentStatus === "APROVADO" ? (
-          <button className="btn btn-outline" disabled>Pagamento confirmado</button>
+        row.status === "APROVADA" ? (
+          <button className="btn btn-outline" disabled>Cadastro aprovado</button>
+        ) : row.paymentStatus === "APROVADO" ? (
+          <button
+            className="btn btn-primary"
+            disabled={paidLeadLoadingId === row.id}
+            onClick={async () => {
+              setPaidLeadError("");
+              setPaidLeadLoadingId(row.id);
+              try {
+                await actions.approvePaidPlanLead(row.id);
+              } catch (error) {
+                setPaidLeadError(error.message || "Não foi possível aprovar o cadastro.");
+              } finally {
+                setPaidLeadLoadingId(null);
+              }
+            }}
+          >
+            {paidLeadLoadingId === row.id ? "Aprovando..." : "Aprovar cadastro"}
+          </button>
         ) : (
           <button
             className="btn btn-primary"
