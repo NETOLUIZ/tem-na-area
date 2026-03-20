@@ -64,6 +64,8 @@ export default function RegisterStorePage() {
   const [loading, setLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
   const [cepError, setCepError] = useState("");
+  const [localLogoName, setLocalLogoName] = useState("");
+  const [localCapaName, setLocalCapaName] = useState("");
 
   const totalSteps = getTotalSteps(form.mode);
   const currentStep = Math.min(step, totalSteps);
@@ -152,7 +154,45 @@ export default function RegisterStorePage() {
 
   function handleAdvance() {
     if (form.mode === "paid" && currentStep === 2 && !paymentConfirmed) return;
+
+    if (form.mode === "paid" && currentStep === 3) {
+      const missing = [];
+      if (!String(form.nome || "").trim()) missing.push("nome da loja");
+      if (!String(form.telefone || "").trim()) missing.push("telefone para login");
+      if (!String(form.whatsapp || "").trim()) missing.push("WhatsApp");
+      if (!String(form.senha || "").trim()) missing.push("senha");
+      if (!String(form.descricaoCurta || "").trim()) missing.push("descrição curta");
+
+      if (missing.length > 0) {
+        setError(`Preencha antes de avançar: ${missing.join(", ")}.`);
+        return;
+      }
+    }
+
+    if (form.mode === "paid" && currentStep === 4) {
+      const missing = [];
+      if (!String(form.cep || "").trim()) missing.push("CEP");
+      if (!String(form.rua || "").trim()) missing.push("rua");
+      if (!String(form.numero || "").trim()) missing.push("número");
+      if (!String(form.bairro || "").trim()) missing.push("bairro");
+      if (!String(form.cidade || "").trim()) missing.push("cidade");
+
+      if (missing.length > 0) {
+        setError(`Preencha antes de concluir: ${missing.join(", ")}.`);
+        return;
+      }
+    }
+
+    setError("");
     setStep((prev) => Math.min(totalSteps, prev + 1));
+  }
+
+  function loadLocalImage(file, setFileName) {
+    if (!file) {
+      setFileName("");
+      return;
+    }
+    setFileName(file.name);
   }
 
   async function handleSubmit(event) {
@@ -376,7 +416,7 @@ export default function RegisterStorePage() {
                 <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
               </label>
 
-              <div className="register-v2-two">
+            <div className="register-v2-two">
                 <label>
                   <span>E-mail</span>
                   <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
@@ -466,8 +506,29 @@ export default function RegisterStorePage() {
                   <input value={form.logo} onChange={(event) => updateField("logo", event.target.value)} />
                 </label>
                 <label>
+                  <span>Arquivo local da logo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => loadLocalImage(event.target.files?.[0], setLocalLogoName)}
+                  />
+                  {localLogoName ? <small className="register-v2-helper">{localLogoName}</small> : null}
+                </label>
+              </div>
+
+              <div className="register-v2-two">
+                <label>
                   <span>URL da capa</span>
                   <input value={form.capa} onChange={(event) => updateField("capa", event.target.value)} />
+                </label>
+                <label>
+                  <span>Arquivo local da capa</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => loadLocalImage(event.target.files?.[0], setLocalCapaName)}
+                  />
+                  {localCapaName ? <small className="register-v2-helper">{localCapaName}</small> : null}
                 </label>
               </div>
             </>
