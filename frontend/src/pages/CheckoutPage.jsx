@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MdArrowForward, MdBatteryStd, MdSignalCellularAlt, MdWifi } from "react-icons/md";
+import { MdArrowForward } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { formatCurrency } from "../utils/format";
@@ -9,11 +9,18 @@ export default function CheckoutPage() {
   const location = useLocation();
   const { selectors, actions } = useApp();
   const cart = selectors.cartDetailed();
+  const [street = "", number = "", district = "", city = ""] = String(location.state?.enderecoEntrega || "")
+    .split(",")
+    .map((item) => item.trim());
 
   const [form, setForm] = useState({
     nome: "",
     telefone: "",
-    enderecoEntrega: location.state?.enderecoEntrega || "",
+    cep: "",
+    rua: street,
+    numero: number,
+    bairro: district,
+    cidade: city,
     observacoes: ""
   });
   const [error, setError] = useState("");
@@ -21,10 +28,18 @@ export default function CheckoutPage() {
 
   const totalItems = useMemo(() => cart.items.reduce((sum, row) => sum + row.quantidade, 0), [cart.items]);
 
+  function updateField(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
   function validate() {
     if (form.nome.trim().length < 3) return "Informe o nome completo.";
-    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone inválido.";
-    if (form.enderecoEntrega.trim().length < 8) return "Informe o endereço de entrega.";
+    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone invalido.";
+    if (form.cep.replace(/\D/g, "").length !== 8) return "Informe um CEP valido.";
+    if (form.rua.trim().length < 3) return "Informe a rua de entrega.";
+    if (form.numero.trim().length < 1) return "Informe o numero da entrega.";
+    if (form.bairro.trim().length < 2) return "Informe o bairro da entrega.";
+    if (form.cidade.trim().length < 2) return "Informe a cidade da entrega.";
     return "";
   }
 
@@ -41,7 +56,7 @@ export default function CheckoutPage() {
     setLoading(false);
 
     if (!order) {
-      setError("Não foi possível finalizar. Verifique sua sacola.");
+      setError("Nao foi possivel finalizar. Verifique sua sacola.");
       return;
     }
 
@@ -53,7 +68,7 @@ export default function CheckoutPage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Sacola vazia</h3>
-          <p>Você precisa adicionar itens antes de finalizar.</p>
+          <p>Voce precisa adicionar itens antes de finalizar.</p>
           <Link className="btn btn-primary" to="/">Voltar para a Home</Link>
         </div>
       </div>
@@ -62,14 +77,9 @@ export default function CheckoutPage() {
 
   return (
     <main className="checkout-v2-page">
-      <div className="checkout-v2-statusbar">
-        <span>9:41</span>
-        <div><MdSignalCellularAlt /><MdWifi /><MdBatteryStd /></div>
-      </div>
-
       <header className="checkout-v2-header">
         <div className="checkout-v2-title-block">
-          <p className="checkout-v2-kicker">Confirmação final no Tem na Área</p>
+          <p className="checkout-v2-kicker">Confirmacao final no Tem na Area</p>
           <h1>Finalizar pedido</h1>
           <p>{cart.store?.nome}</p>
         </div>
@@ -80,17 +90,17 @@ export default function CheckoutPage() {
           <div className="checkout-v2-card">
             <h2>Dados para entrega</h2>
 
-            <input placeholder="Nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-            <input placeholder="Telefone" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
-            <input
-              placeholder="Endereço de entrega"
-              value={form.enderecoEntrega}
-              onChange={(e) => setForm({ ...form, enderecoEntrega: e.target.value })}
-            />
+            <input placeholder="Nome completo" value={form.nome} onChange={(e) => updateField("nome", e.target.value)} />
+            <input placeholder="Telefone" value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
+            <input placeholder="CEP" value={form.cep} onChange={(e) => updateField("cep", e.target.value)} />
+            <input placeholder="Rua" value={form.rua} onChange={(e) => updateField("rua", e.target.value)} />
+            <input placeholder="Casa / numero" value={form.numero} onChange={(e) => updateField("numero", e.target.value)} />
+            <input placeholder="Bairro" value={form.bairro} onChange={(e) => updateField("bairro", e.target.value)} />
+            <input placeholder="Cidade" value={form.cidade} onChange={(e) => updateField("cidade", e.target.value)} />
             <textarea
-              placeholder="Observações do pedido (opcional)"
+              placeholder="Observacoes do pedido (opcional)"
               value={form.observacoes}
-              onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+              onChange={(e) => updateField("observacoes", e.target.value)}
               rows={3}
             />
 

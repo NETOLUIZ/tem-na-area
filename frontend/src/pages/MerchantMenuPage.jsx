@@ -1,11 +1,8 @@
 import { useMemo, useState } from "react";
 import {
   MdArrowBack,
-  MdBatteryStd,
   MdRestaurantMenu,
-  MdSignalCellularAlt,
-  MdTune,
-  MdWifi
+  MdTune
 } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MerchantDesktopSidebar from "../components/MerchantDesktopSidebar";
@@ -148,11 +145,6 @@ export default function MerchantMenuPage() {
           navigate("/login-loja");
         }}
       />
-
-      <div className="menu-v2-statusbar">
-        <span>9:41</span>
-        <div><MdSignalCellularAlt /><MdWifi /><MdBatteryStd /></div>
-      </div>
 
       <header className="menu-v2-header">
         <div className="menu-v2-header-top">

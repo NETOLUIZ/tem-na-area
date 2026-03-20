@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutorial VPS Hostinger - Tem na Area</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --paper: #fffdf8;
+      --ink: #1f2a37;
+      --muted: #5d6b79;
+      --accent: #9a3412;
+      --line: #d8cfc2;
+      --code: #f5efe4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, #efe2c8 0, transparent 28%),
+        linear-gradient(180deg, #efe8da 0%, var(--bg) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 40px auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 40px rgba(31, 42, 55, 0.08);
+      padding: 56px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2;
+      margin-top: 1.6em;
+      color: #12202f;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 2.2rem;
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+
+    p, li { font-size: 1.02rem; }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    code {
+      background: var(--code);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      border-left: 5px solid var(--accent);
+    }
+
+    .note {
+      background: #fff3e8;
+      border: 1px solid #efc9a4;
+      padding: 14px 16px;
+      border-radius: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        margin: 0;
+        max-width: none;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 24px; margin: 0; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Tutorial VPS Hostinger: Deploy Completo do Projeto Tem na Area</h1>
+    <p class="lead">Guia de estudo com o processo que foi seguido para publicar frontend, backend e banco em uma VPS, com PM2, Nginx e Supabase.</p>
+
+    <h2>1. Objetivo</h2>
+    <p>Publicar um projeto full stack em uma VPS da Hostinger usando React + Vite no frontend, Node.js no backend, PostgreSQL no Supabase, PM2 para processo persistente e Nginx como servidor web e proxy reverso.</p>
+
+    <h2>2. Arquitetura Final</h2>
+    <div class="grid">
+      <div>
+        <h3>Componentes</h3>
+        <ul>
+          <li>VPS Ubuntu na Hostinger</li>
+          <li>Nginx</li>
+          <li>PM2</li>
+          <li>Supabase Postgres</li>
+          <li>GitHub</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Rotas finais</h3>
+        <ul>
+          <li>Frontend: <code>http://IP_DO_SERVIDOR</code></li>
+          <li>API: <code>http://IP_DO_SERVIDOR/api/v1</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>3. Problema Inicial</h2>
+    <p>O primeiro erro foi <code>ENOENT Could not read package.json</code>. O motivo era simples: o comando <code>npm</code> estava sendo executado em uma pasta sem o projeto clonado.</p>
+    <pre><code>cd /var/www/tem-na-area-api/tem-na-area
+git pull origin main
+npm install
+npm start</code></pre>
+
+    <h2>4. Ajuste na Raiz do Repositório</h2>
+    <p>Foram adicionados scripts na raiz para que <code>npm start</code> inicializasse a API correta dentro do workspace <code>backend/node</code>.</p>
+    <pre><code>"scripts": {
+  "build": "npm run build --workspace frontend",
+  "start": "npm run start --workspace backend/node",
+  "dev:api": "npm run dev --workspace backend/node",
+  "check:api": "npm run check --workspace backend/node"
+}</code></pre>
+
+    <h2>5. Banco de Dados no Supabase</h2>
+    <p>Depois de corrigir a pasta, a API caiu ao tentar conectar em <code>127.0.0.1:5432</code>. Isso mostrou que o backend ainda estava apontando para um banco local inexistente.</p>
+    <p>Foi criado o arquivo <code>backend/node/.env</code> com a URL do Supabase.</p>
+    <pre><code>DATABASE_URL=postgresql://USUARIO:SENHA@aws-1-sa-east-1.pooler.supabase.com:5432/postgres
+TEM_NA_AREA_DB_SSLMODE=require
+TEM_NA_AREA_DB_SSL_REJECT_UNAUTHORIZED=false
+NODE_TLS_REJECT_UNAUTHORIZED=0
+TEM_NA_AREA_APP_ENV=production
+TEM_NA_AREA_APP_URL=http://72.62.106.59
+TEM_NA_AREA_APP_KEY=tem-na-area-chave-super-secreta-2026
+TEM_NA_AREA_PORT=3001
+CORS_ORIGIN=*</code></pre>
+
+    <div class="note">
+      <strong>Nota:</strong> durante o processo houve erro de certificado SSL e por isso foi usado <code>NODE_TLS_REJECT_UNAUTHORIZED=0</code> como ajuste provisório.
+    </div>
+
+    <h2>6. Publicando a API com PM2</h2>
+    <pre><code>cd /var/www/tem-na-area-api/tem-na-area
+pm2 start npm --name temnaarea -- start
+pm2 save
+pm2 startup</code></pre>
+
+    <p>Validacao:</p>
+    <pre><code>pm2 status
+curl http://127.0.0.1:3001/api/v1/health</code></pre>
+
+    <h2>7. Problemas com Porta 3001</h2>
+    <p>Em alguns momentos apareceu <code>EADDRINUSE</code>, indicando que a porta 3001 ja estava ocupada. O diagnostico foi feito com:</p>
+    <pre><code>lsof -i :3001
+pm2 logs temnaarea --lines 50</code></pre>
+
+    <p>Depois a API foi reiniciada corretamente no PM2.</p>
+
+    <h2>8. Build do Frontend no VPS</h2>
+    <pre><code>cd /var/www/tem-na-area-api/tem-na-area/frontend
+npm install
+npm run build</code></pre>
+
+    <p>Houve erro de dependencia opcional do Rollup no Linux:</p>
+    <pre><code>npm install @rollup/rollup-linux-x64-gnu --save-dev
+npm run build</code></pre>
+
+    <p>Com isso foi gerada a pasta <code>frontend/dist</code>.</p>
+
+    <h2>9. Configurando o Nginx</h2>
+    <p>O arquivo <code>/etc/nginx/sites-available/default</code> foi alterado para servir o frontend e encaminhar a API.</p>
+    <pre><code>server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+
+    root /var/www/tem-na-area-api/tem-na-area/frontend/dist;
+    index index.html;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:3001/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}</code></pre>
+
+    <p>Depois:</p>
+    <pre><code>nginx -t
+systemctl reload nginx</code></pre>
+
+    <h2>10. Ajuste no Frontend para Mesmo Host</h2>
+    <p>O frontend foi alterado para usar <code>/api/v1</code> em producao, mantendo <code>http://127.0.0.1:3001/api/v1</code> no ambiente de desenvolvimento.</p>
+    <pre><code>const defaultApiBaseUrl = import.meta.env.DEV ? "http://127.0.0.1:3001/api/v1" : "/api/v1";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/+$/, "");</code></pre>
+
+    <h2>11. Testes Finais</h2>
+    <pre><code>curl http://127.0.0.1:3001/api/v1/health
+curl http://72.62.106.59:3001/api/v1/health
+curl http://72.62.106.59/api/v1/health</code></pre>
+
+    <p>Todos os testes passaram, confirmando:</p>
+    <ul>
+      <li>frontend no Nginx</li>
+      <li>backend no PM2</li>
+      <li>API disponivel em <code>/api/v1</code></li>
+    </ul>
+
+    <h2>12. Sequencia Resumida</h2>
+    <pre><code>cd /var/www/tem-na-area-api/tem-na-area
+git pull origin main
+
+cd backend/node
+# ajustar .env
+
+cd /var/www/tem-na-area-api/tem-na-area
+pm2 start npm --name temnaarea -- start
+pm2 save
+
+cd frontend
+npm install
+npm run build
+
+nginx -t
+systemctl reload nginx</code></pre>
+
+    <h2>13. Licoes Aprendidas</h2>
+    <ul>
+      <li>rodar <code>npm</code> na pasta certa e essencial</li>
+      <li>scripts de raiz ajudam muito em monorepo</li>
+      <li><code>502 Bad Gateway</code> geralmente e problema no upstream</li>
+      <li>sempre testar com <code>curl</code> antes de culpar o Nginx</li>
+      <li>copiar a string do Supabase inteira evita erro de credencial</li>
+      <li>servir frontend e API no mesmo host simplifica CORS e deploy</li>
+    </ul>
+
+    <h2>14. Proximos Passos</h2>
+    <ul>
+      <li>configurar dominio</li>
+      <li>habilitar HTTPS</li>
+      <li>remover <code>NODE_TLS_REJECT_UNAUTHORIZED=0</code></li>
+      <li>restringir <code>CORS_ORIGIN</code></li>
+    </ul>
+
+    <div class="note">
+      <strong>Como gerar PDF:</strong> abra este arquivo HTML no navegador e use <code>Ctrl + P</code>, depois escolha <code>Salvar como PDF</code>.
+    </div>
+  </main>
+</body>
+</html>

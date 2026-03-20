@@ -212,8 +212,6 @@ export default function RegisterStorePage() {
     }
   }
 
-  const selectedPlan = PLAN_DETAILS[form.mode];
-
   return (
     <div className="register-v2-page">
       <header className="register-v2-topbar">
@@ -264,35 +262,20 @@ export default function RegisterStorePage() {
 
         <form className="register-v2-form" onSubmit={handleSubmit}>
           {currentStep === 1 ? (
-            <>
-              <div className="register-v2-mode-grid">
-                {Object.entries(PLAN_DETAILS).map(([mode, plan]) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    className={`register-v2-mode-card ${form.mode === mode ? "active" : ""}`}
-                    onClick={() => handleModeChange(mode)}
-                  >
-                    <strong>{plan.label}</strong>
-                    <span>{plan.description}</span>
-                    <small className="register-v2-plan-price">{plan.price}</small>
-                  </button>
-                ))}
-              </div>
-
-              <div className="register-v2-plan-box">
-                <div>
-                  <strong>{selectedPlan.label}</strong>
-                  <span>{selectedPlan.price}</span>
-                </div>
-                <p>{selectedPlan.description}</p>
-                <ul className="register-v2-benefits">
-                  {selectedPlan.benefits.map((benefit) => (
-                    <li key={benefit}>{benefit}</li>
-                  ))}
-                </ul>
-              </div>
-            </>
+            <div className="register-v2-mode-grid">
+              {Object.entries(PLAN_DETAILS).map(([mode, plan]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={`register-v2-mode-card ${form.mode === mode ? "active" : ""}`}
+                  onClick={() => handleModeChange(mode)}
+                >
+                  <strong>{plan.label}</strong>
+                  <span>{plan.description}</span>
+                  <small className="register-v2-plan-price">{plan.price}</small>
+                </button>
+              ))}
+            </div>
           ) : null}
 
           {form.mode === "free" && currentStep === 2 ? (

@@ -1,4 +1,4 @@
-import { MdArrowForward, MdBatteryStd, MdClose, MdSignalCellularAlt, MdWifi } from "react-icons/md";
+import { MdArrowForward, MdClose } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import SmartImage from "../components/SmartImage";
 import { useApp } from "../store/AppContext";
@@ -23,11 +23,6 @@ export default function CartPage() {
 
   return (
     <main className="cart-v2-page">
-      <div className="cart-v2-statusbar">
-        <span>9:41</span>
-        <div><MdSignalCellularAlt /><MdWifi /><MdBatteryStd /></div>
-      </div>
-
       <header className="cart-v2-header">
         <div className="cart-v2-title-row">
           <div>

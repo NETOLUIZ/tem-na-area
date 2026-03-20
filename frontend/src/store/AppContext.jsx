@@ -551,7 +551,6 @@ export function AppProvider({ children }) {
       }
 
       const customerId = 1;
-      const [logradouro = "", numero = "", bairro = "", cidade = ""] = String(payload.enderecoEntrega || "").split(",").map((item) => item.trim());
 
       const orderPayload = {
         store_slug: store.slug,
@@ -559,10 +558,11 @@ export function AppProvider({ children }) {
         nome_cliente: payload.nome,
         telefone_cliente: payload.telefone,
         tipo_entrega: "ENTREGA",
-        logradouro,
-        numero,
-        bairro,
-        cidade,
+        cep: payload.cep || "",
+        logradouro: payload.rua || "",
+        numero: payload.numero || "",
+        bairro: payload.bairro || "",
+        cidade: payload.cidade || "",
         estado: "SP",
         observacoes_cliente: payload.observacoes || "",
         itens: cart.items.map((item) => ({

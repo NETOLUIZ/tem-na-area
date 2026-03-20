@@ -26,6 +26,15 @@ CORS_ORIGIN=http://localhost:5173
 - `GET /api/v1/health`
 - `POST /api/v1/auth/merchant/login`
 - `POST /api/v1/auth/admin/login`
+- `POST /api/v1/pdv/auth/login`
+- `GET /api/v1/pdv/bootstrap`
+- `GET /api/v1/pdv/products`
+- `GET /api/v1/pdv/customers`
+- `POST /api/v1/pdv/customers`
+- `GET /api/v1/pdv/orders`
+- `GET /api/v1/pdv/orders/:id`
+- `POST /api/v1/pdv/orders`
+- `PATCH /api/v1/pdv/orders/:id/status`
 - `GET /api/v1/public/home`
 - `GET /api/v1/public/stores`
 - `GET /api/v1/public/stores/:slug`
@@ -62,4 +71,33 @@ O backend inicializa automaticamente o schema minimo do Postgres usando:
 
 ```txt
 ../database/tem_na_area_postgres.sql
+```
+
+## API do PDV
+
+Fluxo minimo:
+
+1. Fazer login em `POST /api/v1/pdv/auth/login`
+2. Salvar o `token`
+3. Enviar `Authorization: Bearer <token>` nas rotas seguintes
+4. Carregar bootstrap em `GET /api/v1/pdv/bootstrap`
+
+Exemplo de criacao de pedido pelo PDV:
+
+```json
+{
+  "cliente_id": 1,
+  "tipo_entrega": "RETIRADA",
+  "status_pagamento": "PENDENTE",
+  "desconto": 0,
+  "taxa_entrega": 0,
+  "observacoes_cliente": "Pedido criado no caixa",
+  "itens": [
+    {
+      "produto_id": 5,
+      "quantidade": 1,
+      "observacoes": "Sem cebola"
+    }
+  ]
+}
 ```

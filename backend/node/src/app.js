@@ -9,6 +9,7 @@ import { createAuthMiddleware } from "./middleware/auth.js";
 import { AdminRepository } from "./repositories/admin-repository.js";
 import { AuthRepository } from "./repositories/auth-repository.js";
 import { CatalogRepository } from "./repositories/catalog-repository.js";
+import { CustomerRepository } from "./repositories/customer-repository.js";
 import { OptionGroupRepository } from "./repositories/option-group-repository.js";
 import { OrderRepository } from "./repositories/order-repository.js";
 import { PromotionRepository } from "./repositories/promotion-repository.js";
@@ -23,6 +24,7 @@ import { registerAdminRoutes } from "./routes/admin-routes.js";
 import { registerAuthRoutes } from "./routes/auth-routes.js";
 import { registerHealthRoutes } from "./routes/health-routes.js";
 import { registerMerchantRoutes } from "./routes/merchant-routes.js";
+import { registerPdvRoutes } from "./routes/pdv-routes.js";
 import { registerPublicRoutes } from "./routes/public-routes.js";
 
 // A aplicacao preserva os contratos da API atual para reduzir impacto no frontend.
@@ -32,6 +34,7 @@ const auth = createAuthMiddleware(authToken);
 const authRepository = new AuthRepository(pool);
 const storeRepository = new StoreRepository(pool);
 const catalogRepository = new CatalogRepository(pool);
+const customerRepository = new CustomerRepository(pool);
 const orderRepository = new OrderRepository(pool);
 const optionGroupRepository = new OptionGroupRepository(pool);
 const promotionRepository = new PromotionRepository(pool);
@@ -63,6 +66,16 @@ registerPublicRoutes(app, {
   catalogRepository,
   optionGroupRepository,
   registrationService,
+  orderService
+});
+registerPdvRoutes(app, {
+  auth,
+  authService,
+  pool,
+  storeRepository,
+  catalogRepository,
+  orderRepository,
+  customerRepository,
   orderService
 });
 registerMerchantRoutes(app, {
