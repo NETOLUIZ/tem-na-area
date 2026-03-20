@@ -13,6 +13,8 @@ export default function SuperAdminStoresPage() {
   const [modal, setModal] = useState(null);
   const [leadLoadingId, setLeadLoadingId] = useState(null);
   const [leadError, setLeadError] = useState("");
+  const [paidLeadLoadingId, setPaidLeadLoadingId] = useState(null);
+  const [paidLeadError, setPaidLeadError] = useState("");
 
   const links = [
     { to: "/admin-temnaarea", label: "Dashboard" },
@@ -102,6 +104,43 @@ export default function SuperAdminStoresPage() {
     }
   ];
 
+  const paidLeadColumns = [
+    { key: "nome", label: "Negócio" },
+    { key: "categoria", label: "Categoria" },
+    { key: "cidade", label: "Cidade" },
+    { key: "whatsapp", label: "WhatsApp" },
+    { key: "createdAt", label: "Solicitação", render: (row) => formatDate(row.createdAt) },
+    { key: "paymentStatus", label: "Pagamento" },
+    { key: "status", label: "Status" },
+    {
+      key: "approve",
+      label: "Ações",
+      render: (row) => (
+        row.paymentStatus === "APROVADO" ? (
+          <button className="btn btn-outline" disabled>Pagamento confirmado</button>
+        ) : (
+          <button
+            className="btn btn-primary"
+            disabled={paidLeadLoadingId === row.id}
+            onClick={async () => {
+              setPaidLeadError("");
+              setPaidLeadLoadingId(row.id);
+              try {
+                await actions.confirmPaidPlanLead(row.id);
+              } catch (error) {
+                setPaidLeadError(error.message || "Não foi possível confirmar o pagamento.");
+              } finally {
+                setPaidLeadLoadingId(null);
+              }
+            }}
+          >
+            {paidLeadLoadingId === row.id ? "Confirmando..." : "Confirmar pagamento"}
+          </button>
+        )
+      )
+    }
+  ];
+
   async function confirmModal() {
     if (!modal) return;
     await actions.superAdminAction(modal.type, modal.row.id, `${modal.type} via painel`);
@@ -160,6 +199,15 @@ export default function SuperAdminStoresPage() {
         </div>
         {leadError ? <p className="error-text">{leadError}</p> : null}
         <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitação do plano grátis cadastrada." />
+      </section>
+
+      <section className="dashboard-panel neon-gap">
+        <div className="section-title">
+          <h3>Solicitações do plano pago</h3>
+          <span>{state.paidLeads.length} pedidos</span>
+        </div>
+        {paidLeadError ? <p className="error-text">{paidLeadError}</p> : null}
+        <Table columns={paidLeadColumns} rows={state.paidLeads} emptyText="Nenhuma solicitação do plano pago cadastrada." />
       </section>
 
       <ModalConfirm

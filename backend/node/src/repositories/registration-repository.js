@@ -79,6 +79,17 @@ export class RegistrationRepository {
     return rows;
   }
 
+  async paidLeads() {
+    const [rows] = await this.db.query(`
+      SELECT sc.*, p.codigo AS plano_codigo
+      FROM solicitacoes_cadastro sc
+      INNER JOIN planos p ON p.id = sc.plano_id
+      WHERE p.codigo = 'PRO'
+      ORDER BY sc.created_at DESC, sc.id DESC
+    `);
+    return rows;
+  }
+
   async findLead(leadId) {
     const [rows] = await this.db.execute(
       `
@@ -242,5 +253,26 @@ export class RegistrationRepository {
       store_id: storeId,
       slug
     };
+  }
+
+  async confirmPaidLead(connection, leadId, adminId) {
+    const lead = await this.findLead(leadId);
+    if (!lead || lead.plano_codigo !== "PRO") {
+      return null;
+    }
+
+    await connection.execute(
+      `
+        UPDATE solicitacoes_cadastro
+        SET status_pagamento = 'APROVADO',
+            status_solicitacao = 'EM_ANALISE',
+            analisado_por_admin_id = ?,
+            analisado_em = NOW()
+        WHERE id = ?
+      `,
+      [adminId, leadId]
+    );
+
+    return this.findLead(leadId);
   }
 }

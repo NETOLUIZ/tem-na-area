@@ -30,6 +30,7 @@ function initialState() {
     homePromotions: [],
     productOptionGroups: [],
     contactLeads: [],
+    paidLeads: [],
     adminStores: [],
     adminSummary: null,
     adminRecentRequests: [],
@@ -215,6 +216,8 @@ function mapLead(lead) {
     cidade: lead.cidade || "",
     whatsapp: lead.whatsapp || "",
     status: lead.status_solicitacao,
+    paymentStatus: lead.status_pagamento || "",
+    planCode: lead.plano_codigo || "",
     publishedAsCard: lead.status_solicitacao === "APROVADA",
     createdAt: lead.created_at || new Date().toISOString()
   };
@@ -394,11 +397,12 @@ export function AppProvider({ children }) {
   }
 
   async function hydrateAdminSession(token) {
-    const [dashboard, storesPayload, logsPayload, leadsPayload] = await Promise.all([
+    const [dashboard, storesPayload, logsPayload, leadsPayload, paidLeadsPayload] = await Promise.all([
       api.adminDashboard(token),
       api.adminStores(token),
       api.adminLogs(token),
-      api.adminLeads(token)
+      api.adminLeads(token),
+      api.adminPaidLeads(token)
     ]);
 
     const adminStores = (storesPayload.stores || []).map(mapStore);
@@ -418,6 +422,7 @@ export function AppProvider({ children }) {
       adminRecentRequests: dashboard.recent_requests || [],
       logs,
       contactLeads: (leadsPayload.leads || []).map(mapLead),
+      paidLeads: (paidLeadsPayload.leads || []).map(mapLead),
       sessions: {
         ...prev.sessions,
         superAdminToken: token,
@@ -649,6 +654,15 @@ export function AppProvider({ children }) {
       if (!token) return { ok: false, message: "Sessão do admin não encontrada." };
 
       await api.approveAdminLead(token, leadId);
+      await hydrateAdminSession(token);
+      return { ok: true };
+    },
+
+    async confirmPaidPlanLead(leadId) {
+      const token = state.sessions.superAdminToken;
+      if (!token) return { ok: false, message: "Sessao do admin nao encontrada." };
+
+      await api.confirmAdminPaidLead(token, leadId);
       await hydrateAdminSession(token);
       return { ok: true };
     },

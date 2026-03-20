@@ -176,8 +176,18 @@ export const api = {
   adminLeads(token) {
     return request("/admin/leads", { token });
   },
+  adminPaidLeads(token) {
+    return request("/admin/leads/paid", { token });
+  },
   approveAdminLead(token, id) {
     return request(`/admin/leads/${id}/approve`, {
+      method: "PATCH",
+      token,
+      body: {}
+    });
+  },
+  confirmAdminPaidLead(token, id) {
+    return request(`/admin/leads/${id}/confirm-payment`, {
       method: "PATCH",
       token,
       body: {}

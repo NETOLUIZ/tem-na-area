@@ -45,6 +45,10 @@ export function registerAdminRoutes(app, dependencies) {
     sendData(res, { leads: await registrationRepository.freeLeads() });
   }));
 
+  app.get("/api/v1/admin/leads/paid", auth.requireRole("admin"), asyncHandler(async (_req, res) => {
+    sendData(res, { leads: await registrationRepository.paidLeads() });
+  }));
+
   app.patch("/api/v1/admin/leads/:id/approve", auth.requireRole("admin"), asyncHandler(async (req, res) => {
     const leadId = requireIntegerId(req.params.id, "leadId");
     const approval = await runInTransaction(pool, async (connection) => {
@@ -59,6 +63,22 @@ export function registerAdminRoutes(app, dependencies) {
       approval,
       leads: await registrationRepository.freeLeads(),
       stores: await storeRepository.adminStores()
+    });
+  }));
+
+  app.patch("/api/v1/admin/leads/:id/confirm-payment", auth.requireRole("admin"), asyncHandler(async (req, res) => {
+    const leadId = requireIntegerId(req.params.id, "leadId");
+    const approval = await runInTransaction(pool, async (connection) => {
+      const result = await registrationRepository.confirmPaidLead(connection, leadId, Number(req.auth.admin_id || 0));
+      if (!result) {
+        throw new ApiError("Solicitacao paga nao encontrada ou invalida.", 404);
+      }
+      return result;
+    });
+
+    sendData(res, {
+      approval,
+      paid_leads: await registrationRepository.paidLeads()
     });
   }));
 }
