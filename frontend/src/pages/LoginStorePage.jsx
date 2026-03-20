@@ -75,7 +75,18 @@ export default function LoginStorePage() {
           <h1>Tem na Area</h1>
         </div>
 
-        <div className="login-v2-hero" />
+        <div className="login-v2-hero" aria-hidden="true">
+          <div className="login-v2-hero-copy">
+            <span className="login-v2-hero-kicker">Painel da loja</span>
+            <strong>Seu caixa local, sua identidade no bairro.</strong>
+            <p>Pedidos, cardápio e operação no mesmo ritmo da rua.</p>
+          </div>
+          <div className="login-v2-hero-stack">
+            <span>Centro</span>
+            <span>Delivery</span>
+            <span>Loja ativa</span>
+          </div>
+        </div>
 
         <h2>Bem-vindo de volta</h2>
         <p>Gerencie sua presença local com a identidade do seu bairro.</p>
