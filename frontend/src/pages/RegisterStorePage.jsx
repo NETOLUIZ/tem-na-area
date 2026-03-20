@@ -175,7 +175,7 @@ export default function RegisterStorePage() {
           observacoes: form.observacoes
         });
 
-        setSuccess("Solicitação do plano grátis enviada. O super admin precisa aprovar antes do card aparecer na home.");
+        setSuccess("Solicitação enviada com sucesso. Aguarde autorização para publicação do card na home.");
         return;
       }
 

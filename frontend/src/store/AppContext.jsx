@@ -591,6 +591,7 @@ export function AppProvider({ children }) {
         email: payload.email,
         telefone: payload.telefone,
         whatsapp: payload.whatsapp,
+        senha: payload.senha,
         categoria_principal: payload.categoria,
         descricao_resumida: payload.descricaoCurta,
         cep: payload.endereco?.cep,
@@ -601,12 +602,14 @@ export function AppProvider({ children }) {
         horario_funcionamento: payload.horarioFuncionamento,
         logo_url: payload.logo,
         capa_url: payload.capa,
-        observacoes: payload.observacoes || ""
+        observacoes: payload.observacoes || "",
+        status_pagamento: String(payload.paymentStatus || "").toUpperCase() === "approved".toUpperCase() ? "APROVADO" : "PENDENTE"
       });
 
       return {
         ok: true,
-        id: result.id
+        id: result.id,
+        storeId: result.store_id || null
       };
     },
 
