@@ -17,7 +17,7 @@ const initial = {
   numero: "",
   bairro: "",
   cidade: "",
-  horarioFuncionamento: "Seg-Dom 10h às 22h",
+  horarioFuncionamento: "Seg-Dom 10h as 22h",
   logo: "",
   capa: "",
   observacoes: ""
@@ -25,31 +25,28 @@ const initial = {
 
 const PLAN_DETAILS = {
   free: {
-    label: "Plano grátis",
-    price: "R$ 0/mês",
-    description: "Card simples na home com clique direto no WhatsApp.",
-    benefits: ["Cadastro rápido", "Aprovação pelo super admin", "Publicação como card de WhatsApp"]
+    label: "Plano gratis",
+    price: "R$ 0/mes",
+    description: "Card simples na home com clique direto no WhatsApp."
   },
   paid: {
     label: "Plano pago",
-    price: "R$ 49,90/mês",
-    description: "Loja completa com painel, produtos, banner e cardápio.",
-    benefits: ["Painel administrativo", "Cadastro de produtos e promoções", "Loja publicada na plataforma"]
+    price: "R$ 49,90/mes",
+    description: "Loja completa com painel, produtos, banner e cardapio."
   }
 };
 
 function getTotalSteps(mode) {
-  return mode === "paid" ? 4 : 2;
+  return mode === "paid" ? 3 : 2;
 }
 
 function getStepTitle(mode, step) {
   if (mode === "free") {
-    return step === 1 ? "Escolha do plano" : "Dados básicos";
+    return step === 1 ? "Escolha do plano" : "Dados basicos";
   }
 
   if (step === 1) return "Escolha do plano";
-  if (step === 2) return "Confirmação do pagamento";
-  if (step === 3) return "Conta da empresa";
+  if (step === 2) return "Conta da empresa";
   return "Dados da loja";
 }
 
@@ -58,7 +55,6 @@ export default function RegisterStorePage() {
   const { actions } = useApp();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(initial);
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -138,7 +134,6 @@ export default function RegisterStorePage() {
   function handleModeChange(mode) {
     setForm((prev) => ({ ...prev, mode }));
     setStep(1);
-    setPaymentConfirmed(false);
     setSuccess("");
     setError("");
   }
@@ -153,27 +148,29 @@ export default function RegisterStorePage() {
   }
 
   function handleAdvance() {
-    if (form.mode === "paid" && currentStep === 2 && !paymentConfirmed) return;
-
-    if (form.mode === "paid" && currentStep === 3) {
+    if (form.mode === "paid" && currentStep === 2) {
       const missing = [];
       if (!String(form.nome || "").trim()) missing.push("nome da loja");
       if (!String(form.telefone || "").trim()) missing.push("telefone para login");
       if (!String(form.whatsapp || "").trim()) missing.push("WhatsApp");
       if (!String(form.senha || "").trim()) missing.push("senha");
-      if (!String(form.descricaoCurta || "").trim()) missing.push("descrição curta");
+      if (!String(form.descricaoCurta || "").trim()) missing.push("descricao curta");
 
       if (missing.length > 0) {
-        setError(`Preencha antes de avançar: ${missing.join(", ")}.`);
+        setError(`Preencha antes de avancar: ${missing.join(", ")}.`);
         return;
       }
     }
 
-    if (form.mode === "paid" && currentStep === 4) {
+    if ((form.mode === "paid" || form.mode === "free") && currentStep === totalSteps) {
+      return;
+    }
+
+    if (form.mode === "paid" && currentStep === 3) {
       const missing = [];
       if (!String(form.cep || "").trim()) missing.push("CEP");
       if (!String(form.rua || "").trim()) missing.push("rua");
-      if (!String(form.numero || "").trim()) missing.push("número");
+      if (!String(form.numero || "").trim()) missing.push("numero");
       if (!String(form.bairro || "").trim()) missing.push("bairro");
       if (!String(form.cidade || "").trim()) missing.push("cidade");
 
@@ -215,12 +212,13 @@ export default function RegisterStorePage() {
           observacoes: form.observacoes
         });
 
-        setSuccess("Solicitação enviada com sucesso. Aguarde autorização para publicação do card na home.");
+        setSuccess("Solicitacao enviada com sucesso. Aguarde autorizacao para publicacao do card na home.");
         return;
       }
 
       const store = await actions.registerStore({
         nome: form.nome,
+        email: form.email,
         categoria: form.categoria,
         descricaoCurta: form.descricaoCurta,
         whatsapp: form.whatsapp,
@@ -236,17 +234,17 @@ export default function RegisterStorePage() {
         horarioFuncionamento: form.horarioFuncionamento,
         logo:
           form.logo ||
-          "https://images.unsplash.com/photo-1523275335684-37898b6baf30auto=format&fit=crop&w=700&q=80",
+          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80",
         capa:
           form.capa ||
-          "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=1200&q=80",
         planType: "paid",
-        paymentStatus: "approved"
+        paymentStatus: "pending"
       });
 
-      setSuccess(`Solicitação enviada com sucesso. Aguarde autorização do admin. Protocolo: ${store.id}.`);
+      setSuccess(`Solicitacao enviada com sucesso. Aguarde confirmacao do pagamento e aprovacao do admin. Protocolo: ${store.id}.`);
     } catch (submitError) {
-      setError(submitError.message || "Não foi possível enviar o cadastro agora.");
+      setError(submitError.message || "Nao foi possivel enviar o cadastro agora.");
     } finally {
       setLoading(false);
     }
@@ -273,11 +271,11 @@ export default function RegisterStorePage() {
       </section>
 
       <main className="register-v2-main">
-        <h2>{form.mode === "paid" ? "Escolha um plano" : "Plano grátis"}</h2>
+        <h2>{form.mode === "paid" ? "Escolha um plano" : "Plano gratis"}</h2>
         <p>
           {form.mode === "paid"
-            ? "No plano pago a empresa confirma o pagamento, cria a conta e depois configura a loja completa no painel."
-            : "No plano grátis a empresa envia uma solicitação simples. Depois da aprovação, o sistema publica um card com clique direto no WhatsApp."}
+            ? "No plano pago a empresa envia a solicitacao para analise. Depois da confirmacao do pagamento e da aprovacao do admin, a conta da loja e liberada."
+            : "No plano gratis a empresa envia uma solicitacao simples. Depois da aprovacao, o sistema publica um card com clique direto no WhatsApp."}
         </p>
 
         {success ? (
@@ -287,12 +285,8 @@ export default function RegisterStorePage() {
               <button type="button" className="btn btn-outline" onClick={() => navigate("/")}>
                 Ir para a home
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigate(form.mode === "paid" ? "/login-loja" : "/")}
-              >
-                {form.mode === "paid" ? "Ir para o login da loja" : "Concluir"}
+              <button type="button" className="btn btn-primary" onClick={() => navigate("/")}>
+                Concluir
               </button>
             </div>
           </div>
@@ -321,7 +315,7 @@ export default function RegisterStorePage() {
           {form.mode === "free" && currentStep === 2 ? (
             <>
               <label>
-                <span>Nome do negócio</span>
+                <span>Nome do negocio</span>
                 <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
               </label>
 
@@ -330,7 +324,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Serviço</option>
+                    <option value="servico">Servico</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -360,7 +354,7 @@ export default function RegisterStorePage() {
                   <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} />
                 </label>
                 <label>
-                  <span>Número</span>
+                  <span>Numero</span>
                   <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} />
                 </label>
               </div>
@@ -371,13 +365,13 @@ export default function RegisterStorePage() {
                   <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} />
                 </label>
                 <label>
-                  <span>Descrição rápida</span>
+                  <span>Descricao rapida</span>
                   <input value={form.observacoes} onChange={(event) => updateField("observacoes", event.target.value)} />
                 </label>
               </div>
 
               <div className="register-v2-note">
-                <strong>Fluxo do plano grátis:</strong>
+                <strong>Fluxo do plano gratis:</strong>
                 <span>O super admin aprova o pedido e o sistema cria automaticamente um card simples na home. O clique nesse card abre o WhatsApp.</span>
               </div>
             </>
@@ -390,33 +384,20 @@ export default function RegisterStorePage() {
                   <strong>{PLAN_DETAILS.paid.label}</strong>
                   <span>{PLAN_DETAILS.paid.price}</span>
                 </div>
-                <p>Com o pagamento aprovado, o cadastro da conta e da loja é liberado imediatamente.</p>
+                <p>Seu cadastro vai para o admin. La o pagamento pode ser confirmado e o cadastro aprovado manualmente.</p>
                 <ul className="register-v2-benefits">
-                  <li>Banner da loja</li>
-                  <li>Produtos e cardápio</li>
-                  <li>Painel administrativo da empresa</li>
+                  <li>Solicitacao enviada para analise</li>
+                  <li>Confirmacao manual do pagamento</li>
+                  <li>Aprovacao manual da conta e da loja</li>
                 </ul>
               </div>
 
-              <label className="register-v2-check">
-                <input
-                  type="checkbox"
-                  checked={paymentConfirmed}
-                  onChange={(event) => setPaymentConfirmed(event.target.checked)}
-                />
-                <span>Simular pagamento aprovado para liberar o cadastro</span>
-              </label>
-            </>
-          ) : null}
-
-          {form.mode === "paid" && currentStep === 3 ? (
-            <>
               <label>
                 <span>Nome da loja</span>
                 <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
               </label>
 
-            <div className="register-v2-two">
+              <div className="register-v2-two">
                 <label>
                   <span>E-mail</span>
                   <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
@@ -439,13 +420,13 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Descrição curta</span>
+                <span>Descricao curta</span>
                 <textarea value={form.descricaoCurta} onChange={(event) => updateField("descricaoCurta", event.target.value)} required />
               </label>
             </>
           ) : null}
 
-          {form.mode === "paid" && currentStep === 4 ? (
+          {form.mode === "paid" && currentStep === 3 ? (
             <>
               <div className="register-v2-two">
                 <label>
@@ -463,7 +444,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Serviço</option>
+                    <option value="servico">Servico</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -479,7 +460,7 @@ export default function RegisterStorePage() {
                   <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} required />
                 </label>
                 <label>
-                  <span>Número</span>
+                  <span>Numero</span>
                   <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} required />
                 </label>
               </div>
@@ -496,7 +477,7 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Horário de funcionamento</span>
+                <span>Horario de funcionamento</span>
                 <input value={form.horarioFuncionamento} onChange={(event) => updateField("horarioFuncionamento", event.target.value)} />
               </label>
 
@@ -539,17 +520,12 @@ export default function RegisterStorePage() {
               {currentStep > 1 ? "Voltar" : "Cancelar"}
             </button>
             {currentStep < totalSteps ? (
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleAdvance}
-                disabled={loading || (form.mode === "paid" && currentStep === 2 && !paymentConfirmed)}
-              >
-                Avançar <MdArrowForward />
+              <button type="button" className="btn btn-primary" onClick={handleAdvance} disabled={loading}>
+                Avancar <MdArrowForward />
               </button>
             ) : (
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Enviando..." : form.mode === "free" ? "Enviar solicitação" : "Criar conta da empresa"}
+                {loading ? "Enviando..." : "Enviar solicitacao"}
               </button>
             )}
           </div>

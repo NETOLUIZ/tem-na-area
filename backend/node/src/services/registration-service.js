@@ -27,11 +27,12 @@ export class RegistrationService {
       }
     }
 
-    if (plan.codigo === "PRO" && String(payload.status_pagamento || "").toUpperCase() === "APROVADO") {
+    if (plan.codigo === "PRO") {
       const result = await runInTransaction(this.pool, async (connection) =>
         this.registrationRepository.createPaidLeadWithPendingAccount(connection, payload, plan)
       );
 
+      const paymentApproved = String(payload.status_pagamento || "").toUpperCase() === "APROVADO";
       return {
         id: result.lead_id,
         store_id: result.store_id,
@@ -42,8 +43,8 @@ export class RegistrationService {
           codigo: plan.codigo,
           nome: plan.nome
         },
-        status_solicitacao: "EM_ANALISE",
-        status_pagamento: "APROVADO"
+        status_solicitacao: paymentApproved ? "EM_ANALISE" : "AGUARDANDO_PAGAMENTO",
+        status_pagamento: paymentApproved ? "APROVADO" : "PENDENTE"
       };
     }
 

@@ -131,6 +131,9 @@ export class RegistrationRepository {
     const normalizedPhone = payload.telefone?.trim() || payload.whatsapp?.trim() || null;
     const normalizedWhatsapp = payload.whatsapp?.trim() || normalizedPhone;
     const passwordHash = crypto.createHash("sha256").update(String(payload.senha)).digest("hex");
+    const paymentApproved = String(payload.status_pagamento || "").toUpperCase() === "APROVADO";
+    const leadStatus = paymentApproved ? "EM_ANALISE" : "AGUARDANDO_PAGAMENTO";
+    const paymentStatus = paymentApproved ? "APROVADO" : "PENDENTE";
 
     const [userRows, userMeta] = await connection.execute(
       `
@@ -168,7 +171,7 @@ export class RegistrationRepository {
           endereco_numero, endereco_bairro, endereco_complemento, cep, horario_funcionamento,
           logo_url, capa_url, observacoes, plano_id, usuario_id, dono_loja_id,
           status_solicitacao, status_pagamento
-        ) VALUES (?, 'LOJA_PAGA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'EM_ANALISE', 'APROVADO')
+        ) VALUES (?, 'LOJA_PAGA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING id
       `,
       [
@@ -194,7 +197,9 @@ export class RegistrationRepository {
         payload.observacoes ?? null,
         plan.id,
         userId,
-        ownerId
+        ownerId,
+        leadStatus,
+        paymentStatus
       ]
     );
     const leadId = getInsertedId(leadRows, leadMeta);
