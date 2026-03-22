@@ -1,4 +1,5 @@
 import { ApiError } from "../lib/api-error.js";
+import { merchantPermissionsForProfile } from "../lib/merchant-permissions.js";
 import { verifyPassword } from "../lib/passwords.js";
 
 export class AuthService {
@@ -16,11 +17,16 @@ export class AuthService {
       throw new ApiError("Usuario sem acesso liberado.", 403, { status: user.status });
     }
 
+    const merchantProfile = String(user.perfil_loja || "ADMIN").toUpperCase();
+    const permissions = merchantPermissionsForProfile(merchantProfile);
+
     return {
       token: this.token.encode({
         sub: Number(user.usuario_id),
         role: "merchant",
         store_id: user.loja_id ? Number(user.loja_id) : null,
+        merchant_profile: merchantProfile,
+        permissions,
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12
       }),
       user: {
@@ -28,7 +34,9 @@ export class AuthService {
         nome: user.nome,
         email: user.email,
         telefone: user.telefone,
-        whatsapp: user.whatsapp
+        whatsapp: user.whatsapp,
+        merchant_profile: merchantProfile,
+        permissions
       },
       store: {
         id: user.loja_id ? Number(user.loja_id) : null,

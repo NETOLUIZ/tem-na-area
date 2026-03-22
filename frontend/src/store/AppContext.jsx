@@ -2,11 +2,27 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { buildSelectionSummary, serializeSelectionSignature, sumOptionPrices } from "../utils/customization";
 import { uid } from "../utils/helpers";
 import { api } from "../services/api";
+import { subscribeAuthInvalidated } from "../lib/auth-events";
+import { hasMerchantPermission, isAdminSessionValid, isAuthFailure, isMerchantSessionValid, merchantPermissionsFromSession, merchantProfileFromSession } from "../lib/auth-session";
 
 const AppContext = createContext(null);
 
 const SESSION_KEY = "temnaarea_sessions_v2";
 const CART_KEY = "temnaarea_cart_v2";
+
+const emptyMerchantSession = {
+  merchantToken: null,
+  merchantStoreId: null,
+  merchantUser: null,
+  merchantProfile: "ADMIN",
+  merchantPermissions: []
+};
+
+const emptyAdminSession = {
+  superAdminToken: null,
+  superAdmin: false,
+  adminUser: null
+};
 
 function loadJson(key, fallback) {
   try {
@@ -22,10 +38,17 @@ function saveJson(key, value) {
 }
 
 function initialState() {
+  const storedSessions = {
+    ...emptyMerchantSession,
+    ...emptyAdminSession,
+    ...loadJson(SESSION_KEY, {})
+  };
+
   return {
     stores: [],
     items: [],
     orders: [],
+    merchantDashboards: {},
     logs: [],
     homePromotions: [],
     productOptionGroups: [],
@@ -36,13 +59,8 @@ function initialState() {
     adminRecentRequests: [],
     cart: loadJson(CART_KEY, { storeId: null, items: [] }),
     sessions: {
-      merchantToken: null,
-      merchantStoreId: null,
-      merchantUser: null,
-      superAdminToken: null,
-      superAdmin: false,
-      adminUser: null,
-      ...loadJson(SESSION_KEY, {})
+      ...(isMerchantSessionValid(storedSessions) ? storedSessions : { ...storedSessions, ...emptyMerchantSession }),
+      ...(isAdminSessionValid(storedSessions) ? {} : emptyAdminSession)
     }
   };
 }
@@ -56,6 +74,8 @@ function mapStore(store) {
   const state = store.endereco_estado || store.estado || "";
   const street = store.endereco_logradouro || store.endereco_rua || "";
   const number = store.endereco_numero || "";
+  const rawNeighborhoods = String(store.bairros_atendidos || "").trim();
+  const rawPayments = String(store.formas_pagamento_aceitas || "").trim();
 
   return {
     id: String(store.id),
@@ -63,11 +83,13 @@ function mapStore(store) {
     nome: store.nome || store.loja_nome || "",
     categoria: store.categoria_principal || store.categoria || "",
     descricaoCurta: store.descricao_curta || "",
+    descricaoCompleta: store.descricao_completa || "",
     whatsapp: store.whatsapp || "",
     telefone: store.telefone || store.responsavel_telefone || "",
     email: store.email_contato || store.responsavel_email || "",
     horarioFuncionamento: store.horario_funcionamento || "",
     status: store.status_loja || store.status || "PENDENTE",
+    aceitaPedidos: typeof store.aceita_pedidos === "boolean" ? store.aceita_pedidos : Number(store.aceita_pedidos ?? 1) === 1,
     cardMode: store.modo_operacao || "LOJA_COMPLETA",
     planType: store.plano_codigo || "",
     planName: store.plano_nome || "",
@@ -85,6 +107,10 @@ function mapStore(store) {
     },
     endereco: {
       rua: [street, number].filter(Boolean).join(", "),
+      cep: store.endereco_cep || "",
+      logradouro: street,
+      numero: number,
+      complemento: store.endereco_complemento || "",
       bairro: store.endereco_bairro || "",
       cidade: city,
       estado: state
@@ -96,7 +122,27 @@ function mapStore(store) {
     config: {
       taxaEntregaPadrao: toNumber(store.taxa_entrega_padrao),
       pedidoMinimo: toNumber(store.pedido_minimo),
-      tempoMedioPreparoMinutos: Number(store.tempo_medio_preparo_minutos || 0)
+      tempoMedioPreparoMinutos: Number(store.tempo_medio_preparo_minutos || 0),
+      tempoMedioEntregaMinutos: Number(store.tempo_medio_entrega_minutos || 0),
+      aceitaRetirada: typeof store.aceita_retirada === "boolean" ? store.aceita_retirada : Number(store.aceita_retirada ?? 1) === 1,
+      aceitaEntrega: typeof store.aceita_entrega === "boolean" ? store.aceita_entrega : Number(store.aceita_entrega ?? 1) === 1,
+      exibirProdutosEsgotados: typeof store.exibir_produtos_esgotados === "boolean" ? store.exibir_produtos_esgotados : Number(store.exibir_produtos_esgotados ?? 0) === 1,
+      exibirWhatsapp: typeof store.exibir_whatsapp === "boolean" ? store.exibir_whatsapp : Number(store.exibir_whatsapp ?? 1) === 1,
+      bairrosAtendidos: rawNeighborhoods ? rawNeighborhoods.split(/\r?\n|,/).map((entry) => entry.trim()).filter(Boolean) : [],
+      formasPagamentoAceitas: rawPayments ? rawPayments.split(/\r?\n|,/).map((entry) => entry.trim()).filter(Boolean) : [],
+      painelCompacto: typeof store.painel_compacto === "boolean" ? store.painel_compacto : Number(store.painel_compacto ?? 0) === 1,
+      alertaSonoroPedidos: typeof store.alerta_sonoro_pedidos === "boolean" ? store.alerta_sonoro_pedidos : Number(store.alerta_sonoro_pedidos ?? 1) === 1,
+      exibirDashboardFinanceiro: typeof store.exibir_dashboard_financeiro === "boolean" ? store.exibir_dashboard_financeiro : Number(store.exibir_dashboard_financeiro ?? 1) === 1,
+      mensagemBoasVindas: store.mensagem_boas_vindas || "",
+      politicaTroca: store.politica_troca || "",
+      politicaEntrega: store.politica_entrega || "",
+      seoTitle: store.seo_title || "",
+      seoDescription: store.seo_description || ""
+    },
+    links: {
+      website: store.website_url || "",
+      instagram: store.instagram_url || "",
+      facebook: store.facebook_url || ""
     },
     createdAt: store.created_at || new Date().toISOString()
   };
@@ -112,11 +158,28 @@ function mapProduct(product) {
     nome: product.nome,
     categoria: product.categoria_nome || product.categoria || "Outros",
     descricao: product.descricao || product.descricao_curta || "",
+    descricaoCurta: product.descricao_curta || "",
     preco: promotionalPrice ?? regularPrice,
     precoAntigo: promotionalPrice != null ? regularPrice : null,
+    precoBase: regularPrice,
     imagem: product.imagem_url || "",
     tags: product.destaque_home ? ["Destaque"] : [],
+    sku: product.sku || "",
+    custo: product.custo == null ? null : toNumber(product.custo),
+    estoqueAtual: Number(product.estoque_atual || 0),
+    estoqueMinimo: Number(product.estoque_minimo || 0),
+    controlaEstoque: typeof product.controla_estoque === "boolean" ? product.controla_estoque : Number(product.controla_estoque ?? 1) === 1,
+    permiteVendaSemEstoque: typeof product.permite_venda_sem_estoque === "boolean" ? product.permite_venda_sem_estoque : Number(product.permite_venda_sem_estoque ?? 0) === 1,
+    destaqueHome: typeof product.destaque_home === "boolean" ? product.destaque_home : Number(product.destaque_home ?? 0) === 1,
+    destaqueCardapio: typeof product.destaque_cardapio === "boolean" ? product.destaque_cardapio : Number(product.destaque_cardapio ?? 0) === 1,
+    tipoProduto: product.tipo_produto || "PADRAO",
+    ordemExibicao: Number(product.ordem_exibicao || 0),
+    disponivelInicio: product.disponivel_inicio || "",
+    disponivelFim: product.disponivel_fim || "",
+    pesoGramas: product.peso_gramas == null ? null : Number(product.peso_gramas),
     ativo: product.status_produto === "ATIVO",
+    esgotado: product.status_produto === "ESGOTADO",
+    statusProduto: product.status_produto || "ATIVO",
     createdAt: product.created_at || new Date().toISOString()
   };
 }
@@ -144,6 +207,29 @@ function mapOrder(order) {
       ].filter(Boolean).join(", "),
       observacoes: order.observacoes_cliente || ""
     },
+    payments: Array.isArray(order.payments)
+      ? order.payments.map((payment) => ({
+          id: String(payment.id),
+          method: payment.metodo_pagamento || "OUTRO",
+          status: payment.status_pagamento || "PENDENTE",
+          amount: toNumber(payment.valor),
+          amountReceived: payment.valor_recebido == null ? null : toNumber(payment.valor_recebido),
+          change: payment.troco == null ? null : toNumber(payment.troco),
+          reference: payment.referencia_externa || "",
+          notes: payment.observacoes || "",
+          createdAt: payment.created_at || new Date().toISOString()
+        }))
+      : [],
+    history: Array.isArray(order.history)
+      ? order.history.map((entry) => ({
+          id: String(entry.id),
+          previousStatus: entry.status_anterior || null,
+          nextStatus: entry.status_novo,
+          note: entry.observacao || "",
+          changedByUserId: entry.alterado_por_usuario_id ? String(entry.alterado_por_usuario_id) : null,
+          createdAt: entry.created_at || new Date().toISOString()
+        }))
+      : [],
     items: Array.isArray(order.items)
       ? order.items.map((item) => ({
           id: String(item.id),
@@ -307,6 +393,26 @@ function validateConfiguration(product, groups, configuration = {}) {
 export function AppProvider({ children }) {
   const [state, setState] = useState(initialState);
 
+  function resetMerchantSession() {
+    setState((prev) => ({
+      ...prev,
+      sessions: {
+        ...prev.sessions,
+        ...emptyMerchantSession
+      }
+    }));
+  }
+
+  function resetAdminSession() {
+    setState((prev) => ({
+      ...prev,
+      sessions: {
+        ...prev.sessions,
+        ...emptyAdminSession
+      }
+    }));
+  }
+
   useEffect(() => {
     saveJson(SESSION_KEY, state.sessions);
   }, [state.sessions]);
@@ -314,6 +420,17 @@ export function AppProvider({ children }) {
   useEffect(() => {
     saveJson(CART_KEY, state.cart);
   }, [state.cart]);
+
+  useEffect(() => subscribeAuthInvalidated(({ scope }) => {
+    if (scope === "merchant") {
+      resetMerchantSession();
+      return;
+    }
+
+    if (scope === "admin") {
+      resetAdminSession();
+    }
+  }), []);
 
   async function loadHome() {
     const data = await api.publicHome();
@@ -378,6 +495,10 @@ export function AppProvider({ children }) {
       stores: uniqueById([...prev.stores.filter((entry) => entry.id !== store.id), store]),
       items: uniqueById([...prev.items.filter((entry) => entry.storeId !== store.id), ...items]),
       orders: uniqueById([...prev.orders.filter((entry) => entry.storeId !== store.id), ...orders]),
+      merchantDashboards: {
+        ...prev.merchantDashboards,
+        [store.id]: dashboard
+      },
       productOptionGroups: [
         ...prev.productOptionGroups.filter((entry) => entry.storeId !== store.id),
         ...productOptionGroups
@@ -386,12 +507,14 @@ export function AppProvider({ children }) {
         ...prev.homePromotions.filter((entry) => entry.storeId !== store.id),
         ...homePromotions
       ],
-      sessions: {
-        ...prev.sessions,
-        merchantToken: token,
-        merchantStoreId: store.id
-      }
-    }));
+        sessions: {
+          ...prev.sessions,
+          merchantToken: token,
+          merchantStoreId: store.id,
+          merchantProfile: merchantProfileFromSession({ merchantToken: token }),
+          merchantPermissions: merchantPermissionsFromSession({ merchantToken: token })
+        }
+      }));
 
     return { store, orders, items, dashboard, productOptionGroups, homePromotions };
   }
@@ -435,31 +558,27 @@ export function AppProvider({ children }) {
     loadHome().catch(() => {});
 
     if (state.sessions.merchantToken) {
-      hydrateMerchantSession(state.sessions.merchantToken).catch(() => {
-        setState((prev) => ({
-          ...prev,
-          sessions: {
-            ...prev.sessions,
-            merchantToken: null,
-            merchantStoreId: null,
-            merchantUser: null
+      if (!isMerchantSessionValid(state.sessions)) {
+        resetMerchantSession();
+      } else {
+        hydrateMerchantSession(state.sessions.merchantToken).catch((error) => {
+          if (isAuthFailure(error)) {
+            resetMerchantSession();
           }
-        }));
-      });
+        });
+      }
     }
 
     if (state.sessions.superAdminToken) {
-      hydrateAdminSession(state.sessions.superAdminToken).catch(() => {
-        setState((prev) => ({
-          ...prev,
-          sessions: {
-            ...prev.sessions,
-            superAdminToken: null,
-            superAdmin: false,
-            adminUser: null
+      if (!isAdminSessionValid(state.sessions)) {
+        resetAdminSession();
+      } else {
+        hydrateAdminSession(state.sessions.superAdminToken).catch((error) => {
+          if (isAuthFailure(error)) {
+            resetAdminSession();
           }
-        }));
-      });
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -688,7 +807,11 @@ export function AppProvider({ children }) {
             ...prev.sessions,
             merchantToken: result.token,
             merchantStoreId: String(result.store.id),
-            merchantUser: result.user
+            merchantUser: result.user,
+            merchantProfile: String(result.user?.merchant_profile || merchantProfileFromSession({ merchantToken: result.token })),
+            merchantPermissions: Array.isArray(result.user?.permissions)
+              ? result.user.permissions
+              : merchantPermissionsFromSession({ merchantToken: result.token })
           }
         }));
 
@@ -723,12 +846,46 @@ export function AppProvider({ children }) {
       if (!token) throw new Error("Sessão do lojista não encontrada.");
 
       await api.updateMerchantSettings(token, {
-        whatsapp: payload.whatsapp,
-        capa_url: payload.capa,
+        nome: payload.nome || "",
+        categoria_principal: payload.categoria || "",
+        status_loja: payload.status || "",
+        whatsapp: payload.whatsapp || "",
         telefone: payload.telefone || "",
         email_contato: payload.email || "",
         descricao_curta: payload.descricaoCurta || "",
-        horario_funcionamento: payload.horarioFuncionamento || ""
+        descricao_completa: payload.descricaoCompleta || "",
+        horario_funcionamento: payload.horarioFuncionamento || "",
+        logo_url: payload.logo || "",
+        capa_url: payload.capa || "",
+        endereco_cep: payload.cep || "",
+        endereco_logradouro: payload.logradouro || "",
+        endereco_numero: payload.numero || "",
+        endereco_complemento: payload.complemento || "",
+        endereco_bairro: payload.bairro || "",
+        endereco_cidade: payload.cidade || "",
+        endereco_estado: payload.estado || "",
+        website_url: payload.website || "",
+        instagram_url: payload.instagram || "",
+        facebook_url: payload.facebook || "",
+        aceita_pedidos: payload.aceitaPedidos,
+        taxa_entrega_padrao: Number(payload.taxaEntregaPadrao || 0),
+        pedido_minimo: Number(payload.pedidoMinimo || 0),
+        tempo_medio_preparo_minutos: Number(payload.tempoMedioPreparoMinutos || 0),
+        tempo_medio_entrega_minutos: Number(payload.tempoMedioEntregaMinutos || 0),
+        aceita_retirada: payload.aceitaRetirada,
+        aceita_entrega: payload.aceitaEntrega,
+        exibir_produtos_esgotados: payload.exibirProdutosEsgotados,
+        exibir_whatsapp: payload.exibirWhatsapp,
+        bairros_atendidos: payload.bairrosAtendidos || "",
+        formas_pagamento_aceitas: payload.formasPagamentoAceitas || "",
+        painel_compacto: payload.painelCompacto,
+        alerta_sonoro_pedidos: payload.alertaSonoroPedidos,
+        exibir_dashboard_financeiro: payload.exibirDashboardFinanceiro,
+        mensagem_boas_vindas: payload.mensagemBoasVindas || "",
+        politica_troca: payload.politicaTroca || "",
+        politica_entrega: payload.politicaEntrega || "",
+        seo_title: payload.seoTitle || "",
+        seo_description: payload.seoDescription || ""
       });
 
       await hydrateMerchantSession(token);
@@ -772,9 +929,24 @@ export function AppProvider({ children }) {
       const body = {
         nome: payload.nome,
         descricao: payload.descricao,
+        descricao_curta: payload.descricaoCurta || payload.descricao || "",
         preco: Number(payload.preco),
+        preco_promocional: payload.precoAntigo ? Number(payload.preco) : null,
         imagem_url: payload.imagem,
-        status_produto: payload.ativo ? "ATIVO" : "INATIVO"
+        sku: payload.sku || null,
+        custo: payload.custo ? Number(payload.custo) : null,
+        estoque_atual: Number(payload.estoqueAtual || 0),
+        estoque_minimo: Number(payload.estoqueMinimo || 0),
+        controla_estoque: payload.controlaEstoque,
+        permite_venda_sem_estoque: payload.permiteVendaSemEstoque,
+        destaque_home: payload.destaqueHome,
+        destaque_cardapio: payload.destaqueCardapio,
+        tipo_produto: payload.tipoProduto || "PADRAO",
+        ordem_exibicao: Number(payload.ordemExibicao || 0),
+        disponivel_inicio: payload.disponivelInicio || null,
+        disponivel_fim: payload.disponivelFim || null,
+        peso_gramas: payload.pesoGramas ? Number(payload.pesoGramas) : null,
+        status_produto: payload.esgotado ? "ESGOTADO" : (payload.ativo ? "ATIVO" : "INATIVO")
       };
 
       if (itemId) {
@@ -836,11 +1008,11 @@ export function AppProvider({ children }) {
       return { ok: true };
     },
 
-    async updateOrderStatus(storeId, orderId, nextStatus) {
+    async updateOrderStatus(storeId, orderId, nextStatus, reason = null) {
       const token = state.sessions.merchantToken;
       if (!token) return;
 
-      const result = await api.updateMerchantOrderStatus(token, orderId, nextStatus);
+      const result = await api.updateMerchantOrderStatus(token, orderId, nextStatus, reason);
       const order = mapOrder(result.order);
 
       setState((prev) => ({
@@ -926,6 +1098,18 @@ export function AppProvider({ children }) {
     },
     homePromotionsByStore(storeId) {
       return state.homePromotions.filter((promotion) => promotion.storeId === storeId);
+    },
+    merchantDashboard(storeId) {
+      return state.merchantDashboards?.[storeId] || null;
+    },
+    merchantProfile() {
+      return state.sessions.merchantProfile || merchantProfileFromSession(state.sessions);
+    },
+    merchantPermissions() {
+      return merchantPermissionsFromSession(state.sessions);
+    },
+    can(permission) {
+      return hasMerchantPermission(state.sessions, permission);
     },
     activeHomePromotions() {
       return state.homePromotions

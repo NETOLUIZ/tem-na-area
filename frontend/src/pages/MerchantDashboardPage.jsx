@@ -1,60 +1,128 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import MerchantDesktopSidebar from "../components/MerchantDesktopSidebar";
+import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
+import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
 import { useApp } from "../store/AppContext";
-import { formatCurrency } from "../utils/format";
+import { formatCurrency, formatDate } from "../utils/format";
 
-function MerchantDonut({ value, label, tone }) {
+function formatDelta(value) {
+  const amount = Number(value || 0);
+  const signal = amount > 0 ? "+" : "";
+  return `${signal}${amount.toFixed(1)}% vs ontem`;
+}
+
+function DashboardKpiCard({ title, value, helper, tone = "default" }) {
   return (
-    <article className="prompt-card prompt-donut-card merchant-dashboard-stat-card">
-      <div className={`prompt-donut ${tone}`}>
+    <article className={`dashboard-kpi-card tone-${tone}`}>
+      <div className="dashboard-kpi-head">
+        <span>{title}</span>
+      </div>
+      <strong>{value}</strong>
+      <small>{helper}</small>
+    </article>
+  );
+}
+
+function DashboardAlertCard({ alert }) {
+  return (
+    <article className={`dashboard-alert-card tone-${alert.tone || "info"}`}>
+      <strong>{alert.title}</strong>
+      <p>{alert.description}</p>
+    </article>
+  );
+}
+
+function DashboardRecentOrders({ orders }) {
+  return (
+    <article className="dashboard-panel">
+      <div className="dashboard-panel-head">
         <div>
-          <strong>{value}</strong>
+          <p className="prompt-card-kicker">ULTIMOS PEDIDOS</p>
+          <h3>Feed operacional</h3>
         </div>
       </div>
-      <p>{label}</p>
-    </article>
-  );
-}
 
-function MerchantProgressCard({ title, value }) {
-  return (
-    <article className="prompt-card prompt-copy-card merchant-dashboard-progress-card">
-      <p className="prompt-card-kicker">{title}</p>
-      <strong>{value}</strong>
-      <span>Resumo operacional da loja em tempo real.</span>
-    </article>
-  );
-}
-
-function MerchantOrders({ orders }) {
-  return (
-    <article className="prompt-card prompt-activities-widget merchant-dashboard-orders-card">
-      <p className="prompt-card-kicker">PEDIDOS RECENTES</p>
-      <div className="prompt-merchant-rows">
+      <div className="dashboard-mini-list">
         {orders.length ? (
           orders.map((order) => (
-            <div key={order.id} className="prompt-merchant-row">
-              <div>
-                <strong>{order.id}</strong>
-                <span>{order.cliente.nome}</span>
+            <div key={order.id} className="log-item">
+              <div className="log-item-top">
+                <strong>#{order.codigo || order.id}</strong>
+                <span className={`orders-v2-badge status-${String(order.status || order.status_pedido || "").toLowerCase().replace(/_/g, "-")}`}>
+                  {order.status || order.status_pedido}
+                </span>
               </div>
+              <p>{order.cliente?.nome || order.nome_cliente}</p>
+              <small>{formatDate(order.createdAt || order.created_at)}</small>
               <em>{formatCurrency(order.total)}</em>
             </div>
           ))
         ) : (
-          <span>Nenhum pedido recente para exibir.</span>
+          <p className="muted">Nenhum pedido recente para exibir.</p>
         )}
       </div>
     </article>
   );
 }
 
-function MerchantLinks({ storeId, slug }) {
+function DashboardPaymentSummary({ rows }) {
   return (
-    <article className="prompt-card prompt-slider-widget prompt-merchant-links merchant-dashboard-links-card">
+    <article className="dashboard-panel">
+      <div className="dashboard-panel-head">
+        <div>
+          <p className="prompt-card-kicker">PAGAMENTOS</p>
+          <h3>Resumo do dia</h3>
+        </div>
+      </div>
+
+      <div className="dashboard-mini-list">
+        {rows.length ? (
+          rows.map((row) => (
+            <div key={row.label} className="list-row">
+              <div>
+                <strong>{row.label}</strong>
+                <p className="muted">{row.total} pedido(s)</p>
+              </div>
+              <em>{formatCurrency(row.valor_total)}</em>
+            </div>
+          ))
+        ) : (
+          <p className="muted">Sem dados de pagamento no dia.</p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function DashboardAlerts({ alerts }) {
+  return (
+    <article className="dashboard-panel">
+      <div className="dashboard-panel-head">
+        <div>
+          <p className="prompt-card-kicker">ALERTAS</p>
+          <h3>Prioridades operacionais</h3>
+        </div>
+      </div>
+
+      <div className="dashboard-alert-list">
+        {alerts.length ? alerts.map((alert) => <DashboardAlertCard key={alert.id} alert={alert} />) : <p className="muted">Operacao estavel no momento.</p>}
+      </div>
+    </article>
+  );
+}
+
+function DashboardQuickLinks({ storeId, slug }) {
+  return (
+    <article className="dashboard-panel">
+      <div className="dashboard-panel-head">
+        <div>
+          <p className="prompt-card-kicker">ATALHOS</p>
+          <h3>Acesso rapido</h3>
+        </div>
+      </div>
+
       <div className="prompt-link-grid">
-        <Link to={`/admin-loja/${storeId}/cardapio`} className="prompt-link-tile">CATÁLOGO</Link>
         <Link to={`/admin-loja/${storeId}/pedidos`} className="prompt-link-tile">PEDIDOS</Link>
+        <Link to={`/admin-loja/${storeId}/cardapio`} className="prompt-link-tile">CATALOGO</Link>
         <Link to={`/admin-loja/${storeId}/ajustes`} className="prompt-link-tile">AJUSTES</Link>
         <Link to={slug ? `/loja/${slug}` : `/admin-loja/${storeId}`} className="prompt-link-tile">VITRINE</Link>
       </div>
@@ -70,78 +138,81 @@ export default function MerchantDashboardPage() {
   const store = state.stores.find((item) => item.id === storeId);
   const orders = selectors.ordersByStore(storeId).slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const items = selectors.allItemsByStore(storeId);
+  const dashboard = selectors.merchantDashboard(storeId);
 
   if (!store) {
-    return (
-      <main className="container page-space">
-        <div className="empty-state">
-          <h3>Loja não encontrada</h3>
-          <p>Não foi possível carregar o painel desta operação.</p>
-          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
-        </div>
-      </main>
-    );
+    return <MerchantPanelMissingState description="Nao foi possivel carregar o painel desta operacao." />;
   }
 
-  const completedRevenue = orders
-    .filter((order) => order.status === "CONCLUIDO")
-    .reduce((sum, order) => sum + order.total, 0);
-  const pending = orders.filter((order) => ["NOVO", "ACEITO", "EM_PREPARO", "SAIU_PARA_ENTREGA"].includes(order.status)).length;
-  const activeItems = items.filter((item) => item.ativo).length;
+  const today = dashboard?.today || {
+    faturamento_total: orders.filter((order) => new Date(order.createdAt).toDateString() === new Date().toDateString()).reduce((sum, order) => sum + order.total, 0),
+    total_pedidos: orders.filter((order) => new Date(order.createdAt).toDateString() === new Date().toDateString()).length,
+    pedidos_abertos: orders.filter((order) => ["NOVO", "ACEITO", "EM_PREPARO", "SAIU_PARA_ENTREGA"].includes(order.status)).length,
+    ticket_medio: 0
+  };
+  const summary = dashboard?.summary || {};
+  const products = dashboard?.products || {};
+  const comparison = dashboard?.comparison || {
+    faturamento_total_pct: 0,
+    total_pedidos_pct: 0,
+    ticket_medio_pct: 0
+  };
+  const paymentSummary = dashboard?.payment_summary || [];
+  const alerts = dashboard?.alerts || [];
+  const recentOrders = dashboard?.recent_orders?.length
+    ? dashboard.recent_orders
+    : orders.slice(0, 6).map((order) => ({
+        ...order,
+        status_pedido: order.status,
+        nome_cliente: order.cliente.nome,
+        created_at: order.createdAt
+      }));
+
+  const effectiveTicket = Number(today.ticket_medio || 0) || (today.total_pedidos ? today.faturamento_total / today.total_pedidos : 0);
 
   return (
-    <main className="store-panel-page merchant-has-sidebar prompt-merchant-shell">
-      <MerchantDesktopSidebar
-        storeId={storeId}
-        storeName={store.nome}
-        storeSlug={store.slug}
-        status={store.status}
-        onLogout={() => {
-          actions.logoutMerchant();
-          navigate("/pdv");
-        }}
-      />
-
-      <section className="prompt-merchant-main merchant-dashboard-main">
-        <header className="prompt-topbar prompt-topbar-merchant merchant-dashboard-hero">
-          <div className="merchant-dashboard-hero-copy">
-            <p className="prompt-breadcrumb">PAINEL DA LOJA / VISÃO GERAL</p>
-            <h1>{store.nome}</h1>
-            <p className="merchant-dashboard-subtitle">
-              Acompanhe pedidos, catálogo e desempenho da sua operação em um painel unificado.
-            </p>
+    <MerchantPanelShell
+      storeId={storeId}
+      store={store}
+      className="prompt-merchant-shell merchant-dashboard-shell"
+      bodyClassName="merchant-dashboard-main"
+      eyebrow="PAINEL DA LOJA / VISAO GERAL"
+      title={store.nome}
+      description="Visao operacional premium da loja com indicadores diarios, alertas e feed recente da operacao."
+      heroAside={(
+        <div className="merchant-dashboard-hero-meta">
+          <div className="merchant-dashboard-store-chip">
+            <span>Status</span>
+            <strong>{store.status}</strong>
           </div>
-
-          <div className="prompt-topbar-right merchant-dashboard-hero-meta">
-            <div className="merchant-dashboard-store-chip">
-              <span>Status</span>
-              <strong>{store.status}</strong>
-            </div>
-            <div className="merchant-dashboard-store-chip">
-              <span>Categoria</span>
-              <strong>{store.categoria || "Loja"}</strong>
-            </div>
-          </div>
-        </header>
-
-        <div className="prompt-dashboard-grid merchant-dashboard-grid">
-          <div className="prompt-donut-row merchant-dashboard-stats">
-            <MerchantDonut value={store.metrics.visitasPagina || 0} label="VISITAS" tone="cyan" />
-            <MerchantDonut value={store.metrics.cliquesWhatsapp || 0} label="WHATSAPP" tone="amber" />
-            <MerchantDonut value={activeItems} label="ITENS ATIVOS" tone="lime" />
-            <MerchantProgressCard title="FATURAMENTO" value={formatCurrency(completedRevenue)} />
-            <MerchantProgressCard title="EM ANDAMENTO" value={pending} />
-          </div>
-
-          <div className="prompt-main-row merchant-dashboard-content">
-            <MerchantOrders orders={orders.slice(0, 5)} />
-          </div>
-
-          <div className="prompt-bottom-row prompt-bottom-row-merchant merchant-dashboard-links-wrap">
-            <MerchantLinks storeId={storeId} slug={store.slug} />
+          <div className="merchant-dashboard-store-chip">
+            <span>Categoria</span>
+            <strong>{store.categoria || "Loja"}</strong>
           </div>
         </div>
-      </section>
-    </main>
+      )}
+      onLogout={() => {
+        actions.logoutMerchant();
+        navigate("/pdv");
+      }}
+    >
+      <div className="dashboard-kpi-grid merchant-dashboard-stats">
+        <DashboardKpiCard title="Vendas do dia" value={formatCurrency(today.faturamento_total)} helper={formatDelta(comparison.faturamento_total_pct)} tone="gold" />
+        <DashboardKpiCard title="Pedidos do dia" value={today.total_pedidos} helper={formatDelta(comparison.total_pedidos_pct)} tone="blue" />
+        <DashboardKpiCard title="Pedidos em aberto" value={today.pedidos_abertos} helper="Pedidos que exigem acao agora" tone="orange" />
+        <DashboardKpiCard title="Ticket medio" value={formatCurrency(effectiveTicket)} helper={formatDelta(comparison.ticket_medio_pct)} tone="violet" />
+        <DashboardKpiCard title="Itens ativos" value={products.produtos_ativos || items.filter((item) => item.ativo).length} helper={`${summary.total_pedidos || orders.length} pedidos na base`} tone="green" />
+      </div>
+
+      <div className="merchant-dashboard-content">
+        <DashboardRecentOrders orders={recentOrders} />
+        <DashboardAlerts alerts={alerts} />
+      </div>
+
+      <div className="merchant-dashboard-bottom">
+        <DashboardPaymentSummary rows={paymentSummary} />
+        <DashboardQuickLinks storeId={storeId} slug={store.slug} />
+      </div>
+    </MerchantPanelShell>
   );
 }

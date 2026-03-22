@@ -16,12 +16,16 @@ import { securityHeaders } from "./middleware/security.js";
 import { AdminRepository } from "./repositories/admin-repository.js";
 import { AuthRepository } from "./repositories/auth-repository.js";
 import { CatalogRepository } from "./repositories/catalog-repository.js";
+import { CashRegisterRepository } from "./repositories/cash-register-repository.js";
 import { CommerceRepository } from "./repositories/commerce-repository.js";
 import { CustomerRepository } from "./repositories/customer-repository.js";
+import { InventoryRepository } from "./repositories/inventory-repository.js";
 import { OptionGroupRepository } from "./repositories/option-group-repository.js";
 import { OrderRepository } from "./repositories/order-repository.js";
+import { PaymentRecordRepository } from "./repositories/payment-record-repository.js";
 import { PromotionRepository } from "./repositories/promotion-repository.js";
 import { RegistrationRepository } from "./repositories/registration-repository.js";
+import { ReportsRepository } from "./repositories/reports-repository.js";
 import { StoreRepository } from "./repositories/store-repository.js";
 import { AdminService } from "./services/admin-service.js";
 import { AuthService } from "./services/auth-service.js";
@@ -48,7 +52,11 @@ const authRepository = new AuthRepository(pool);
 const storeRepository = new StoreRepository(pool);
 const catalogRepository = new CatalogRepository(pool);
 const customerRepository = new CustomerRepository(pool);
+const cashRegisterRepository = new CashRegisterRepository(pool);
+const inventoryRepository = new InventoryRepository(pool);
 const orderRepository = new OrderRepository(pool);
+const reportsRepository = new ReportsRepository(pool);
+const paymentRecordRepository = new PaymentRecordRepository(pool);
 const optionGroupRepository = new OptionGroupRepository(pool);
 const promotionRepository = new PromotionRepository(pool);
 const registrationRepository = new RegistrationRepository(pool);
@@ -57,7 +65,7 @@ const commerceRepository = new CommerceRepository(pool);
 
 const authService = new AuthService(authRepository, authToken);
 const catalogService = new CatalogService(catalogRepository);
-const orderService = new OrderService(pool, storeRepository, catalogRepository, orderRepository);
+const orderService = new OrderService(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository);
 const registrationService = new RegistrationService(registrationRepository, pool);
 const adminService = new AdminService(storeRepository);
 const storesController = new StoresController(commerceRepository);
@@ -76,7 +84,7 @@ app.use(express.json());
 app.set("trust proxy", 1);
 
 registerHealthRoutes(app, { pool });
-registerAuthRoutes(app, { authService });
+registerAuthRoutes(app, { auth, authService });
 registerStoresRoutes(app, { storesController });
 registerProductsRoutes(app, { productsController });
 registerOrdersRoutes(app, { auth, ordersController });
@@ -101,11 +109,16 @@ registerPdvRoutes(app, {
 });
 registerMerchantRoutes(app, {
   auth,
+  pool,
   storeRepository,
   catalogRepository,
   orderRepository,
+  customerRepository,
+  cashRegisterRepository,
+  inventoryRepository,
   optionGroupRepository,
   promotionRepository,
+  reportsRepository,
   catalogService,
   orderService
 });

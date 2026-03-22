@@ -25,6 +25,21 @@ export function createAuthMiddleware(token) {
           next(error);
         }
       };
+    },
+    requirePermission(...permissions) {
+      return (req, _res, next) => {
+        try {
+          const user = readUser(req);
+          const allowed = Array.isArray(user.permissions) ? user.permissions : [];
+          if (permissions.length > 0 && !permissions.every((permission) => allowed.includes(permission))) {
+            throw new ApiError("Usuario sem permissao para esta operacao.", 403);
+          }
+          req.auth = user;
+          next();
+        } catch (error) {
+          next(error);
+        }
+      };
     }
   };
 }

@@ -8,12 +8,16 @@ const ALLOWED_STATUS_FLOW = {
   SAIU_PARA_ENTREGA: ["CONCLUIDO", "CANCELADO"]
 };
 
+const PAYMENT_METHODS = new Set(["DINHEIRO", "PIX", "DEBITO", "CREDITO", "OUTRO"]);
+const PAYMENT_STATUSES = new Set(["PENDENTE", "PAGO", "PARCIAL", "CANCELADO", "ESTORNADO"]);
+
 export class OrderService {
-  constructor(pool, storeRepository, catalogRepository, orderRepository) {
+  constructor(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository) {
     this.pool = pool;
     this.storeRepository = storeRepository;
     this.catalogRepository = catalogRepository;
     this.orderRepository = orderRepository;
+    this.paymentRecordRepository = paymentRecordRepository;
   }
 
   async create(payload) {
@@ -72,6 +76,8 @@ export class OrderService {
     const deliveryFee = Number(payload.taxa_entrega ?? store.taxa_entrega_padrao ?? 0);
     const sequence = await this.orderRepository.nextStoreSequence(Number(store.id));
     const total = Number((subtotal - discount + deliveryFee).toFixed(2));
+    const payments = this.normalizePayments(payload.pagamentos, total);
+    const paymentStatus = this.resolveOrderPaymentStatus(payments, total, payload.status_pagamento);
 
     // Pedido e itens precisam ser persistidos juntos para manter a numeracao e o total consistentes.
     const connection = await this.pool.getConnection();
@@ -87,7 +93,7 @@ export class OrderService {
           cliente_id: Number(payload.cliente_id),
           numero_pedido_loja: sequence,
           status_pedido: "NOVO",
-          status_pagamento: payload.status_pagamento ?? "PENDENTE",
+          status_pagamento: paymentStatus,
           tipo_entrega: payload.tipo_entrega ?? "ENTREGA",
           canal_venda: payload.canal_venda ?? "SITE",
           nome_cliente: payload.nome_cliente,
@@ -109,6 +115,11 @@ export class OrderService {
         },
         items
       );
+
+      if (payments.length) {
+        await this.paymentRecordRepository.createMany(connection, Number(store.id), orderId, payments);
+      }
+
       await connection.commit();
     } catch (error) {
       await connection.rollback();
@@ -120,7 +131,7 @@ export class OrderService {
     return this.orderRepository.findOrder(Number(store.id), orderId);
   }
 
-  async updateStatus(storeId, orderId, nextStatus, userId) {
+  async updateStatus(storeId, orderId, nextStatus, userId, reason = null) {
     const order = await this.orderRepository.findOrder(storeId, orderId);
     if (!order) {
       throw new ApiError("Pedido nao encontrado.", 404);
@@ -132,7 +143,107 @@ export class OrderService {
       throw new ApiError("Transicao de status invalida.", 422, { current, allowed });
     }
 
-    await this.orderRepository.updateStatus(storeId, orderId, nextStatus, userId);
+    if (["CANCELADO", "RECUSADO"].includes(nextStatus) && !String(reason || "").trim()) {
+      throw new ApiError("Informe o motivo ao cancelar ou recusar o pedido.", 422);
+    }
+
+    await this.orderRepository.updateStatus(storeId, orderId, nextStatus, userId, reason);
     return this.orderRepository.findOrder(storeId, orderId);
+  }
+
+  normalizePayments(rawPayments, orderTotal) {
+    if (!Array.isArray(rawPayments) || rawPayments.length === 0) {
+      return [];
+    }
+
+    return rawPayments
+      .map((entry) => {
+        const method = String(entry?.metodo_pagamento || entry?.method || "DINHEIRO").trim().toUpperCase();
+        const status = String(entry?.status_pagamento || entry?.status || "PAGO").trim().toUpperCase();
+        const amount = Number(entry?.valor ?? entry?.amount ?? 0);
+        const amountReceived = entry?.valor_recebido ?? entry?.amountReceived ?? null;
+        const normalizedAmountReceived = amountReceived === null || amountReceived === "" ? null : Number(amountReceived);
+        const change = entry?.troco ?? entry?.change ?? null;
+        const normalizedChange = change === null || change === "" ? null : Number(change);
+        const reference = entry?.referencia_externa ?? entry?.reference ?? null;
+        const notes = entry?.observacoes ?? entry?.notes ?? null;
+
+        if (!PAYMENT_METHODS.has(method)) {
+          throw new ApiError("Metodo de pagamento invalido.", 422, { method });
+        }
+
+        if (!PAYMENT_STATUSES.has(status)) {
+          throw new ApiError("Status de pagamento invalido.", 422, { status });
+        }
+
+        if (!Number.isFinite(amount) || amount < 0) {
+          throw new ApiError("Valor de pagamento invalido.", 422, { amount });
+        }
+
+        if (normalizedAmountReceived !== null && (!Number.isFinite(normalizedAmountReceived) || normalizedAmountReceived < 0)) {
+          throw new ApiError("Valor recebido invalido.", 422, { amountReceived: normalizedAmountReceived });
+        }
+
+        if (normalizedChange !== null && (!Number.isFinite(normalizedChange) || normalizedChange < 0)) {
+          throw new ApiError("Troco invalido.", 422, { change: normalizedChange });
+        }
+
+        if (status === "PAGO" && amount === 0 && Number(orderTotal || 0) > 0) {
+          throw new ApiError("Pagamentos pagos precisam ter valor maior que zero.", 422);
+        }
+
+        if (method === "DINHEIRO" && normalizedAmountReceived !== null && normalizedAmountReceived < amount) {
+          throw new ApiError("Valor recebido em dinheiro nao pode ser menor que o valor do pagamento.", 422);
+        }
+
+        return {
+          method,
+          status,
+          amount: Number(amount.toFixed(2)),
+          amountReceived: normalizedAmountReceived === null ? null : Number(normalizedAmountReceived.toFixed(2)),
+          change: normalizedChange === null ? null : Number(normalizedChange.toFixed(2)),
+          reference: reference ? String(reference).trim() : null,
+          notes: notes ? String(notes).trim() : null
+        };
+      })
+      .filter((payment) => payment.amount > 0 || payment.status !== "PAGO");
+  }
+
+  resolveOrderPaymentStatus(payments, orderTotal, fallbackStatus = null) {
+    const normalizedFallback = String(fallbackStatus || "").trim().toUpperCase();
+
+    if (!payments.length) {
+      return PAYMENT_STATUSES.has(normalizedFallback) ? normalizedFallback : "PENDENTE";
+    }
+
+    const activePayments = payments.filter((entry) => !["CANCELADO", "ESTORNADO"].includes(entry.status));
+
+    if (!activePayments.length) {
+      if (payments.every((entry) => entry.status === "ESTORNADO")) {
+        return "ESTORNADO";
+      }
+
+      if (payments.every((entry) => entry.status === "CANCELADO")) {
+        return "CANCELADO";
+      }
+    }
+
+    if (normalizedFallback && PAYMENT_STATUSES.has(normalizedFallback) && ["CANCELADO", "ESTORNADO"].includes(normalizedFallback)) {
+      return normalizedFallback;
+    }
+
+    const paidAmount = activePayments
+      .filter((entry) => ["PAGO", "PARCIAL"].includes(entry.status))
+      .reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+
+    if (paidAmount <= 0) {
+      return "PENDENTE";
+    }
+
+    if (paidAmount + 0.009 >= Number(orderTotal || 0)) {
+      return "PAGO";
+    }
+
+    return "PARCIAL";
   }
 }

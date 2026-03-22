@@ -3,6 +3,22 @@ export class OrderRepository {
     this.db = db;
   }
 
+  async loadPayments(orderId) {
+    try {
+      const [payments] = await this.db.execute(
+        "SELECT * FROM pedido_pagamentos WHERE pedido_id = ? ORDER BY created_at ASC, id ASC",
+        [orderId]
+      );
+      return payments;
+    } catch (error) {
+      if (error?.code === "42P01") {
+        return [];
+      }
+
+      throw error;
+    }
+  }
+
   async findCustomer(customerId) {
     const [rows] = await this.db.execute("SELECT * FROM clientes WHERE id = ? LIMIT 1", [customerId]);
     return rows[0] || null;
@@ -99,7 +115,14 @@ export class OrderRepository {
         "SELECT * FROM itens_pedido WHERE pedido_id = ? ORDER BY id ASC",
         [order.id]
       );
+      const payments = await this.loadPayments(order.id);
+      const [history] = await this.db.execute(
+        "SELECT * FROM historico_status_pedido WHERE pedido_id = ? ORDER BY created_at DESC, id DESC",
+        [order.id]
+      );
       order.items = items;
+      order.payments = payments;
+      order.history = history;
     }
 
     return orders;
@@ -116,11 +139,18 @@ export class OrderRepository {
     }
 
     const [items] = await this.db.execute("SELECT * FROM itens_pedido WHERE pedido_id = ? ORDER BY id ASC", [orderId]);
+    const payments = await this.loadPayments(orderId);
+    const [history] = await this.db.execute(
+      "SELECT * FROM historico_status_pedido WHERE pedido_id = ? ORDER BY created_at DESC, id DESC",
+      [orderId]
+    );
     order.items = items;
+    order.payments = payments;
+    order.history = history;
     return order;
   }
 
-  async updateStatus(storeId, orderId, nextStatus, userId) {
+  async updateStatus(storeId, orderId, nextStatus, userId, note = null) {
     const current = await this.findOrder(storeId, orderId);
     if (!current) {
       return;
@@ -139,7 +169,14 @@ export class OrderRepository {
       [nextStatus, nextStatus, nextStatus, nextStatus, orderId, storeId]
     );
 
-    await this.appendHistory(this.db, orderId, current.status_pedido, nextStatus, userId, "Status alterado pelo painel.");
+    await this.appendHistory(
+      this.db,
+      orderId,
+      current.status_pedido,
+      nextStatus,
+      userId,
+      note || "Status alterado pelo painel."
+    );
   }
 
   async appendHistory(executor, orderId, previous, next, userId, note) {

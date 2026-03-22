@@ -1,3 +1,5 @@
+import { emitAuthInvalidated } from "../lib/auth-events";
+
 const defaultApiBaseUrl = import.meta.env.DEV ? "http://127.0.0.1:3001/api/v1" : "/api/v1";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/+$/, "");
 
@@ -16,6 +18,13 @@ async function request(path, options = {}) {
 
   if (!response.ok || payload.ok === false) {
     const message = payload?.error?.message || payload?.message || "Falha na comunicacao com a API.";
+    if (response.status === 401 && options.authScope) {
+      emitAuthInvalidated({
+        scope: options.authScope,
+        reason: message
+      });
+    }
+
     throw new Error(message);
   }
 
@@ -46,6 +55,39 @@ export const api = {
       body: { login, senha }
     });
   },
+  pdvBootstrap(token) {
+    return request("/pdv/bootstrap", { token, authScope: "merchant" });
+  },
+  pdvProducts(token) {
+    return request("/pdv/products", { token, authScope: "merchant" });
+  },
+  pdvCustomers(token, search = "", limit = 20) {
+    const query = new URLSearchParams();
+    if (search) query.set("search", search);
+    if (limit) query.set("limit", String(limit));
+    const suffix = query.toString() ? `?${query}` : "";
+    return request(`/pdv/customers${suffix}`, { token, authScope: "merchant" });
+  },
+  createPdvCustomer(token, body) {
+    return request("/pdv/customers", {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  pdvOrders(token, status) {
+    const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
+    return request(`/pdv/orders${suffix}`, { token, authScope: "merchant" });
+  },
+  createPdvOrder(token, body) {
+    return request("/pdv/orders", {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
   adminLogin(login, senha) {
     return request("/auth/admin/login", {
       method: "POST",
@@ -59,25 +101,103 @@ export const api = {
     });
   },
   merchantDashboard(token) {
-    return request("/merchant/dashboard", { token });
+    return request("/merchant/dashboard", { token, authScope: "merchant" });
   },
   merchantOrders(token, status) {
     const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
-    return request(`/merchant/orders${suffix}`, { token });
+    return request(`/merchant/orders${suffix}`, { token, authScope: "merchant" });
+  },
+  merchantCustomers(token, search = "", limit = 24) {
+    const query = new URLSearchParams();
+    if (search) query.set("search", search);
+    if (limit) query.set("limit", String(limit));
+    const suffix = query.toString() ? `?${query}` : "";
+    return request(`/merchant/customers${suffix}`, { token, authScope: "merchant" });
+  },
+  merchantCustomerDetail(token, customerId) {
+    return request(`/merchant/customers/${customerId}`, { token, authScope: "merchant" });
+  },
+  merchantCashRegister(token) {
+    return request("/merchant/cash-register", { token, authScope: "merchant" });
+  },
+  merchantInventory(token) {
+    return request("/merchant/inventory", { token, authScope: "merchant" });
+  },
+  merchantReports(token, params = {}) {
+    const query = new URLSearchParams();
+    if (params.start) query.set("start", params.start);
+    if (params.end) query.set("end", params.end);
+    const suffix = query.toString() ? `?${query}` : "";
+    return request(`/merchant/reports${suffix}`, { token, authScope: "merchant" });
+  },
+  merchantInventoryMovements(token, productId, limit = 12) {
+    const query = new URLSearchParams();
+    if (limit) query.set("limit", String(limit));
+    const suffix = query.toString() ? `?${query}` : "";
+    return request(`/merchant/inventory/${productId}/movements${suffix}`, { token, authScope: "merchant" });
+  },
+  createMerchantInventoryMovement(token, productId, body) {
+    return request(`/merchant/inventory/${productId}/movements`, {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  openMerchantCashRegister(token, body) {
+    return request("/merchant/cash-register/open", {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  createMerchantCashMovement(token, sessionId, body) {
+    return request(`/merchant/cash-register/${sessionId}/movements`, {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  closeMerchantCashRegister(token, sessionId, body) {
+    return request(`/merchant/cash-register/${sessionId}/close`, {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  createMerchantCustomer(token, body) {
+    return request("/merchant/customers", {
+      method: "POST",
+      token,
+      authScope: "merchant",
+      body
+    });
+  },
+  updateMerchantCustomer(token, customerId, body) {
+    return request(`/merchant/customers/${customerId}`, {
+      method: "PUT",
+      token,
+      authScope: "merchant",
+      body
+    });
   },
   merchantProducts(token) {
-    return request("/merchant/products", { token });
+    return request("/merchant/products", { token, authScope: "merchant" });
   },
   merchantSettings(token) {
-    return request("/merchant/settings", { token });
+    return request("/merchant/settings", { token, authScope: "merchant" });
   },
   merchantOptionGroups(token) {
-    return request("/merchant/option-groups", { token });
+    return request("/merchant/option-groups", { token, authScope: "merchant" });
   },
   createMerchantOptionGroup(token, body) {
     return request("/merchant/option-groups", {
       method: "POST",
       token,
+      authScope: "merchant",
       body
     });
   },
@@ -85,22 +205,25 @@ export const api = {
     return request(`/merchant/option-groups/${id}`, {
       method: "PUT",
       token,
+      authScope: "merchant",
       body
     });
   },
   deleteMerchantOptionGroup(token, id) {
     return request(`/merchant/option-groups/${id}`, {
       method: "DELETE",
-      token
+      token,
+      authScope: "merchant"
     });
   },
   merchantPromotions(token) {
-    return request("/merchant/promotions", { token });
+    return request("/merchant/promotions", { token, authScope: "merchant" });
   },
   createMerchantPromotion(token, body) {
     return request("/merchant/promotions", {
       method: "POST",
       token,
+      authScope: "merchant",
       body
     });
   },
@@ -108,19 +231,22 @@ export const api = {
     return request(`/merchant/promotions/${id}`, {
       method: "PUT",
       token,
+      authScope: "merchant",
       body
     });
   },
   deleteMerchantPromotion(token, id) {
     return request(`/merchant/promotions/${id}`, {
       method: "DELETE",
-      token
+      token,
+      authScope: "merchant"
     });
   },
   updateMerchantSettings(token, body) {
     return request("/merchant/settings", {
       method: "PUT",
       token,
+      authScope: "merchant",
       body
     });
   },
@@ -128,6 +254,7 @@ export const api = {
     return request("/merchant/products", {
       method: "POST",
       token,
+      authScope: "merchant",
       body
     });
   },
@@ -135,20 +262,23 @@ export const api = {
     return request(`/merchant/products/${id}`, {
       method: "PUT",
       token,
+      authScope: "merchant",
       body
     });
   },
   deleteMerchantProduct(token, id) {
     return request(`/merchant/products/${id}`, {
       method: "DELETE",
-      token
+      token,
+      authScope: "merchant"
     });
   },
-  updateMerchantOrderStatus(token, id, status) {
+  updateMerchantOrderStatus(token, id, status, reason = null) {
     return request(`/merchant/orders/${id}/status`, {
       method: "PATCH",
       token,
-      body: { status }
+      authScope: "merchant",
+      body: { status, reason }
     });
   },
   createFreeLead(body) {
@@ -164,25 +294,26 @@ export const api = {
     });
   },
   adminDashboard(token) {
-    return request("/admin/dashboard", { token });
+    return request("/admin/dashboard", { token, authScope: "admin" });
   },
   adminStores(token, status) {
     const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
-    return request(`/admin/stores${suffix}`, { token });
+    return request(`/admin/stores${suffix}`, { token, authScope: "admin" });
   },
   adminLogs(token) {
-    return request("/admin/logs", { token });
+    return request("/admin/logs", { token, authScope: "admin" });
   },
   adminLeads(token) {
-    return request("/admin/leads", { token });
+    return request("/admin/leads", { token, authScope: "admin" });
   },
   adminPaidLeads(token) {
-    return request("/admin/leads/paid", { token });
+    return request("/admin/leads/paid", { token, authScope: "admin" });
   },
   approveAdminLead(token, id) {
     return request(`/admin/leads/${id}/approve`, {
       method: "PATCH",
       token,
+      authScope: "admin",
       body: {}
     });
   },
@@ -190,6 +321,7 @@ export const api = {
     return request(`/admin/leads/${id}/confirm-payment`, {
       method: "PATCH",
       token,
+      authScope: "admin",
       body: {}
     });
   },
@@ -197,6 +329,7 @@ export const api = {
     return request(`/admin/leads/${id}/approve-paid`, {
       method: "PATCH",
       token,
+      authScope: "admin",
       body: {}
     });
   },
@@ -204,6 +337,7 @@ export const api = {
     return request(`/admin/stores/${id}/status`, {
       method: "PATCH",
       token,
+      authScope: "admin",
       body: { status, motivo }
     });
   }

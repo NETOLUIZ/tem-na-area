@@ -1,11 +1,12 @@
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import { useApp } from "../store/AppContext";
+import { isAdminSessionValid, isMerchantSessionValid } from "../lib/auth-session";
 
 // Resolve a entrada curta do admin da loja e redireciona para a loja logada.
 export function MerchantEntryRoute() {
   const { state } = useApp();
 
-  if (!state.sessions.merchantStoreId) {
+  if (!isMerchantSessionValid(state.sessions)) {
     return <Navigate to="/pdv" replace />;
   }
 
@@ -17,7 +18,7 @@ export function MerchantProtectedRoute() {
   const { state } = useApp();
   const params = useParams();
 
-  if (!state.sessions.merchantStoreId) {
+  if (!isMerchantSessionValid(state.sessions)) {
     return <Navigate to="/pdv" replace />;
   }
 
@@ -32,7 +33,7 @@ export function MerchantProtectedRoute() {
 export function SuperAdminProtectedRoute() {
   const { state } = useApp();
 
-  if (!state.sessions.superAdmin) {
+  if (!state.sessions.superAdmin || !isAdminSessionValid(state.sessions)) {
     return <Navigate to="/admin-temnaarea/login" replace />;
   }
 
