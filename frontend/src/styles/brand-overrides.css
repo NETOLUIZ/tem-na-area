@@ -1199,6 +1199,102 @@ button:disabled,
   display: block;
 }
 
+/* ==========================================================================
+   Sidebar do painel do lojista
+   Este bloco concentra apenas os ajustes de tamanho e rolagem da coluna
+   esquerda. Se quiser mexer depois, comece por aqui.
+   ========================================================================== */
+
+/* Reserva horizontal do layout para a sidebar em telas grandes. */
+@media (min-width: 1024px) {
+  .merchant-has-sidebar {
+    padding-left: 244px !important;
+  }
+}
+
+/* Estrutura principal da sidebar.
+   Mantemos altura total da viewport e escondemos excesso fora do container. */
+.merchant-desktop-sidebar {
+  width: 224px !important;
+  height: 100vh !important;
+  padding: 16px 12px !important;
+  gap: 12px !important;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho da loja menor para liberar espaço para os links. */
+.merchant-desktop-brand {
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 4px 2px 10px !important;
+}
+
+/* Ícone/monograma da loja menor. */
+.merchant-desktop-brand-mark {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  font-size: 1rem !important;
+}
+
+/* Título e subtítulo compactos. */
+.merchant-desktop-brand h2 {
+  font-size: 0.98rem !important;
+  line-height: 1.05 !important;
+}
+
+.merchant-desktop-brand p {
+  margin-top: 3px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.2 !important;
+}
+
+.merchant-desktop-brand small {
+  margin-top: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 0.67rem !important;
+}
+
+/* Menu com rolagem interna.
+   Assim a sidebar inteira não "trava" quando a lista cresce. */
+.merchant-desktop-nav {
+  display: grid;
+  gap: 6px !important;
+  align-content: start;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Botões/links menores para caberem todos na altura da tela. */
+.merchant-desktop-nav a,
+.merchant-desktop-logout {
+  min-height: 42px !important;
+  padding: 0 11px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+  font-size: 0.84rem !important;
+}
+
+/* Ícones um pouco menores para acompanhar a compactação dos botões. */
+.merchant-desktop-nav a svg,
+.merchant-desktop-logout svg {
+  font-size: 1rem !important;
+  flex: 0 0 auto;
+}
+
+/* Texto do link com quebra controlada para não empurrar a largura. */
+.merchant-desktop-nav a span,
+.merchant-desktop-logout span {
+  line-height: 1.15 !important;
+}
+
+/* Botão de sair mais enxuto e sempre visível no rodapé. */
+.merchant-desktop-logout {
+  margin-top: auto;
+}
+
 @media (max-width: 1023px) {
   .merchant-pos-cart {
     position: static;
