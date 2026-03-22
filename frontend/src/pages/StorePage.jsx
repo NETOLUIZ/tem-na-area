@@ -43,7 +43,7 @@ export default function StorePage() {
     return () => {
       active = false;
     };
-  }, [loadStore, slug]);
+  }, [slug]);
 
   useEffect(() => {
     if (!store || store.status !== "ATIVA") return;
@@ -51,7 +51,7 @@ export default function StorePage() {
 
     lastTrackedStoreId.current = store.id;
     trackStoreVisit(store.id);
-  }, [store, trackStoreVisit]);
+  }, [store]);
 
   useEffect(() => {
     if (cart.storeId !== store?.id) {
