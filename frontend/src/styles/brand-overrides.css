@@ -489,26 +489,27 @@ h1, h2, h3, h4, h5, h6,
 
 .merchant-pos-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.85fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
+  gap: 16px;
+  align-items: start;
 }
 
 .merchant-pos-catalog,
 .merchant-pos-cart {
   display: grid;
-  gap: 16px;
+  gap: 14px;
   align-content: start;
 }
 
 .merchant-pos-toolbar {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .merchant-pos-products {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 12px;
 }
 
 .merchant-pos-product-card,
@@ -523,31 +524,51 @@ h1, h2, h3, h4, h5, h6,
 .merchant-pos-product-card {
   overflow: hidden;
   display: grid;
+  grid-template-rows: 132px auto auto;
 }
 
 .merchant-pos-product-card img {
-  width: 100%;
-  height: 170px;
-  object-fit: cover;
-}
+    width: 100%;
+    height: 132px;
+    object-fit: cover;
+  }
 
 .merchant-pos-product-main,
 .merchant-pos-product-actions {
-  padding: 14px;
-}
+    padding: 12px;
+  }
 
 .merchant-pos-product-main {
-  display: grid;
-  gap: 8px;
+    display: grid;
+    gap: 6px;
+  }
+
+.merchant-pos-product-main h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
 }
 
 .merchant-pos-product-main p {
-  color: var(--muted);
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+.merchant-pos-product-main strong {
+  font-size: 0.98rem;
 }
 
 .merchant-pos-product-actions .btn {
-  width: 100%;
-}
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+  }
 
 .merchant-pos-sale-types,
 .merchant-pos-customers,
@@ -587,18 +608,36 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .merchant-pos-customer-form {
+    display: grid;
+    gap: 10px;
+  }
+
+.merchant-pos-customer-form input,
+.merchant-pos-customer-form textarea,
+.merchant-pos-payment-card input,
+.merchant-pos-payment-card select,
+.merchant-pos-discounts input,
+.merchant-pos-discounts textarea,
+.merchant-pos-payments input,
+.merchant-pos-payments select {
+  width: 100%;
+}
+
+.merchant-pos-payments label,
+.merchant-pos-discounts label,
+.merchant-pos-customer-form label {
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .merchant-pos-payment-card {
-  padding: 14px;
-  display: grid;
-  gap: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025));
-  border: 1px solid rgba(84, 113, 163, 0.22);
-  border-radius: 18px;
-}
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025));
+    border: 1px solid rgba(84, 113, 163, 0.22);
+    border-radius: 18px;
+  }
 
 .merchant-pos-payment-head {
   display: flex;
@@ -608,10 +647,10 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .merchant-pos-cart-item {
-  padding: 14px;
-  display: grid;
-  gap: 8px;
-}
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+  }
 
 .merchant-pos-cart-head {
   display: flex;
@@ -656,13 +695,38 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .merchant-pos-summary {
-  display: grid;
-  gap: 10px;
-}
+    display: grid;
+    gap: 8px;
+  }
 
 .merchant-pos-submit {
-  width: 100%;
-  min-height: 52px;
+    width: 100%;
+    min-height: 52px;
+  }
+
+.merchant-pos-cart .dashboard-panel {
+  padding: 16px;
+}
+
+.merchant-pos-catalog .dashboard-panel,
+.merchant-pos-cart .dashboard-panel,
+.merchant-pos-sale-types button,
+.merchant-pos-customer,
+.merchant-pos-payment-card,
+.merchant-pos-cart-item {
+  box-sizing: border-box;
+}
+
+.merchant-pos-cart .dashboard-panel-head,
+.merchant-pos-payment-head,
+.merchant-pos-cart-head {
+  align-items: center;
+}
+
+.merchant-pos-cart .menu-v2-grid2,
+.merchant-pos-payments .menu-v2-grid2,
+.merchant-pos-discounts .menu-v2-grid2 {
+  align-items: start;
 }
 
 .merchant-customers-hero-actions {
@@ -1105,6 +1169,29 @@ button:disabled,
 .merchant-pos-payments,
 .merchant-pos-discounts {
   align-content: start;
+}
+
+.merchant-menu-shell .menu-v2-tabs button,
+.merchant-menu-shell .menu-v2-filters button {
+  background: linear-gradient(180deg, rgba(20, 24, 38, 0.96), rgba(13, 16, 27, 0.94));
+  color: #c9d2e3;
+  border: 1px solid rgba(84, 113, 163, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.merchant-menu-shell .menu-v2-tabs button:hover,
+.merchant-menu-shell .menu-v2-filters button:hover {
+  color: #f7f2df;
+  border-color: rgba(244, 191, 36, 0.24);
+  background: linear-gradient(180deg, rgba(30, 24, 12, 0.92), rgba(18, 16, 24, 0.96));
+}
+
+.merchant-menu-shell .menu-v2-tabs button.active,
+.merchant-menu-shell .menu-v2-filters button.active {
+  color: #0a0d14;
+  border-color: rgba(255, 210, 90, 0.72);
+  background: linear-gradient(135deg, #f4bf24, #ffd45a);
+  box-shadow: 0 12px 24px rgba(244, 191, 36, 0.22);
 }
 
 .register-v2-note strong,
