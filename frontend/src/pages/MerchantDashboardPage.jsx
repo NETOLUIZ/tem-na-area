@@ -53,10 +53,10 @@ function MerchantLinks({ storeId, slug }) {
   return (
     <article className="prompt-card prompt-slider-widget prompt-merchant-links merchant-dashboard-links-card">
       <div className="prompt-link-grid">
-        <Link to={`/admin-loja/${storeId}/cardapio`} className="prompt-link-tile">CARDAPIO</Link>
+        <Link to={`/admin-loja/${storeId}/cardapio`} className="prompt-link-tile">CATÁLOGO</Link>
         <Link to={`/admin-loja/${storeId}/pedidos`} className="prompt-link-tile">PEDIDOS</Link>
         <Link to={`/admin-loja/${storeId}/ajustes`} className="prompt-link-tile">AJUSTES</Link>
-        <Link to={slug ? `/loja/${slug}` : `/admin-loja/${storeId}`} className="prompt-link-tile">LOJA</Link>
+        <Link to={slug ? `/loja/${slug}` : `/admin-loja/${storeId}`} className="prompt-link-tile">VITRINE</Link>
       </div>
     </article>
   );
@@ -75,9 +75,9 @@ export default function MerchantDashboardPage() {
     return (
       <main className="container page-space">
         <div className="empty-state">
-          <h3>Loja nao encontrada</h3>
-          <p>Nao foi possivel carregar o painel dessa loja.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <h3>Loja não encontrada</h3>
+          <p>Não foi possível carregar o painel desta operação.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </main>
     );
@@ -105,10 +105,10 @@ export default function MerchantDashboardPage() {
       <section className="prompt-merchant-main merchant-dashboard-main">
         <header className="prompt-topbar prompt-topbar-merchant merchant-dashboard-hero">
           <div className="merchant-dashboard-hero-copy">
-            <p className="prompt-breadcrumb">PAINEL DA LOJA / VISAO GERAL</p>
+            <p className="prompt-breadcrumb">PAINEL DA LOJA / VISÃO GERAL</p>
             <h1>{store.nome}</h1>
             <p className="merchant-dashboard-subtitle">
-              Acompanhe pedidos, cardapio e desempenho da loja em um painel mais organizado.
+              Acompanhe pedidos, catálogo e desempenho da sua operação em um painel unificado.
             </p>
           </div>
 
@@ -130,7 +130,7 @@ export default function MerchantDashboardPage() {
             <MerchantDonut value={store.metrics.cliquesWhatsapp || 0} label="WHATSAPP" tone="amber" />
             <MerchantDonut value={activeItems} label="ITENS ATIVOS" tone="lime" />
             <MerchantProgressCard title="FATURAMENTO" value={formatCurrency(completedRevenue)} />
-            <MerchantProgressCard title="PEDIDOS" value={pending} />
+            <MerchantProgressCard title="EM ANDAMENTO" value={pending} />
           </div>
 
           <div className="prompt-main-row merchant-dashboard-content">

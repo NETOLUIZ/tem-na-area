@@ -14,8 +14,8 @@ export default function CartPage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Sacola vazia</h3>
-          <p>Adicione produtos para seguir com a compra.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <p>Adicione produtos para continuar a compra.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </div>
     );
@@ -26,7 +26,7 @@ export default function CartPage() {
       <header className="cart-v2-header">
         <div className="cart-v2-title-row">
           <div>
-            <p className="cart-v2-kicker">Seu pedido no Tem na Área</p>
+            <p className="cart-v2-kicker">Sua compra no Tem na Área</p>
             <h1>Sacola</h1>
           </div>
           <span>{cart.store.nome}</span>
@@ -44,7 +44,7 @@ export default function CartPage() {
                   <div>
                     <small className="cart-v2-item-label">Item selecionado</small>
                     <h3>{row.item.nome}</h3>
-                    <p>{formatCurrency(row.unitPrice)} cada</p>
+                    <p>{formatCurrency(row.unitPrice)} por unidade</p>
                     {row.summaryLines?.length ? (
                       <div className="cart-line-summary">
                         {row.summaryLines.map((line) => <small key={line}>{line}</small>)}
@@ -84,11 +84,8 @@ export default function CartPage() {
           <span>Total do pedido</span>
           <strong>{formatCurrency(cart.total)}</strong>
         </div>
-        <button
-          className="cart-v2-checkout"
-          onClick={() => navigate("/checkout")}
-        >
-          Finalizar compra <span aria-hidden="true"><MdArrowForward /></span>
+        <button className="cart-v2-checkout" onClick={() => navigate("/checkout")}>
+          Avançar para confirmação <span aria-hidden="true"><MdArrowForward /></span>
         </button>
         <div className="cart-v2-handle" />
       </footer>

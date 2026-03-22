@@ -25,14 +25,14 @@ const initial = {
 
 const PLAN_DETAILS = {
   free: {
-    label: "Plano gratis",
+    label: "Plano vitrine",
     price: "R$ 0/mes",
-    description: "Card simples na home com clique direto no WhatsApp."
+    description: "Presença básica na home com clique direto no WhatsApp."
   },
   paid: {
-    label: "Plano pago",
+    label: "Plano operação",
     price: "R$ 49,90/mes",
-    description: "Loja completa com painel, produtos, banner e cardapio."
+    description: "Operação completa com painel, produtos, campanhas e catálogo."
   }
 };
 
@@ -42,7 +42,7 @@ function getTotalSteps(mode) {
 
 function getStepTitle(mode, step) {
   if (mode === "free") {
-    return step === 1 ? "Escolha do plano" : "Dados basicos";
+    return step === 1 ? "Escolha do plano" : "Dados básicos";
   }
 
   if (step === 1) return "Escolha do plano";
@@ -87,7 +87,7 @@ export default function RegisterStorePage() {
 
     if (cepDigits.length !== 8) {
       setCepLoading(false);
-      setCepError("CEP invalido.");
+      setCepError("CEP inválido.");
       return undefined;
     }
 
@@ -103,7 +103,7 @@ export default function RegisterStorePage() {
         const payload = await response.json();
 
         if (!response.ok || payload.erro) {
-          throw new Error("CEP nao encontrado.");
+          throw new Error("CEP não encontrado.");
         }
 
         setForm((prev) => ({
@@ -117,7 +117,7 @@ export default function RegisterStorePage() {
         if (controller.signal.aborted) {
           return;
         }
-        setCepError(lookupError.message || "Nao foi possivel buscar o CEP.");
+        setCepError(lookupError.message || "Não foi possível buscar o CEP.");
       } finally {
         if (!controller.signal.aborted) {
           setCepLoading(false);
@@ -154,10 +154,10 @@ export default function RegisterStorePage() {
       if (!String(form.telefone || "").trim()) missing.push("telefone para login");
       if (!String(form.whatsapp || "").trim()) missing.push("WhatsApp");
       if (!String(form.senha || "").trim()) missing.push("senha");
-      if (!String(form.descricaoCurta || "").trim()) missing.push("descricao curta");
+      if (!String(form.descricaoCurta || "").trim()) missing.push("descrição curta");
 
       if (missing.length > 0) {
-        setError(`Preencha antes de avancar: ${missing.join(", ")}.`);
+        setError(`Preencha antes de avançar: ${missing.join(", ")}.`);
         return;
       }
     }
@@ -170,7 +170,7 @@ export default function RegisterStorePage() {
       const missing = [];
       if (!String(form.cep || "").trim()) missing.push("CEP");
       if (!String(form.rua || "").trim()) missing.push("rua");
-      if (!String(form.numero || "").trim()) missing.push("numero");
+      if (!String(form.numero || "").trim()) missing.push("número");
       if (!String(form.bairro || "").trim()) missing.push("bairro");
       if (!String(form.cidade || "").trim()) missing.push("cidade");
 
@@ -212,7 +212,7 @@ export default function RegisterStorePage() {
           observacoes: form.observacoes
         });
 
-        setSuccess("Solicitacao enviada com sucesso. Aguarde autorizacao para publicacao do card na home.");
+        setSuccess("Solicitação enviada com sucesso. Aguarde a aprovação para publicar sua vitrine na home.");
         return;
       }
 
@@ -242,9 +242,9 @@ export default function RegisterStorePage() {
         paymentStatus: "pending"
       });
 
-      setSuccess(`Solicitacao enviada com sucesso. Aguarde confirmacao do pagamento e aprovacao do admin. Protocolo: ${store.id}.`);
+      setSuccess(`Solicitação enviada com sucesso. Aguarde confirmação do pagamento e aprovação da central. Protocolo: ${store.id}.`);
     } catch (submitError) {
-      setError(submitError.message || "Nao foi possivel enviar o cadastro agora.");
+      setError(submitError.message || "Não foi possível enviar o cadastro agora.");
     } finally {
       setLoading(false);
     }
@@ -256,7 +256,7 @@ export default function RegisterStorePage() {
         <button type="button" className="register-v2-back" onClick={handleBack} aria-label="Voltar">
           <MdArrowBack />
         </button>
-        <h1>Cadastrar minha empresa</h1>
+        <h1>Entrar para a rede</h1>
         <div className="register-v2-empty" />
       </header>
 
@@ -271,11 +271,11 @@ export default function RegisterStorePage() {
       </section>
 
       <main className="register-v2-main">
-        <h2>{form.mode === "paid" ? "Escolha um plano" : "Plano gratis"}</h2>
+        <h2>{form.mode === "paid" ? "Escolha seu formato de entrada" : "Plano vitrine"}</h2>
         <p>
           {form.mode === "paid"
-            ? "No plano pago a empresa envia a solicitacao para analise. Depois da confirmacao do pagamento e da aprovacao do admin, a conta da loja e liberada."
-            : "No plano gratis a empresa envia uma solicitacao simples. Depois da aprovacao, o sistema publica um card com clique direto no WhatsApp."}
+            ? "No plano operação, a empresa envia a solicitação para análise. Depois da confirmação do pagamento e da aprovação da central, o painel é liberado."
+            : "No plano vitrine, a empresa envia uma solicitação simples. Depois da aprovação, a plataforma publica uma vitrine com clique direto no WhatsApp."}
         </p>
 
         {success ? (
@@ -283,7 +283,7 @@ export default function RegisterStorePage() {
             <p className="success-text">{success}</p>
             <div className="register-v2-actions">
               <button type="button" className="btn btn-outline" onClick={() => navigate("/")}>
-                Ir para a home
+                Ir para o início
               </button>
               <button type="button" className="btn btn-primary" onClick={() => navigate("/")}>
                 Concluir
@@ -315,7 +315,7 @@ export default function RegisterStorePage() {
           {form.mode === "free" && currentStep === 2 ? (
             <>
               <label>
-                <span>Nome do negocio</span>
+                <span>Nome do negócio</span>
                 <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
               </label>
 
@@ -324,7 +324,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Servico</option>
+                    <option value="servico">Serviço</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -354,7 +354,7 @@ export default function RegisterStorePage() {
                   <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} />
                 </label>
                 <label>
-                  <span>Numero</span>
+                  <span>Número</span>
                   <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} />
                 </label>
               </div>
@@ -365,14 +365,14 @@ export default function RegisterStorePage() {
                   <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} />
                 </label>
                 <label>
-                  <span>Descricao rapida</span>
+                  <span>Resumo rápido</span>
                   <input value={form.observacoes} onChange={(event) => updateField("observacoes", event.target.value)} />
                 </label>
               </div>
 
               <div className="register-v2-note">
-                <strong>Fluxo do plano gratis:</strong>
-                <span>O super admin aprova o pedido e o sistema cria automaticamente um card simples na home. O clique nesse card abre o WhatsApp.</span>
+                <strong>Fluxo do plano vitrine:</strong>
+                <span>A central aprova o pedido e o sistema cria automaticamente uma vitrine simples na home. O clique leva direto para o WhatsApp.</span>
               </div>
             </>
           ) : null}
@@ -384,11 +384,11 @@ export default function RegisterStorePage() {
                   <strong>{PLAN_DETAILS.paid.label}</strong>
                   <span>{PLAN_DETAILS.paid.price}</span>
                 </div>
-                <p>Seu cadastro vai para o admin. La o pagamento pode ser confirmado e o cadastro aprovado manualmente.</p>
+                <p>Seu cadastro segue para a central. Lá o pagamento pode ser confirmado e a operação aprovada manualmente.</p>
                 <ul className="register-v2-benefits">
-                  <li>Solicitacao enviada para analise</li>
-                  <li>Confirmacao manual do pagamento</li>
-                  <li>Aprovacao manual da conta e da loja</li>
+                  <li>Solicitação enviada para análise</li>
+                  <li>Confirmação manual do pagamento</li>
+                  <li>Aprovação manual da conta e da loja</li>
                 </ul>
               </div>
 
@@ -420,7 +420,7 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Descricao curta</span>
+                <span>Descrição curta</span>
                 <textarea value={form.descricaoCurta} onChange={(event) => updateField("descricaoCurta", event.target.value)} required />
               </label>
             </>
@@ -444,7 +444,7 @@ export default function RegisterStorePage() {
                   <span>Categoria</span>
                   <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
                     <option value="comida">Comida</option>
-                    <option value="servico">Servico</option>
+                    <option value="servico">Serviço</option>
                     <option value="loja">Loja</option>
                   </select>
                 </label>
@@ -460,7 +460,7 @@ export default function RegisterStorePage() {
                   <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} required />
                 </label>
                 <label>
-                  <span>Numero</span>
+                  <span>Número</span>
                   <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} required />
                 </label>
               </div>
@@ -477,7 +477,7 @@ export default function RegisterStorePage() {
               </div>
 
               <label>
-                <span>Horario de funcionamento</span>
+                <span>Horário de funcionamento</span>
                 <input value={form.horarioFuncionamento} onChange={(event) => updateField("horarioFuncionamento", event.target.value)} />
               </label>
 
@@ -521,11 +521,11 @@ export default function RegisterStorePage() {
             </button>
             {currentStep < totalSteps ? (
               <button type="button" className="btn btn-primary" onClick={handleAdvance} disabled={loading}>
-                Avancar <MdArrowForward />
+                Avançar <MdArrowForward />
               </button>
             ) : (
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Enviando..." : "Enviar solicitacao"}
+                {loading ? "Enviando..." : "Enviar solicitação"}
               </button>
             )}
           </div>

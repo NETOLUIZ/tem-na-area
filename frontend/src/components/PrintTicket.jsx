@@ -31,10 +31,9 @@ export default function PrintTicket({ order, store }) {
       <p><strong>Cliente:</strong> {order.cliente.nome}</p>
       <p><strong>Telefone:</strong> {order.cliente.telefone}</p>
       <p><strong>Entrega:</strong> {order.cliente.enderecoEntrega}</p>
-        {order.cliente.observacoes ? <p><strong>Obs:</strong> {order.cliente.observacoes}</p> : null}
+      {order.cliente.observacoes ? <p><strong>Obs:</strong> {order.cliente.observacoes}</p> : null}
       <hr />
       <p className="ticket-footer">Obrigado por comprar no Tem na Área</p>
     </div>
   );
 }
-

@@ -33,7 +33,7 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
         <div className="prompt-sidebar-brand">
           <div className="prompt-brand-mark" aria-hidden="true">T</div>
           <div>
-            <h2>Tem na Area</h2>
+            <h2>Tem na Área</h2>
             <p>{subtitle}</p>
           </div>
         </div>
@@ -45,15 +45,15 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
         </nav>
 
         <div className="prompt-sidebar-footer">
-          <Link className="prompt-ghost-button" to="/">HOME</Link>
-          {onLogout ? <button className="prompt-ghost-button" onClick={onLogout}>LOGOUT</button> : null}
+          <Link className="prompt-ghost-button" to="/">Início</Link>
+          {onLogout ? <button className="prompt-ghost-button" onClick={onLogout}>Sair</button> : null}
         </div>
       </aside>
 
       <main className="prompt-admin-main">
         <header className="prompt-topbar">
           <div>
-            <p className="prompt-breadcrumb">PAINEL GLOBAL / TEM NA AREA</p>
+            <p className="prompt-breadcrumb">CENTRAL TEM NA ÁREA / VISÃO GERAL</p>
             <h1>{title}</h1>
           </div>
         </header>

@@ -42,8 +42,8 @@ export default function MerchantSettingsPage() {
       <main className="container page-space">
         <div className="empty-state">
           <h3>Loja não encontrada</h3>
-          <p>Não foi possível carregar os ajustes dessa loja.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <p>Não foi possível carregar os ajustes desta operação.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </main>
     );
@@ -66,12 +66,12 @@ export default function MerchantSettingsPage() {
         <header className="store-panel-header merchant-ui-hero">
           <div className="merchant-ui-hero-copy">
             <small>PAINEL DA LOJA / AJUSTES</small>
-            <h1>Ajustes da Loja</h1>
-            <p>Atualize a vitrine pública, o canal de contato e a capa exibida para o cliente.</p>
+            <h1>Ajustes da operação</h1>
+            <p>Atualize vitrine, capa, descrição e canal de contato exibidos para o cliente.</p>
           </div>
 
           <div className="merchant-ui-hero-actions">
-            {store.slug ? <Link to={`/loja/${store.slug}`} className="store-panel-pill">Ver loja</Link> : null}
+            {store.slug ? <Link to={`/loja/${store.slug}`} className="store-panel-pill">Ver vitrine</Link> : null}
           </div>
         </header>
 
@@ -80,7 +80,7 @@ export default function MerchantSettingsPage() {
             <div className="store-panel-section-head merchant-ui-section-head">
               <div>
                 <h3>Vitrine e contato</h3>
-                <p>Esses dados aparecem para o cliente na pagina da loja.</p>
+                <p>Essas informações aparecem na página pública da loja.</p>
               </div>
             </div>
 
@@ -101,7 +101,7 @@ export default function MerchantSettingsPage() {
                 </label>
 
                 <label>
-                  <span>URL da foto de capa</span>
+                  <span>URL da imagem de capa</span>
                   <input
                     type="url"
                     placeholder="https://..."
@@ -117,7 +117,7 @@ export default function MerchantSettingsPage() {
                   <span>Descrição curta</span>
                   <input
                     type="text"
-                    placeholder="Resumo da loja"
+                    placeholder="Resumo da operação"
                     value={form.descricaoCurta}
                     onChange={(e) => {
                       setSavedMessage("");

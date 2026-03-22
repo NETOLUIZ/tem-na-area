@@ -76,7 +76,7 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
     });
 
     if (!result?.ok) {
-      setError(result?.message || "Revise a montagem do pedido.");
+      setError(result?.message || "Revise a personalização do item.");
       return;
     }
 
@@ -84,15 +84,15 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
   }
 
   return (
-    <div className="customization-modal-overlay" role="dialog" aria-modal="true" aria-label={`Montar pedido de ${item.nome}`}>
-      <button type="button" className="customization-modal-backdrop" onClick={onClose} aria-label="Fechar montagem" />
+    <div className="customization-modal-overlay" role="dialog" aria-modal="true" aria-label={`Personalizar pedido de ${item.nome}`}>
+      <button type="button" className="customization-modal-backdrop" onClick={onClose} aria-label="Fechar personalização" />
 
       <section className="customization-modal-panel">
         <header className="customization-modal-header">
           <div className="customization-modal-product">
             <SmartImage src={item.imagem} alt={item.nome} className="customization-modal-thumb" />
             <div>
-              <small>Monte seu pedido</small>
+              <small>Personalize seu pedido</small>
               <h2>{item.nome}</h2>
               <p>{item.descricao}</p>
               <strong>{formatCurrency(item.preco)}</strong>
@@ -158,7 +158,7 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
             </section>
           )) : (
             <div className="customization-empty">
-              <p>Este produto não possui grupos de montagem. Ajuste a quantidade e adicione ao carrinho.</p>
+              <p>Este item não possui grupos de personalização. Ajuste a quantidade e adicione ao carrinho.</p>
             </div>
           )}
 

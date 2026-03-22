@@ -20,7 +20,7 @@ const STATUS_LABEL = {
   NOVO: "Novo",
   ACEITO: "Aceito",
   EM_PREPARO: "Em preparo",
-  SAIU_PARA_ENTREGA: "Saiu",
+  SAIU_PARA_ENTREGA: "Saiu para entrega",
   CONCLUIDO: "Concluído",
   CANCELADO: "Cancelado",
   RECUSADO: "Recusado"
@@ -52,7 +52,7 @@ function getNextStatus(status) {
 function getActionLabel(status) {
   if (status === "NOVO") return "Aceitar";
   if (status === "ACEITO") return "Preparar";
-  if (status === "EM_PREPARO") return "Enviar";
+  if (status === "EM_PREPARO") return "Despachar";
   if (status === "SAIU_PARA_ENTREGA") return "Concluir";
   return "Imprimir";
 }
@@ -94,8 +94,8 @@ export default function MerchantOrdersPage() {
       <main className="container page-space">
         <div className="empty-state">
           <h3>Loja não encontrada</h3>
-          <p>Não foi possível carregar os pedidos dessa loja.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <p>Não foi possível carregar os pedidos desta operação.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </main>
     );
@@ -119,7 +119,7 @@ export default function MerchantOrdersPage() {
       <header className="orders-v2-header">
         <div className="orders-v2-title-wrap">
           <h1>Pedidos</h1>
-          <p>Tem na Área Admin</p>
+          <p>Central operacional Tem na Área</p>
         </div>
         <button className="orders-v2-bell" type="button" aria-label="Notificações">
           <MdNotificationsNone />
@@ -155,7 +155,7 @@ export default function MerchantOrdersPage() {
             <div className="orders-v2-empty">
               <div><MdReceiptLong /></div>
               <h3>Nenhum pedido encontrado</h3>
-              <p>Parece que não há pedidos para este filtro no momento.</p>
+              <p>Não há pedidos para esse filtro no momento.</p>
             </div>
           ) : (
             filtered.map((order) => (
@@ -170,7 +170,7 @@ export default function MerchantOrdersPage() {
                   </span>
                 </div>
 
-                <p className="orders-v2-meta">{`${getRelativeTime(order.createdAt)} · ${order.items.length} itens`}</p>
+                <p className="orders-v2-meta">{`${getRelativeTime(order.createdAt)} · ${order.items.length} item(ns)`}</p>
 
                 <div className="orders-v2-order-lines">
                   {order.items.map((item) => {
@@ -219,7 +219,7 @@ export default function MerchantOrdersPage() {
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/cardapio`} className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdRestaurantMenu /></span>
-          <small>Cardápio</small>
+          <small>Catálogo</small>
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/ajustes`} className={({ isActive }) => (isActive ? "active" : "")}>
           <span><MdSettings /></span>

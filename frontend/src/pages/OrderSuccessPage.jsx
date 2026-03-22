@@ -22,10 +22,10 @@ export default function OrderSuccessPage() {
 
         <div className="success-v2-head">
           <p className="success-v2-kicker">Pedido confirmado no Tem na Área</p>
-          <h1>Pedido realizado!</h1>
+          <h1>Pedido realizado com sucesso</h1>
           <p>
-            Seu pedido <strong>{order?.id || orderId || "#----"}</strong> foi enviado com sucesso para{" "}
-            <strong>{store?.nome || "o estabelecimento"}</strong>.
+            Seu pedido <strong>{order?.id || orderId || "#----"}</strong> já foi enviado para{" "}
+            <strong>{store?.nome || "a operação selecionada"}</strong>.
           </p>
         </div>
 
@@ -34,7 +34,7 @@ export default function OrderSuccessPage() {
             <div className="success-v2-badge mint"><MdLocalShipping /></div>
             <div>
               <small>TEMPO ESTIMADO</small>
-              <strong>35 - 50 minutos</strong>
+              <strong>35 a 50 minutos</strong>
             </div>
           </div>
 
@@ -52,9 +52,9 @@ export default function OrderSuccessPage() {
         <div className="success-v2-actions">
           <Link className="success-v2-primary" to={store?.slug ? `/loja/${store.slug}` : "/"}>
             <MdStorefront aria-hidden="true" />
-            Ver loja <span aria-hidden="true"><MdArrowForward /></span>
+            Voltar para a vitrine <span aria-hidden="true"><MdArrowForward /></span>
           </Link>
-          <Link className="success-v2-secondary" to="/">Voltar para o início</Link>
+          <Link className="success-v2-secondary" to="/">Ir para o início</Link>
         </div>
       </section>
     </main>

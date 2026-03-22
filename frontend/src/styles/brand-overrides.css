@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --primary: #f4bf24;
+  --primary-900: #cb9711;
+  --secondary: #135dff;
+  --accent-blue: #37a7ff;
+  --accent-orange: #ff7a00;
+  --accent-pink: #ff5b7a;
+  --bg: #090b12;
+  --card: #101521;
+  --card-hover: #151d2d;
+  --text: #f5f7fb;
+  --muted: #9aa7bd;
+  --line: rgba(84, 113, 163, 0.28);
+  --line-soft: rgba(255, 255, 255, 0.08);
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --shadow-glow: 0 0 40px rgba(244, 191, 36, 0.14);
+  --app-shell-bg:
+    radial-gradient(circle at top left, rgba(244, 191, 36, 0.09), transparent 32%),
+    radial-gradient(circle at top right, rgba(19, 93, 255, 0.14), transparent 28%),
+    radial-gradient(circle at bottom center, rgba(55, 167, 255, 0.1), transparent 30%),
+    linear-gradient(180deg, #090b12 0%, #0e1420 48%, #111929 100%);
+}
+
+html, body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.topbar-content h1,
+.login-v2-brand h1,
+.register-v2-topbar h1,
+.prompt-topbar h1,
+.merchant-dashboard-hero h1 {
+  font-family: "Sora", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.topbar,
+.register-v2-topbar,
+.cart-v2-header,
+.checkout-v2-header,
+.prompt-topbar,
+.prompt-topbar-merchant,
+.orders-v2-header,
+.menu-v2-header,
+.store-panel-header {
+  border-color: rgba(84, 113, 163, 0.22);
+  background: linear-gradient(180deg, rgba(8, 11, 18, 0.94), rgba(14, 20, 32, 0.9));
+}
+
+.hero-card,
+.home-promo-carousel,
+.store-card,
+.product-card,
+.empty-state,
+.login-v2-card,
+.register-v2-card,
+.checkout-v2-card,
+.success-v2-card,
+.prompt-card,
+.dashboard-panel,
+.dashboard-kpi-card,
+.orders-v2-card,
+.orders-v2-search,
+.orders-v2-empty,
+.menu-v2-card,
+.menu-v2-list-wrap,
+.menu-v2-item,
+.store-panel-profile,
+.store-panel-nav,
+.table-wrap {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(84, 113, 163, 0.22);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hero-card {
+  border-radius: 28px;
+  padding: 56px 36px;
+}
+
+.btn,
+.prompt-sidebar-link,
+.merchant-desktop-nav a,
+.merchant-desktop-logout,
+.prompt-ghost-button,
+.prompt-link-tile,
+.orders-v2-action,
+.menu-v2-submit,
+.cart-v2-checkout,
+.checkout-v2-submit,
+.success-v2-primary,
+.success-v2-secondary {
+  border-radius: 16px;
+}
+
+.btn-primary,
+.cart-v2-checkout,
+.checkout-v2-submit,
+.success-v2-primary,
+.menu-v2-submit {
+  background: linear-gradient(135deg, var(--primary), #ffd45a);
+  color: #0a0d14;
+  box-shadow: 0 16px 32px rgba(244, 191, 36, 0.2);
+}
+
+.btn-outline,
+.prompt-ghost-button,
+.success-v2-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border: 1px solid rgba(84, 113, 163, 0.22);
+}
+
+.prompt-sidebar,
+.merchant-desktop-sidebar {
+  background:
+    radial-gradient(circle at top left, rgba(244, 191, 36, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(7, 10, 16, 0.98), rgba(13, 18, 28, 0.96));
+  border-right: 1px solid rgba(84, 113, 163, 0.2);
+}
+
+.prompt-sidebar-link.active,
+.merchant-desktop-nav a.active {
+  background: linear-gradient(90deg, rgba(244, 191, 36, 0.14), rgba(19, 93, 255, 0.14));
+  border-color: rgba(244, 191, 36, 0.26);
+  color: var(--text);
+}
+
+.prompt-brand-mark,
+.merchant-desktop-brand-mark,
+.login-v2-brand-icon,
+.success-v2-icon,
+.success-v2-badge {
+  background: linear-gradient(135deg, var(--primary), #ffe07a);
+  color: #0a0d14;
+}
+
+.home-promo-badge,
+.prompt-card-kicker,
+.success-v2-kicker,
+.checkout-v2-kicker,
+.cart-v2-kicker {
+  color: var(--primary);
+}
+
+.table thead th {
+  color: var(--primary);
+}
+
+@media (max-width: 760px) {
+  .hero-card {
+    padding: 148px 20px 28px;
+    border-radius: 24px;
+  }
+}

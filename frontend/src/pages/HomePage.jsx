@@ -85,7 +85,7 @@ export default function HomePage() {
         <div className="topbar-content">
           <h1>Tem na Área</h1>
           <input
-            placeholder="Buscar loja, comida ou serviço..."
+            placeholder="Buscar loja, serviço ou categoria..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -95,11 +95,11 @@ export default function HomePage() {
       <main className="container page-space">
         <section className="hero-card" style={{ "--hero-image": `url(${heroImage})` }}>
           <div className="hero-card-text">
-            <h2>Aqui no Tem na Área você encontra tudo na palma da mão.</h2>
-            <p>Descubra lojas locais, faça seu pedido e acompanhe tudo em segundos.</p>
+            <h2>O comércio local com presença forte, simples e profissional.</h2>
+            <p>Descubra negócios da sua região, faça pedidos com agilidade e acompanhe tudo em uma experiência única da Tem na Área.</p>
             <div style={{ marginTop: "1rem" }}>
               <Link className="btn btn-primary" to="/cadastrar-loja">
-                Cadastrar meu negócio
+                Quero minha marca na rede
               </Link>
             </div>
           </div>
@@ -108,8 +108,8 @@ export default function HomePage() {
         {promotions.length ? (
           <section className="home-promo-shell">
             <div className="section-title">
-              <h3>Propagandas em destaque</h3>
-              <span>{promotions.length} campanhas ativas</span>
+              <h3>Campanhas em destaque</h3>
+              <span>{promotions.length} ativa(s) agora</span>
             </div>
 
             <div className="home-promo-carousel">
@@ -133,7 +133,7 @@ export default function HomePage() {
                         to={`/loja/${promotion.store.slug}`}
                         onClick={() => actions.incrementMetric(promotion.store.id, "cliquesSite")}
                       >
-                        Ver produto na loja
+                        Ver na vitrine
                       </Link>
                     </div>
 
@@ -150,7 +150,7 @@ export default function HomePage() {
                     key={promotion.id}
                     type="button"
                     className={index === activePromoIndex ? "active" : ""}
-                    aria-label={`Ir para propaganda ${index + 1}`}
+                    aria-label={`Ir para campanha ${index + 1}`}
                     onClick={() => setActivePromoIndex(index)}
                   />
                 ))}
@@ -160,12 +160,12 @@ export default function HomePage() {
         ) : (
           <section className="home-promo-shell">
             <div className="section-title">
-              <h3>Propagandas em destaque</h3>
-              <span>0 campanhas ativas</span>
+              <h3>Campanhas em destaque</h3>
+              <span>0 ativa(s)</span>
             </div>
             <div className="empty-state">
-              <h4>Nenhuma propaganda ativa no momento</h4>
-              <p>As campanhas publicadas pelas lojas vão aparecer aqui automaticamente.</p>
+              <h4>Nenhuma campanha ativa no momento</h4>
+              <p>As campanhas publicadas pelas lojas parceiras aparecem aqui automaticamente.</p>
             </div>
           </section>
         )}
@@ -184,14 +184,14 @@ export default function HomePage() {
 
         <section>
           <div className="section-title">
-            <h3>Lojas em destaque</h3>
-            <span>{stores.length} resultados</span>
+            <h3>Vitrines em destaque</h3>
+            <span>{stores.length} resultado(s)</span>
           </div>
 
           {!stores.length ? (
             <div className="empty-state">
-              <h4>Nenhuma loja encontrada</h4>
-              <p>Tente mudar a busca ou os filtros.</p>
+              <h4>Nenhum negócio encontrado</h4>
+              <p>Ajuste a busca ou troque o filtro para encontrar mais opções na sua área.</p>
             </div>
           ) : (
             <div className="store-grid" ref={cardsSectionRef}>
@@ -211,4 +211,3 @@ export default function HomePage() {
     </div>
   );
 }
-

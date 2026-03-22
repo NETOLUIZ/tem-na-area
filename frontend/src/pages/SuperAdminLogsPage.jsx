@@ -12,7 +12,7 @@ export default function SuperAdminLogsPage() {
   ];
 
   return (
-    <AdminLayout title="Logs de acoes" subtitle="Historico do Tem na Area" links={links} onLogout={actions.logoutSuperAdmin}>
+    <AdminLayout title="Logs de ações" subtitle="Histórico do Tem na Área" links={links} onLogout={actions.logoutSuperAdmin}>
       <section className="dashboard-kpi-grid neon-gap">
         <article className="dashboard-kpi-card">
           <h4>Total de logs</h4>
@@ -33,7 +33,7 @@ export default function SuperAdminLogsPage() {
               <small>{log.motivo}</small>
             </article>
           ))}
-          {!state.logs.length ? <p className="muted">Nenhuma acao registrada.</p> : null}
+          {!state.logs.length ? <p className="muted">Nenhuma ação registrada.</p> : null}
         </div>
       </section>
     </AdminLayout>

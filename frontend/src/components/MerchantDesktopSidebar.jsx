@@ -10,7 +10,7 @@ export default function MerchantDesktopSidebar({ storeId, storeName, storeSlug, 
         <div className="merchant-desktop-brand-mark" aria-hidden="true">{initial}</div>
         <div className="merchant-desktop-brand-copy">
           <h2>Tem na Área</h2>
-          <p>{storeName || "Minha Loja"}</p>
+          <p>{storeName || "Minha operação"}</p>
           <small>{status || "PENDENTE"}</small>
         </div>
       </div>
@@ -26,7 +26,7 @@ export default function MerchantDesktopSidebar({ storeId, storeName, storeSlug, 
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/cardapio`} className={({ isActive }) => (isActive ? "active" : "")}>
           <MdRestaurantMenu />
-          <span>Cardápio</span>
+          <span>Catálogo</span>
         </NavLink>
         <NavLink to={`/admin-loja/${storeId}/ajustes`} className={({ isActive }) => (isActive ? "active" : "")}>
           <MdSettings />
@@ -37,7 +37,7 @@ export default function MerchantDesktopSidebar({ storeId, storeName, storeSlug, 
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           <MdStorefront />
-          <span>Loja</span>
+          <span>Vitrine</span>
         </NavLink>
       </nav>
 

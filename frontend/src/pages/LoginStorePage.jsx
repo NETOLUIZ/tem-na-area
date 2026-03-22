@@ -77,19 +77,19 @@ export default function LoginStorePage() {
 
         <div className="login-v2-hero" aria-hidden="true">
           <div className="login-v2-hero-copy">
-            <span className="login-v2-hero-kicker">Painel da loja</span>
-            <strong>Seu caixa local, sua identidade no bairro.</strong>
-            <p>Pedidos, cardápio e operação no mesmo ritmo da rua.</p>
+            <span className="login-v2-hero-kicker">Painel do parceiro</span>
+            <strong>Sua operacao local com padrao premium e resposta rapida.</strong>
+            <p>Pedidos, catalogo, vitrine e gestao em um fluxo unico, direto e profissional.</p>
           </div>
           <div className="login-v2-hero-stack">
-            <span>Centro</span>
-            <span>Delivery</span>
-            <span>Loja ativa</span>
+            <span>Operacao ativa</span>
+            <span>Vitrine online</span>
+            <span>Gestao diaria</span>
           </div>
         </div>
 
         <h2>Bem-vindo de volta</h2>
-        <p>Gerencie sua presença local com a identidade do seu bairro.</p>
+        <p>Acesse sua area para atualizar a vitrine, atender pedidos e acompanhar a performance da loja.</p>
 
         {error ? <p className="error-text">{error}</p> : null}
 
@@ -109,7 +109,7 @@ export default function LoginStorePage() {
 
           <div className="login-v2-pass-row">
             <label>Senha</label>
-            <Link to="/login-loja" className="login-v2-link">Esqueceu a senha</Link>
+            <Link to="/login-loja" className="login-v2-link">Esqueci minha senha</Link>
           </div>
 
           <div className="login-v2-input-wrap">
@@ -129,12 +129,12 @@ export default function LoginStorePage() {
           </div>
 
           <button className="btn btn-primary login-v2-submit" type="submit">
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? "Entrando..." : "Entrar no painel"}
             <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
           </button>
         </form>
 
-        <div className="login-v2-divider"><span>ou entre com</span></div>
+        <div className="login-v2-divider"><span>ou continue com</span></div>
 
         <div className="login-v2-social">
           <button type="button" className="btn btn-outline">Google</button>
@@ -142,7 +142,7 @@ export default function LoginStorePage() {
         </div>
 
         <p className="login-v2-foot">
-          Não tem cadastro? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar loja</Link>
+          Ainda nao faz parte da rede? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar empresa</Link>
         </p>
       </section>
     </main>

@@ -32,7 +32,7 @@ export default function StoreCard({ store, onOpen, className = "", style }) {
         <p className="store-description">{store.descricaoCurta}</p>
 
         <div className="store-rating">
-          <div className="store-rating-stars" aria-label={`Avaliao mdia de ${averageRating.toFixed(1)} estrelas`}>
+          <div className="store-rating-stars" aria-label={`Avaliação média de ${averageRating.toFixed(1)} estrelas`}>
             {[1, 2, 3, 4, 5].map((star) => {
               const filled = star <= Math.round(averageRating);
               const Icon = filled ? MdStar : MdStarBorder;
@@ -52,7 +52,7 @@ export default function StoreCard({ store, onOpen, className = "", style }) {
           </div>
 
           <span className="store-rating-text">
-            {ratingCount ? `${averageRating.toFixed(1)} (${ratingCount} avaliações)` : "Seja o primeiro a avaliar"}
+            {ratingCount ? `${averageRating.toFixed(1)} (${ratingCount} avaliações)` : "Seja a primeira pessoa a avaliar"}
           </span>
         </div>
 
@@ -68,7 +68,7 @@ export default function StoreCard({ store, onOpen, className = "", style }) {
         ) : (
           <Link to={`/loja/${store.slug}`} className="btn btn-primary" onClick={onOpen}>
             <MdOutlineStorefront aria-hidden="true" />
-            Ver loja
+            Abrir vitrine
           </Link>
         )}
       </div>

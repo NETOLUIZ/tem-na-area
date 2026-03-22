@@ -21,21 +21,9 @@ export default function SuperAdminFinancePage() {
     { to: "/admin-temnaarea/logs", label: "Logs" }
   ];
 
-  const paidStores = useMemo(
-    () => state.adminStores.filter(isPaidStore),
-    [state.adminStores]
-  );
-
-  const approvedPaidStores = useMemo(
-    () => paidStores.filter(isPaymentApproved),
-    [paidStores]
-  );
-
-  const pendingPaidStores = useMemo(
-    () => paidStores.filter((store) => !isPaymentApproved(store)),
-    [paidStores]
-  );
-
+  const paidStores = useMemo(() => state.adminStores.filter(isPaidStore), [state.adminStores]);
+  const approvedPaidStores = useMemo(() => paidStores.filter(isPaymentApproved), [paidStores]);
+  const pendingPaidStores = useMemo(() => paidStores.filter((store) => !isPaymentApproved(store)), [paidStores]);
   const activeApprovedStores = useMemo(
     () => approvedPaidStores.filter((store) => store.status === "ATIVA"),
     [approvedPaidStores]
@@ -55,7 +43,7 @@ export default function SuperAdminFinancePage() {
   ];
 
   return (
-    <AdminLayout title="Financeiro" subtitle="Conversao de lojas pagas" links={links} onLogout={actions.logoutSuperAdmin}>
+    <AdminLayout title="Financeiro" subtitle="Receita e conversão da rede" links={links} onLogout={actions.logoutSuperAdmin}>
       <section className="dashboard-kpi-grid neon-gap">
         <article className="dashboard-kpi-card">
           <h4>Lojas pagas</h4>
@@ -65,32 +53,32 @@ export default function SuperAdminFinancePage() {
         <article className="dashboard-kpi-card">
           <h4>Ativas no plano pago</h4>
           <strong>{activeApprovedStores.length}</strong>
-          <p>Lojas pagas ja operando no painel.</p>
+          <p>Operações pagas já rodando na plataforma.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Pendentes</h4>
+          <h4>Pendências</h4>
           <strong>{pendingPaidStores.length}</strong>
-          <p>Cadastros pagos aguardando aprovacao ou confirmacao.</p>
+          <p>Cadastros aguardando confirmação ou aprovação.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Conversao</h4>
+          <h4>Conversão</h4>
           <strong>{conversionRate}%</strong>
-          <p>Pagamento aprovado dentro das lojas do plano pago.</p>
+          <p>Pagamentos aprovados dentro da base paga.</p>
         </article>
       </section>
 
       <section className="dashboard-panel neon-gap">
         <div className="section-title">
-          <h3>Lojas com servico pago</h3>
-          <span>{approvedPaidStores.length} aprovadas</span>
+          <h3>Operações com serviço pago</h3>
+          <span>{approvedPaidStores.length} aprovada(s)</span>
         </div>
-        <Table columns={columns} rows={approvedPaidStores} emptyText="Nenhuma loja paga aprovada ate agora." />
+        <Table columns={columns} rows={approvedPaidStores} emptyText="Nenhuma loja paga aprovada até agora." />
       </section>
 
       <section className="dashboard-panel neon-gap">
         <div className="section-title">
           <h3>Pagamentos pendentes</h3>
-          <span>{pendingPaidStores.length} registros</span>
+          <span>{pendingPaidStores.length} registro(s)</span>
         </div>
         <Table columns={columns} rows={pendingPaidStores} emptyText="Nenhum pagamento pendente no momento." />
       </section>

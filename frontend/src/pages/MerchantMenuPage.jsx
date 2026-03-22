@@ -1,9 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  MdArrowBack,
-  MdRestaurantMenu,
-  MdTune
-} from "react-icons/md";
+import { MdArrowBack, MdRestaurantMenu, MdTune } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MerchantDesktopSidebar from "../components/MerchantDesktopSidebar";
 import MerchantOptionGroupManager from "../components/MerchantOptionGroupManager";
@@ -11,7 +7,7 @@ import SmartImage from "../components/SmartImage";
 import { useApp } from "../store/AppContext";
 import { formatCurrency, formatDate } from "../utils/format";
 
-const CATEGORIAS = ["Massas", "Bebidas", "Sobremesas", "Outros"];
+const CATEGORIAS = ["Destaques", "Combos", "Bebidas", "Outros"];
 
 const emptyItem = {
   nome: "",
@@ -126,8 +122,8 @@ export default function MerchantMenuPage() {
       <main className="container page-space">
         <div className="empty-state">
           <h3>Loja não encontrada</h3>
-          <p>Não foi possível carregar o cardápio dessa loja.</p>
-          <Link className="btn btn-primary" to="/">Voltar para Home</Link>
+          <p>Não foi possível carregar o catálogo desta operação.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </main>
     );
@@ -151,7 +147,7 @@ export default function MerchantMenuPage() {
           <button type="button" onClick={() => navigate(`/admin-loja/${storeId}`)} aria-label="Voltar">
             <MdArrowBack />
           </button>
-          <h1>Gerenciar cardápio</h1>
+          <h1>Gerenciar catálogo</h1>
         </div>
         <div className="menu-v2-tabs">
           <button type="button" className={activeTab === "form" ? "active" : ""} onClick={() => setActiveTab("form")}>
@@ -161,10 +157,10 @@ export default function MerchantMenuPage() {
             Itens cadastrados
           </button>
           <button type="button" className={activeTab === "montagem" ? "active" : ""} onClick={() => setActiveTab("montagem")}>
-            <MdTune /> Montagem
+            <MdTune /> Personalização
           </button>
           <button type="button" className={activeTab === "promo" ? "active" : ""} onClick={() => setActiveTab("promo")}>
-            Propaganda Home
+            Campanhas
           </button>
         </div>
       </header>
@@ -189,12 +185,12 @@ export default function MerchantMenuPage() {
             />
 
             <div className="menu-v2-grid2">
-              <input type="number" step="0.01" placeholder="Preco (R$)" value={form.preco} onChange={(e) => setForm({ ...form, preco: e.target.value })} required />
-              <input type="number" step="0.01" placeholder="Preco antigo" value={form.precoAntigo} onChange={(e) => setForm({ ...form, precoAntigo: e.target.value })} />
+              <input type="number" step="0.01" placeholder="Preço (R$)" value={form.preco} onChange={(e) => setForm({ ...form, preco: e.target.value })} required />
+              <input type="number" step="0.01" placeholder="Preço anterior" value={form.precoAntigo} onChange={(e) => setForm({ ...form, precoAntigo: e.target.value })} />
             </div>
 
             <input type="url" placeholder="URL da imagem" value={form.imagem} onChange={(e) => setForm({ ...form, imagem: e.target.value })} required />
-            <input placeholder="Tags (separadas por virgula)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+            <input placeholder="Tags (separadas por vírgula)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
 
             <label className="menu-v2-toggle">
               <span>Item ativo</span>
@@ -237,13 +233,13 @@ export default function MerchantMenuPage() {
                         {linkedGroups.length ? (
                           linkedGroups.map((group) => <span key={group.id} className="tag">{group.name}</span>)
                         ) : (
-                          <span className="muted">Sem montagem configurada</span>
+                          <span className="muted">Sem personalização configurada</span>
                         )}
                       </div>
                     </div>
                     <div className="menu-v2-item-actions">
                       <button type="button" onClick={() => edit(item)}>Editar</button>
-                      <button type="button" onClick={() => setActiveTab("montagem")}>Montagem</button>
+                      <button type="button" onClick={() => setActiveTab("montagem")}>Personalização</button>
                       <button type="button" onClick={async () => actions.deleteMenuItem(item.id)}>Excluir</button>
                     </div>
                   </article>
@@ -269,23 +265,23 @@ export default function MerchantMenuPage() {
           <section className="menu-v2-promo-wrap">
             <form className="menu-v2-card menu-v2-form" onSubmit={submitPromotion}>
               <div className="register-v2-note">
-                <strong>Regras da propaganda:</strong>
-                <span>Cada loja pode publicar no máximo 2 propagandas por dia. Cada campanha fica ativa por 48 horas e já está incluída no plano.</span>
+                <strong>Regras da campanha:</strong>
+                <span>Cada loja pode publicar até 2 campanhas por dia. Cada ação fica ativa por 48 horas e já está incluída no plano.</span>
               </div>
 
               {promotionMessage ? <p className="success-text">{promotionMessage}</p> : null}
 
               <select value={promotionForm.itemId} onChange={(e) => setPromotionForm({ ...promotionForm, itemId: e.target.value })} required>
-                <option value="">Escolha um produto da loja</option>
+                <option value="">Escolha um item ativo da loja</option>
                 {items.filter((item) => item.ativo).map((item) => (
                   <option key={item.id} value={item.id}>{item.nome}</option>
                 ))}
               </select>
 
-              <input placeholder="Título da propaganda" value={promotionForm.title} onChange={(e) => setPromotionForm({ ...promotionForm, title: e.target.value })} required />
+              <input placeholder="Título da campanha" value={promotionForm.title} onChange={(e) => setPromotionForm({ ...promotionForm, title: e.target.value })} required />
               <textarea
                 rows={4}
-                placeholder="Subtítulo curto para aparecer no carrossel"
+                placeholder="Subtítulo curto para o carrossel"
                 value={promotionForm.subtitle}
                 onChange={(e) => setPromotionForm({ ...promotionForm, subtitle: e.target.value })}
                 required
@@ -301,7 +297,7 @@ export default function MerchantMenuPage() {
               </div>
 
               <button className="menu-v2-submit" type="submit">
-                {editingPromotionId ? "Salvar propaganda" : "Publicar na home"}
+                {editingPromotionId ? "Salvar campanha" : "Publicar campanha"}
               </button>
 
               {editingPromotionId ? (
@@ -317,7 +313,7 @@ export default function MerchantMenuPage() {
                     <h3>{promotion.title}</h3>
                     <p>{promotion.subtitle}</p>
                     <div className="menu-v2-promo-meta">
-                      <strong>{promotion.item?.nome || "Produto removido"}</strong>
+                      <strong>{promotion.item?.nome || "Item removido"}</strong>
                       <small>{promotion.badge}</small>
                       <small>Expira em {formatDate(promotion.expiresAt)}</small>
                     </div>
@@ -332,7 +328,7 @@ export default function MerchantMenuPage() {
               {!promotions.length ? (
                 <div className="menu-v2-empty">
                   <span><MdRestaurantMenu /></span>
-                  <p>Nenhuma propaganda publicada por esta loja.</p>
+                  <p>Nenhuma campanha publicada por esta loja.</p>
                 </div>
               ) : null}
             </div>

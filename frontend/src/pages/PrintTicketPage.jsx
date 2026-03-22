@@ -22,8 +22,8 @@ export default function PrintTicketPage() {
     return (
       <main className="container page-space">
         <div className="empty-state">
-          <h3>Pedido no encontrado</h3>
-          <p>No foi possvel gerar o ticket.</p>
+          <h3>Pedido não encontrado</h3>
+          <p>Não foi possível gerar o ticket deste pedido.</p>
           <Link className="btn btn-primary" to={`/admin-loja/${storeId}/pedidos`}>Voltar</Link>
         </div>
       </main>

@@ -18,7 +18,7 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
       <aside className="cart-drawer-panel">
         <header className="cart-drawer-header">
           <div className="cart-drawer-header-copy">
-            <span className="cart-drawer-kicker">Seu pedido no Tem na Área</span>
+            <span className="cart-drawer-kicker">Sua compra no Tem na Área</span>
             <h3>{cart.store?.nome || "Sua sacola"}</h3>
             <div className="cart-drawer-store-meta">
               <span>
@@ -43,11 +43,7 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
           </div>
           <div>
             <small>Total parcial</small>
-            <strong>
-              {formatCurrency(
-                visibleItems.reduce((sum, row) => sum + row.subtotal, 0)
-              )}
-            </strong>
+            <strong>{formatCurrency(visibleItems.reduce((sum, row) => sum + row.subtotal, 0))}</strong>
           </div>
         </section>
 
@@ -91,11 +87,11 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
 
           <div className="cart-drawer-actions">
             <button type="button" className="btn btn-outline" onClick={onClose}>
-              Continuar comprando
+              Seguir navegando
             </button>
             <Link className="btn btn-primary cart-drawer-checkout" to="/sacola" onClick={onClose}>
               <MdOutlineShoppingBag aria-hidden="true" />
-              Ir para sacola
+              Revisar sacola
             </Link>
           </div>
         </footer>

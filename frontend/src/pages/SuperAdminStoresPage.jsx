@@ -37,14 +37,14 @@ export default function SuperAdminStoresPage() {
     { key: "categoria", label: "Categoria" },
     { key: "cidade", label: "Cidade", render: (row) => row.endereco.cidade },
     { key: "status", label: "Status" },
-    { key: "createdAt", label: "Criada", render: (row) => formatDate(row.createdAt) },
+    { key: "createdAt", label: "Criada em", render: (row) => formatDate(row.createdAt) },
     {
       key: "actions",
-      label: "Acoes",
+      label: "Ações",
       render: (row) => (
         <div className="inline-actions">
           {row.status === "PENDENTE" ? (
-            <button className="btn btn-primary" onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovacao manual")}>
+            <button className="btn btn-primary" onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovação manual")}>
               Aprovar
             </button>
           ) : null}
@@ -63,15 +63,15 @@ export default function SuperAdminStoresPage() {
   ];
 
   const leadColumns = [
-    { key: "nome", label: "Negocio" },
+    { key: "nome", label: "Negócio" },
     { key: "categoria", label: "Categoria" },
     { key: "cidade", label: "Cidade" },
     { key: "whatsapp", label: "WhatsApp" },
-    { key: "createdAt", label: "Solicitacao", render: (row) => formatDate(row.createdAt) },
+    { key: "createdAt", label: "Solicitação", render: (row) => formatDate(row.createdAt) },
     { key: "status", label: "Status" },
     {
       key: "approve",
-      label: "Acoes",
+      label: "Ações",
       render: (row) => (
         row.publishedAsCard ? (
           <button className="btn btn-outline" disabled>Publicado</button>
@@ -85,13 +85,13 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approveFreePlanLead(row.id);
               } catch (error) {
-                setLeadError(error.message || "Nao foi possivel aprovar o plano gratis.");
+                setLeadError(error.message || "Não foi possível aprovar a entrada gratuita.");
               } finally {
                 setLeadLoadingId(null);
               }
             }}
           >
-            {leadLoadingId === row.id ? "Aprovando..." : "Aprovar plano gratis"}
+            {leadLoadingId === row.id ? "Aprovando..." : "Aprovar entrada gratuita"}
           </button>
         )
       )
@@ -99,16 +99,16 @@ export default function SuperAdminStoresPage() {
   ];
 
   const paidLeadColumns = [
-    { key: "nome", label: "Negocio" },
+    { key: "nome", label: "Negócio" },
     { key: "categoria", label: "Categoria" },
     { key: "cidade", label: "Cidade" },
     { key: "whatsapp", label: "WhatsApp" },
-    { key: "createdAt", label: "Solicitacao", render: (row) => formatDate(row.createdAt) },
+    { key: "createdAt", label: "Solicitação", render: (row) => formatDate(row.createdAt) },
     { key: "paymentStatus", label: "Pagamento" },
     { key: "status", label: "Status" },
     {
       key: "approve",
-      label: "Acoes",
+      label: "Ações",
       render: (row) => (
         row.status === "APROVADA" ? (
           <button className="btn btn-outline" disabled>Cadastro aprovado</button>
@@ -122,7 +122,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approvePaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(error.message || "Nao foi possivel aprovar o cadastro.");
+                setPaidLeadError(error.message || "Não foi possível aprovar o cadastro.");
               } finally {
                 setPaidLeadLoadingId(null);
               }
@@ -140,7 +140,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.confirmPaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(error.message || "Nao foi possivel confirmar o pagamento.");
+                setPaidLeadError(error.message || "Não foi possível confirmar o pagamento.");
               } finally {
                 setPaidLeadLoadingId(null);
               }
@@ -160,34 +160,34 @@ export default function SuperAdminStoresPage() {
   }
 
   return (
-    <AdminLayout title="Lojas cadastradas" subtitle="Gestao global" links={links} onLogout={actions.logoutSuperAdmin}>
+    <AdminLayout title="Rede de lojas" subtitle="Gestão global" links={links} onLogout={actions.logoutSuperAdmin}>
       <section className="dashboard-kpi-grid neon-gap">
         <article className="dashboard-kpi-card">
           <h4>Resultado atual</h4>
           <strong>{rows.length}</strong>
-          <p>Lojas no filtro aplicado.</p>
+          <p>Operações dentro do filtro aplicado.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Pendentes</h4>
+          <h4>Pendências</h4>
           <strong>{state.adminStores.filter((store) => store.status === "PENDENTE").length}</strong>
-          <p>Operacoes aguardando aprovacao.</p>
+          <p>Cadastros aguardando decisão.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Comida</h4>
+          <h4>Gastronomia</h4>
           <strong>{state.adminStores.filter((store) => store.categoria === "comida").length}</strong>
-          <p>Estabelecimentos de alimentacao.</p>
+          <p>Negócios do segmento de alimentação.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Outras categorias</h4>
+          <h4>Outras frentes</h4>
           <strong>{state.adminStores.filter((store) => store.categoria !== "comida").length}</strong>
-          <p>Servicos e lojas em operacao.</p>
+          <p>Serviços, varejo e outras operações.</p>
         </article>
       </section>
 
       <section className="dashboard-panel neon-gap">
         <div className="filters-row">
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="TODOS">Todos status</option>
+            <option value="TODOS">Todos os status</option>
             <option value="PENDENTE">Pendente</option>
             <option value="ATIVA">Ativa</option>
             <option value="BLOQUEADA">Bloqueada</option>
@@ -195,37 +195,37 @@ export default function SuperAdminStoresPage() {
           <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value="TODAS">Todas as categorias</option>
             <option value="comida">Comida</option>
-            <option value="servico">Servico</option>
+            <option value="servico">Serviço</option>
             <option value="loja">Loja</option>
           </select>
           <input placeholder="Filtrar por cidade" value={cityFilter} onChange={(event) => setCityFilter(event.target.value)} />
         </div>
 
-        <Table columns={columns} rows={rows} emptyText="Nenhuma loja encontrada com esses filtros." />
+        <Table columns={columns} rows={rows} emptyText="Nenhuma loja encontrada com os filtros atuais." />
       </section>
 
       <section className="dashboard-panel neon-gap">
         <div className="section-title">
-          <h3>Solicitacoes do plano pago</h3>
-          <span>{state.paidLeads.length} pedidos</span>
+          <h3>Entradas do plano pago</h3>
+          <span>{state.paidLeads.length} pedido(s)</span>
         </div>
         {paidLeadError ? <p className="error-text">{paidLeadError}</p> : null}
-        <Table columns={paidLeadColumns} rows={state.paidLeads} emptyText="Nenhuma solicitacao do plano pago cadastrada." />
+        <Table columns={paidLeadColumns} rows={state.paidLeads} emptyText="Nenhuma solicitação paga cadastrada." />
       </section>
 
       <section className="dashboard-panel neon-gap">
         <div className="section-title">
-          <h3>Solicitacoes do plano gratis</h3>
-          <span>{state.contactLeads.length} pedidos</span>
+          <h3>Entradas do plano gratuito</h3>
+          <span>{state.contactLeads.length} pedido(s)</span>
         </div>
         {leadError ? <p className="error-text">{leadError}</p> : null}
-        <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitacao do plano gratis cadastrada." />
+        <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitação gratuita cadastrada." />
       </section>
 
       <ModalConfirm
         open={Boolean(modal)}
         title="Bloquear loja"
-        description="A loja sera removida da Home e ficara inacessivel para clientes."
+        description="A loja deixará de aparecer no Tem na Área e ficará indisponível para clientes."
         onCancel={() => setModal(null)}
         onConfirm={confirmModal}
       />

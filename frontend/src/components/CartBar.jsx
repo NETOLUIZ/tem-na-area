@@ -7,7 +7,7 @@ export default function CartBar({ count, total, onOpen }) {
   return (
     <div className="cart-bar">
       <div>
-        <strong>Ver sacola ({count})</strong>
+        <strong>Sacola ({count})</strong>
         <span>{formatCurrency(total)}</span>
       </div>
       <div className="cart-bar-actions">
@@ -15,7 +15,7 @@ export default function CartBar({ count, total, onOpen }) {
           Ver itens
         </button>
         <Link className="btn btn-dark" to="/sacola">
-          Abrir
+          Abrir sacola
         </Link>
       </div>
     </div>

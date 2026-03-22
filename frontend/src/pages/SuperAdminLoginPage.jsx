@@ -82,12 +82,12 @@ export default function SuperAdminLoginPage() {
         </div>
 
         <div className="login-v2-hero super-admin-login-hero">
-          <span>Painel master</span>
-          <strong>Controle total da plataforma</strong>
+          <span>Central estratégica</span>
+          <strong>Controle total da rede, da marca e da operação.</strong>
         </div>
 
-        <h2>Login do admin</h2>
-        <p>Gerencie aprovações, bloqueios e a operação global com a mesma identidade visual do site.</p>
+        <h2>Acesso administrativo</h2>
+        <p>Gerencie aprovações, pagamentos, bloqueios e visibilidade da plataforma em um painel unificado.</p>
 
         <div className="super-admin-login-grid">
           <div className="super-admin-login-hint">
@@ -97,9 +97,9 @@ export default function SuperAdminLoginPage() {
           </div>
 
           <div className="super-admin-login-hint super-admin-login-hint-alt">
-            <strong>Fluxo</strong>
-            <span>Aprovar lojas e leads</span>
-            <span>Monitorar pedidos e operação</span>
+            <strong>Escopo</strong>
+            <span>Aprovar entradas e pagamentos</span>
+            <span>Monitorar a saúde operacional da rede</span>
           </div>
         </div>
 
@@ -138,7 +138,7 @@ export default function SuperAdminLoginPage() {
           </div>
 
           <button className="btn btn-primary login-v2-submit" type="submit">
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? "Entrando..." : "Entrar na central"}
             <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
           </button>
         </form>

@@ -30,15 +30,15 @@ export default function SuperAdminDashboardPage() {
         <div className="prompt-donut-row">
           <DonutCard value={summary.lojas_ativas || 0} tone="cyan" label="Lojas ativas" />
           <DonutCard value={summary.lojas_pendentes || 0} tone="amber" label="Pendências" />
-          <DonutCard value={summary.pedidos_30_dias || 0} tone="lime" label="Pedidos 30 dias" />
+          <DonutCard value={summary.pedidos_30_dias || 0} tone="lime" label="Pedidos em 30 dias" />
           <DonutCard value={summary.solicitacoes_abertas || 0} tone="cyan" label="Solicitações abertas" />
-          <DonutCard value={summary.total_lojas || 0} tone="amber" label="Total de lojas" />
+          <DonutCard value={summary.total_lojas || 0} tone="amber" label="Total da rede" />
         </div>
 
         <section className="dashboard-panel neon-gap">
           <div className="section-title">
-            <h3>Solicitações recentes</h3>
-            <span>{state.adminRecentRequests.length} registros</span>
+            <h3>Entradas recentes</h3>
+            <span>{state.adminRecentRequests.length} registro(s)</span>
           </div>
           <div className="dashboard-mini-list">
             {state.adminRecentRequests.map((request) => (

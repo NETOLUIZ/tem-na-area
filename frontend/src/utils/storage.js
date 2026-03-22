@@ -212,7 +212,7 @@ export function createSeedState() {
     makeStore("s1", {
       nome: "Espetinho do Joao",
       categoria: "comida",
-      descricaoCurta: "Espetinhos na brasa e porcoes para toda a familia.",
+      descricaoCurta: "Sabores na brasa e combos para toda a familia.",
       whatsapp: "11988880001",
       telefone: "1130211001",
       senha: "123456",
@@ -222,9 +222,9 @@ export function createSeedState() {
       capa: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=1200&q=80"
     }),
     makeStore("s2", {
-      nome: "Pizzaria Bella Massa",
+      nome: "Bella Massa",
       categoria: "comida",
-      descricaoCurta: "Pizzas artesanais com fermentação natural.",
+      descricaoCurta: "Receitas artesanais com preparo premium.",
       whatsapp: "11988880002",
       telefone: "1130211002",
       senha: "123456",
@@ -286,7 +286,7 @@ export function createSeedState() {
       {
         nome: "Acai do Bairro",
         categoria: "comida",
-        descricaoCurta: "Acai, vitaminas e combos fitness.",
+      descricaoCurta: "Acai, vitaminas e combos leves para o dia a dia.",
         whatsapp: "11988880007",
         telefone: "1130211007",
         senha: "123456",
@@ -302,7 +302,7 @@ export function createSeedState() {
       {
         nome: "Studio Bela Pele",
         categoria: "servico",
-        descricaoCurta: "Estetica facial e corporal por agendamento.",
+      descricaoCurta: "Estetica facial e corporal com atendimento agendado.",
         whatsapp: "11988880008",
         telefone: "1130211008",
         senha: "123456",
@@ -329,8 +329,8 @@ export function createSeedState() {
       id: "promo-s1-1",
       storeId: "s1",
       itemId: "s1-4",
-      title: "Promo do dia saindo rápido",
-      subtitle: "Espetinho do Joao com oferta especial para hoje.",
+      title: "Oferta local em destaque",
+      subtitle: "Espetinho do Joao com condicao especial por tempo limitado.",
       badge: "Oferta local",
       active: true,
       createdAt: nowIso(),
@@ -340,8 +340,8 @@ export function createSeedState() {
       id: "promo-s2-1",
       storeId: "s2",
       itemId: "s2-2",
-      title: "Pizza especial em destaque",
-      subtitle: "Bella Massa com fermentação natural e sabor premium.",
+      title: "Destaque premium da vitrine",
+      subtitle: "Bella Massa com preparo artesanal e sabor marcante.",
       badge: "Mais pedido",
       active: true,
       createdAt: nowIso(),
@@ -353,7 +353,7 @@ export function createSeedState() {
       itemId: "s3-1",
       title: "Burger artesanal na home",
       subtitle: "Hamburgueria Prime com blend exclusivo e batata crocante.",
-      badge: "Imperdivel",
+      badge: "Destaque local",
       active: true,
       createdAt: nowIso(),
       expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
@@ -367,7 +367,7 @@ export function createSeedState() {
     normalizeOptionGroup({ id: "grp-s2-extra", storeId: "s2", name: "Adicionais", type: "multiple", required: false, minSelect: 0, maxSelect: 4, sortOrder: 4, active: true }),
     normalizeOptionGroup({ id: "grp-s3-point", storeId: "s3", name: "Ponto da carne", type: "single", required: true, minSelect: 1, maxSelect: 1, sortOrder: 1, active: true }),
     normalizeOptionGroup({ id: "grp-s3-extra", storeId: "s3", name: "Adicionais", type: "multiple", required: false, minSelect: 0, maxSelect: 3, sortOrder: 2, active: true }),
-    normalizeOptionGroup({ id: "grp-s3-note", storeId: "s3", name: "Observacoes para cozinha", type: "text", required: false, minSelect: 0, maxSelect: 1, sortOrder: 3, active: true })
+    normalizeOptionGroup({ id: "grp-s3-note", storeId: "s3", name: "Observacoes para preparo", type: "text", required: false, minSelect: 0, maxSelect: 1, sortOrder: 3, active: true })
   ];
 
   const productOptionItems = [

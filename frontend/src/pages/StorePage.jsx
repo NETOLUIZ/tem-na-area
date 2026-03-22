@@ -40,7 +40,7 @@ export default function StorePage() {
     return () => {
       active = false;
     };
-  }, [slug]);
+  }, [actions, slug]);
 
   useEffect(() => {
     if (!store || store.status !== "ATIVA") return;
@@ -61,8 +61,8 @@ export default function StorePage() {
     return (
       <div className="container page-space">
         <div className="empty-state">
-          <h3>Carregando loja</h3>
-          <p>Buscando os dados do catálogo no servidor.</p>
+          <h3>Carregando vitrine</h3>
+          <p>Buscando dados atualizados do catálogo no servidor.</p>
         </div>
       </div>
     );
@@ -72,9 +72,9 @@ export default function StorePage() {
     return (
       <div className="container page-space">
         <div className="empty-state">
-          <h3>Loja indisponível</h3>
-          <p>{error || "Esta loja está temporariamente inacessível no Tem na Área."}</p>
-          <Link className="btn btn-primary" to="/">Voltar para a home</Link>
+          <h3>Vitrine indisponível</h3>
+          <p>{error || "Esta operação está temporariamente inacessível na Tem na Área."}</p>
+          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
         </div>
       </div>
     );
@@ -101,21 +101,21 @@ export default function StorePage() {
             }}
           >
             <MdChat aria-hidden="true" />
-            WhatsApp
+            Atendimento no WhatsApp
           </button>
         </div>
       </header>
 
       <main className="container page-space">
         <div className="section-title">
-          <h3>Cardápio</h3>
-          <span>{items.length} itens</span>
+          <h3>Catálogo da loja</h3>
+          <span>{items.length} item(ns)</span>
         </div>
 
         {!items.length ? (
           <div className="empty-state">
-            <h4>Cardápio vazio</h4>
-            <p>Esta loja ainda não cadastrou produtos.</p>
+            <h4>Catálogo em atualização</h4>
+            <p>Esta loja ainda não publicou produtos na vitrine.</p>
           </div>
         ) : (
           <div className="menu-grid">

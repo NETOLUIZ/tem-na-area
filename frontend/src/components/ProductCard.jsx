@@ -9,7 +9,7 @@ export default function ProductCard({ item, hasCustomization, onAdd }) {
         <div className="product-top">
           <h4>{item.nome}</h4>
           <div className="product-top-tags">
-            {hasCustomization ? <span className="tag">Personalizavel</span> : null}
+            {hasCustomization ? <span className="tag">Personalizável</span> : null}
             {item.tags.length ? <span className="tag">{item.tags[0]}</span> : null}
           </div>
         </div>
@@ -20,7 +20,7 @@ export default function ProductCard({ item, hasCustomization, onAdd }) {
             <strong>{formatCurrency(item.preco)}</strong>
           </div>
           <button className="btn btn-primary" onClick={onAdd}>
-            {hasCustomization ? "Montar" : "Adicionar"}
+            {hasCustomization ? "Personalizar" : "Adicionar"}
           </button>
         </div>
       </div>

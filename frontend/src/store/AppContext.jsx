@@ -482,7 +482,7 @@ export function AppProvider({ children }) {
     },
 
     addToCart(storeId, itemId, configuration = {}) {
-      let result = { ok: false, message: "Não foi possível adicionar o item." };
+      let result = { ok: false, message: "Nao foi possivel adicionar o item." };
 
       setState((prev) => {
         const incomingStore = prev.stores.find((store) => store.id === storeId);
@@ -496,7 +496,7 @@ export function AppProvider({ children }) {
         const groups = prev.productOptionGroups.filter((group) => group.productIds.includes(String(itemId)) && group.active);
         const validated = validateConfiguration(product, groups, configuration);
         if (!validated.ok) {
-          result = { ok: false, message: validated.errors[0] || "Revise a montagem do pedido." };
+          result = { ok: false, message: validated.errors[0] || "Revise a personalizacao do item." };
           return prev;
         }
 
@@ -753,7 +753,7 @@ export function AppProvider({ children }) {
       }
 
       await hydrateMerchantSession(token);
-      return { ok: true, message: promotionId ? "Propaganda atualizada com sucesso." : "Propaganda publicada com sucesso." };
+      return { ok: true, message: promotionId ? "Campanha atualizada com sucesso." : "Campanha publicada com sucesso." };
     },
 
     async deleteHomePromotion(promotionId) {
