@@ -13,6 +13,8 @@ export default function SuperAdminStoresPage() {
   const [categoryFilter, setCategoryFilter] = useState("TODAS");
   const [cityFilter, setCityFilter] = useState("");
   const [modal, setModal] = useState(null);
+  const [modalSubmitting, setModalSubmitting] = useState(false);
+  const [modalError, setModalError] = useState("");
   const [leadLoadingId, setLeadLoadingId] = useState(null);
   const [leadError, setLeadError] = useState("");
   const [paidLeadLoadingId, setPaidLeadLoadingId] = useState(null);
@@ -55,11 +57,17 @@ export default function SuperAdminStoresPage() {
               Desbloquear
             </button>
           ) : (
-            <button className="btn btn-outline" onClick={() => setModal({ type: "BLOQUEAR", row })}>
+            <button className="btn btn-outline" onClick={() => {
+              setModalError("");
+              setModal({ type: "BLOQUEAR", row });
+            }}>
               Bloquear
             </button>
           )}
-          <button className="btn btn-danger admin-store-delete" onClick={() => setModal({ type: "EXCLUIR", row })}>
+          <button className="btn btn-danger admin-store-delete" onClick={() => {
+            setModalError("");
+            setModal({ type: "EXCLUIR", row });
+          }}>
             <MdClose />
             Excluir
           </button>
@@ -160,10 +168,20 @@ export default function SuperAdminStoresPage() {
   ];
 
   async function confirmModal() {
-    if (!modal) return;
-    const reason = modal.type === "EXCLUIR" ? "Exclusao via painel" : `${modal.type} via painel`;
-    await actions.superAdminAction(modal.type, modal.row.id, reason);
-    setModal(null);
+    if (!modal || modalSubmitting) return;
+
+    setModalError("");
+    setModalSubmitting(true);
+
+    try {
+      const reason = modal.type === "EXCLUIR" ? "Exclusao via painel" : `${modal.type} via painel`;
+      await actions.superAdminAction(modal.type, modal.row.id, reason);
+      setModal(null);
+    } catch (error) {
+      setModalError(getUserErrorMessage(error, "Nao foi possivel concluir esta acao agora."));
+    } finally {
+      setModalSubmitting(false);
+    }
   }
 
   return (
@@ -235,7 +253,14 @@ export default function SuperAdminStoresPage() {
         description={modal?.type === "EXCLUIR"
           ? "A loja sera removida da listagem administrativa e deixara de aparecer na plataforma."
           : "A loja deixara de aparecer no Tem na Area e ficara indisponivel para clientes."}
-        onCancel={() => setModal(null)}
+        confirmLabel={modal?.type === "EXCLUIR" ? "Excluir loja" : "Bloquear loja"}
+        loading={modalSubmitting}
+        error={modalError}
+        onCancel={() => {
+          if (modalSubmitting) return;
+          setModalError("");
+          setModal(null);
+        }}
         onConfirm={confirmModal}
       />
     </AdminLayout>

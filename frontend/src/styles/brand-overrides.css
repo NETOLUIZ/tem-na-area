@@ -82,6 +82,91 @@ h1, h2, h3, h4, h5, h6,
   padding: 56px 36px;
 }
 
+.home-promo-shell {
+  display: grid;
+  gap: 14px;
+}
+
+.home-promo-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-promo-track {
+  display: flex;
+  width: 100%;
+  transition: transform 450ms ease;
+}
+
+.home-promo-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  min-height: 320px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  gap: 18px;
+  align-items: center;
+  padding: 24px;
+}
+
+.home-promo-copy,
+.home-promo-visual {
+  min-width: 0;
+}
+
+.home-promo-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.home-promo-copy .btn {
+  width: fit-content;
+  min-width: 220px;
+}
+
+.home-promo-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.home-promo-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.home-promo-visual {
+  min-height: 270px;
+  display: grid;
+  place-items: center;
+}
+
+.home-promo-visual img {
+  width: min(100%, 340px);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 28px;
+}
+
+.home-promo-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 0 18px;
+}
+
+.home-promo-dots button {
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.home-promo-dots button.active {
+  width: 36px;
+}
+
 .btn,
 .prompt-sidebar-link,
 .merchant-desktop-nav a,
@@ -179,6 +264,30 @@ h1, h2, h3, h4, h5, h6,
   .hero-card {
     padding: 148px 20px 28px;
     border-radius: 24px;
+  }
+
+  .home-promo-slide {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .home-promo-visual {
+    order: -1;
+    min-height: 200px;
+  }
+
+  .home-promo-visual img {
+    width: min(100%, 220px);
+  }
+
+  .home-promo-copy .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .home-promo-dots {
+    padding-bottom: 14px;
   }
 }
 
