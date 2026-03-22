@@ -38,7 +38,7 @@ const PLAN_DETAILS = {
   },
   paid: {
     title: "Plano operacao",
-    price: "R$ 49,90/mes",
+    price: "Falar com suporte",
     description: "Operacao completa com painel, produtos, campanhas e catalogo.",
     eyebrow: "Plano recomendado",
     features: [
@@ -359,7 +359,7 @@ export default function RegisterStorePage() {
                   <div className="register-v2-paid-offer">
                     <div>
                       <span>Plano operacao</span>
-                      <strong>R$ 49,90/mes</strong>
+                      <strong>Falar com suporte</strong>
                     </div>
                     <p>Escolha este plano para liberar uma presenca mais forte e comercial dentro da plataforma.</p>
                   </div>
