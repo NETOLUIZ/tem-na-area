@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { getUserErrorMessage } from "../utils/errors";
 
-const initial = {
-  mode: "paid",
+const initialForm = {
+  mode: "free",
   nome: "",
-  categoria: "comida",
+  categoria: "",
   descricaoCurta: "",
   whatsapp: "",
   telefone: "",
@@ -18,518 +18,454 @@ const initial = {
   numero: "",
   bairro: "",
   cidade: "",
-  horarioFuncionamento: "Seg-Dom 10h as 22h",
+  horarioFuncionamento: "",
   logo: "",
   capa: "",
-  observacoes: ""
+  observacoes: "",
 };
 
 const PLAN_DETAILS = {
   free: {
-    label: "Plano vitrine",
+    title: "Plano vitrine",
     price: "R$ 0/mes",
-    description: "Presença básica na home com clique direto no WhatsApp."
+    description: "Presenca basica na home com clique direto no WhatsApp.",
   },
   paid: {
-    label: "Plano operação",
+    title: "Plano operacao",
     price: "R$ 49,90/mes",
-    description: "Operação completa com painel, produtos, campanhas e catálogo."
-  }
+    description: "Operacao completa com painel, produtos, campanhas e catalogo.",
+  },
 };
 
 function getTotalSteps(mode) {
-  return mode === "paid" ? 3 : 2;
+  return mode === "paid" ? 4 : 3;
 }
 
 function getStepTitle(mode, step) {
-  if (mode === "free") {
-    return step === 1 ? "Escolha do plano" : "Dados básicos";
-  }
+  if (step === 1) return "Escolha seu formato de entrada";
+  if (step === 2) return "Dados da empresa";
+  if (step === 3) return mode === "paid" ? "Endereco e operacao" : "Material de vitrine";
+  return "Revisao da solicitacao";
+}
 
-  if (step === 1) return "Escolha do plano";
-  if (step === 2) return "Conta da empresa";
-  return "Dados da loja";
+function sanitizePhone(value) {
+  return value.replace(/\D/g, "");
+}
+
+async function loadLocalImage(file) {
+  if (!file) return "";
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(new Error("Nao foi possivel ler a imagem selecionada."));
+    reader.readAsDataURL(file);
+  });
 }
 
 export default function RegisterStorePage() {
   const navigate = useNavigate();
   const { actions } = useApp();
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState(initial);
-  const [success, setSuccess] = useState("");
+
+  const [form, setForm] = useState(initialForm);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [cepLoading, setCepLoading] = useState(false);
-  const [cepError, setCepError] = useState("");
-  const [localLogoName, setLocalLogoName] = useState("");
-  const [localCapaName, setLocalCapaName] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loadingCep, setLoadingCep] = useState(false);
 
   const totalSteps = getTotalSteps(form.mode);
-  const currentStep = Math.min(step, totalSteps);
-  const progressWidth = `${Math.round((currentStep / totalSteps) * 100)}%`;
+
+  useEffect(() => {
+    setCurrentStep((prev) => Math.min(prev, getTotalSteps(form.mode)));
+  }, [form.mode]);
+
+  useEffect(() => {
+    const cep = sanitizePhone(form.cep);
+    if (cep.length !== 8) return undefined;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(async () => {
+      try {
+        setLoadingCep(true);
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`, {
+          signal: controller.signal,
+        });
+        const data = await response.json();
+
+        if (!data || data.erro) return;
+
+        setForm((prev) => ({
+          ...prev,
+          rua: prev.rua || data.logradouro || "",
+          bairro: prev.bairro || data.bairro || "",
+          cidade: prev.cidade || data.localidade || "",
+        }));
+      } catch {
+        // silent fallback for CEP lookup
+      } finally {
+        setLoadingCep(false);
+      }
+    }, 350);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+      setLoadingCep(false);
+    };
+  }, [form.cep]);
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  useEffect(() => {
-    const cepDigits = String(form.cep || "").replace(/\D+/g, "");
-    if (!cepDigits) {
-      setCepError("");
-      setCepLoading(false);
-      return undefined;
-    }
-
-    if (cepDigits.length < 8) {
-      setCepError("");
-      setCepLoading(false);
-      return undefined;
-    }
-
-    if (cepDigits.length !== 8) {
-      setCepLoading(false);
-      setCepError("CEP inválido.");
-      return undefined;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(async () => {
-      try {
-        setCepLoading(true);
-        setCepError("");
-
-        const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`, {
-          signal: controller.signal
-        });
-        const payload = await response.json();
-
-        if (!response.ok || payload.erro) {
-          throw new Error("CEP não encontrado.");
-        }
-
-        setForm((prev) => ({
-          ...prev,
-          cep: cepDigits,
-          rua: payload.logradouro || prev.rua,
-          bairro: payload.bairro || prev.bairro,
-          cidade: payload.localidade || prev.cidade
-        }));
-      } catch (lookupError) {
-        if (controller.signal.aborted) {
-          return;
-        }
-        setCepError(getUserErrorMessage(lookupError, "Não foi possível buscar o CEP."));
-      } finally {
-        if (!controller.signal.aborted) {
-          setCepLoading(false);
-        }
-      }
-    }, 250);
-
-    return () => {
-      controller.abort();
-      clearTimeout(timeoutId);
-    };
-  }, [form.cep]);
-
   function handleModeChange(mode) {
-    setForm((prev) => ({ ...prev, mode }));
-    setStep(1);
-    setSuccess("");
     setError("");
+    setSuccess("");
+    setForm((prev) => ({ ...prev, mode }));
   }
 
   function handleBack() {
-    if (currentStep > 1) {
-      setStep((prev) => prev - 1);
+    setError("");
+    setSuccess("");
+
+    if (currentStep === 1) {
+      navigate("/");
       return;
     }
 
-    navigate("/");
+    setCurrentStep((prev) => Math.max(1, prev - 1));
+  }
+
+  function validateCurrentStep() {
+    if (currentStep === 1 && !form.mode) {
+      return "Selecione o tipo de entrada antes de continuar.";
+    }
+
+    if (currentStep === 2) {
+      if (!form.nome.trim()) return "Informe o nome da empresa.";
+      if (!form.categoria.trim()) return "Informe a categoria principal.";
+      if (!form.whatsapp.trim()) return "Informe o WhatsApp principal.";
+    }
+
+    if (currentStep === 3 && form.mode === "paid") {
+      if (!form.email.trim()) return "Informe o e-mail de acesso.";
+      if (!form.senha.trim()) return "Informe a senha inicial.";
+      if (!form.cidade.trim()) return "Informe a cidade da empresa.";
+    }
+
+    return "";
   }
 
   function handleAdvance() {
-    if (form.mode === "paid" && currentStep === 2) {
-      const missing = [];
-      if (!String(form.nome || "").trim()) missing.push("nome da loja");
-      if (!String(form.telefone || "").trim()) missing.push("telefone para login");
-      if (!String(form.whatsapp || "").trim()) missing.push("WhatsApp");
-      if (!String(form.senha || "").trim()) missing.push("senha");
-      if (!String(form.descricaoCurta || "").trim()) missing.push("descrição curta");
-
-      if (missing.length > 0) {
-        setError(`Preencha antes de avançar: ${missing.join(", ")}.`);
-        return;
-      }
-    }
-
-    if ((form.mode === "paid" || form.mode === "free") && currentStep === totalSteps) {
+    const validationError = validateCurrentStep();
+    if (validationError) {
+      setError(validationError);
       return;
-    }
-
-    if (form.mode === "paid" && currentStep === 3) {
-      const missing = [];
-      if (!String(form.cep || "").trim()) missing.push("CEP");
-      if (!String(form.rua || "").trim()) missing.push("rua");
-      if (!String(form.numero || "").trim()) missing.push("número");
-      if (!String(form.bairro || "").trim()) missing.push("bairro");
-      if (!String(form.cidade || "").trim()) missing.push("cidade");
-
-      if (missing.length > 0) {
-        setError(`Preencha antes de concluir: ${missing.join(", ")}.`);
-        return;
-      }
     }
 
     setError("");
-    setStep((prev) => Math.min(totalSteps, prev + 1));
+    setSuccess("");
+    setCurrentStep((prev) => Math.min(totalSteps, prev + 1));
   }
 
-  function loadLocalImage(file, setFileName) {
-    if (!file) {
-      setFileName("");
-      return;
+  async function handleImageChange(field, event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const image = await loadLocalImage(file);
+      updateField(field, image);
+    } catch (imageError) {
+      setError(getUserErrorMessage(imageError));
     }
-    setFileName(file.name);
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    const validationError = validateCurrentStep();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setBusy(true);
     setError("");
     setSuccess("");
-    setLoading(true);
 
     try {
       if (form.mode === "free") {
         await actions.registerContactLead({
-          nome: form.nome,
-          whatsapp: form.whatsapp,
-          cep: form.cep,
-          rua: form.rua,
-          numero: form.numero,
-          bairro: form.bairro,
-          cidade: form.cidade,
-          categoria: form.categoria,
-          observacoes: form.observacoes
+          nome: form.nome.trim(),
+          categoria: form.categoria.trim(),
+          descricaoCurta: form.descricaoCurta.trim(),
+          whatsapp: sanitizePhone(form.whatsapp),
+          telefone: sanitizePhone(form.telefone),
+          observacoes: form.observacoes.trim(),
+          logo: form.logo,
+          capa: form.capa,
         });
 
-        setSuccess("Solicitação enviada com sucesso. Aguarde a aprovação para publicar sua vitrine na home.");
-        return;
+        setSuccess("Cadastro enviado. A vitrine sera analisada pela central.");
+      } else {
+        await actions.registerStore({
+          nome: form.nome.trim(),
+          categoria: form.categoria.trim(),
+          descricaoCurta: form.descricaoCurta.trim(),
+          whatsapp: sanitizePhone(form.whatsapp),
+          telefone: sanitizePhone(form.telefone),
+          email: form.email.trim(),
+          senha: form.senha,
+          cep: sanitizePhone(form.cep),
+          rua: form.rua.trim(),
+          numero: form.numero.trim(),
+          bairro: form.bairro.trim(),
+          cidade: form.cidade.trim(),
+          horarioFuncionamento: form.horarioFuncionamento.trim(),
+          logo: form.logo,
+          capa: form.capa,
+          observacoes: form.observacoes.trim(),
+        });
+
+        setSuccess("Solicitacao enviada. Depois da aprovacao e do pagamento, a area da empresa sera liberada.");
       }
 
-      const store = await actions.registerStore({
-        nome: form.nome,
-        email: form.email,
-        categoria: form.categoria,
-        descricaoCurta: form.descricaoCurta,
-        whatsapp: form.whatsapp,
-        telefone: form.telefone,
-        senha: form.senha,
-        endereco: {
-          cep: form.cep,
-          rua: form.rua,
-          numero: form.numero,
-          bairro: form.bairro,
-          cidade: form.cidade
-        },
-        horarioFuncionamento: form.horarioFuncionamento,
-        logo:
-          form.logo ||
-          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80",
-        capa:
-          form.capa ||
-          "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=1200&q=80",
-        planType: "paid",
-        paymentStatus: "pending"
-      });
-
-      setSuccess(`Solicitação enviada com sucesso. Aguarde confirmação do pagamento e aprovação da central. Protocolo: ${store.id}.`);
+      setCurrentStep(1);
+      setForm(initialForm);
     } catch (submitError) {
-      setError(getUserErrorMessage(submitError, "Não foi possível enviar o cadastro agora."));
+      setError(getUserErrorMessage(submitError));
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   }
 
   return (
     <div className="register-v2-page">
       <header className="register-v2-topbar">
-        <button type="button" className="register-v2-back" onClick={handleBack} aria-label="Voltar">
-          <MdArrowBack />
+        <button type="button" className="btn btn-ghost" onClick={() => navigate("/")}>
+          Voltar para home
         </button>
-        <h1>Entrar para a rede</h1>
-        <div className="register-v2-empty" />
       </header>
 
-      <section className="register-v2-progress-box">
-        <div className="register-v2-progress-head">
-          <p>Passo {currentStep}: {getStepTitle(form.mode, currentStep)}</p>
-          <span>{currentStep}/{totalSteps}</span>
-        </div>
-        <div className="register-v2-progress-track">
-          <div className="register-v2-progress-fill" style={{ width: progressWidth }} />
-        </div>
-      </section>
-
       <main className="register-v2-main">
-        <h2>{form.mode === "paid" ? "Escolha seu formato de entrada" : "Plano vitrine"}</h2>
-        <p>
-          {form.mode === "paid"
-            ? "No plano operação, a empresa envia a solicitação para análise. Depois da confirmação do pagamento e da aprovação da central, o painel é liberado."
-            : "No plano vitrine, a empresa envia uma solicitação simples. Depois da aprovação, a plataforma publica uma vitrine com clique direto no WhatsApp."}
-        </p>
+        <section className="register-v2-progress-box">
+          <p className="eyebrow">Entrada da rede</p>
+          <h1>{getStepTitle(form.mode, currentStep)}</h1>
+          <p className="muted">
+            No plano operacao, a empresa envia a solicitacao para analise. Depois da
+            confirmacao do pagamento e da aprovacao da central, o painel e liberado.
+          </p>
 
-        {success ? (
-          <div className="stack">
-            <p className="success-text">{success}</p>
-            <div className="register-v2-actions">
-              <button type="button" className="btn btn-outline" onClick={() => navigate("/")}>
-                Ir para o início
-              </button>
-              <button type="button" className="btn btn-primary" onClick={() => navigate("/")}>
-                Concluir
-              </button>
-            </div>
+          <div className="register-v2-steps" aria-label="Etapas do cadastro">
+            {Array.from({ length: totalSteps }).map((_, index) => {
+              const step = index + 1;
+              const active = step === currentStep;
+              const done = step < currentStep;
+
+              return (
+                <span
+                  key={step}
+                  className={`register-v2-step ${active ? "is-active" : ""} ${done ? "is-done" : ""}`}
+                >
+                  {step}
+                </span>
+              );
+            })}
           </div>
-        ) : null}
-
-        {error ? <p className="error-text">{error}</p> : null}
+        </section>
 
         <form className="register-v2-form" onSubmit={handleSubmit}>
-          {currentStep === 1 ? (
-            <div className="register-v2-mode-grid">
-              {Object.entries(PLAN_DETAILS).map(([mode, plan]) => (
-                <button
-                  key={mode}
-                  type="button"
-                  className={`register-v2-mode-card ${form.mode === mode ? "active" : ""}`}
-                  onClick={() => handleModeChange(mode)}
-                >
-                  <strong>{plan.label}</strong>
-                  <span>{plan.description}</span>
-                  <small className="register-v2-plan-price">{plan.price}</small>
-                </button>
-              ))}
-            </div>
-          ) : null}
+          {currentStep === 1 && (
+            <section className="register-v2-card">
+              <div className="register-v2-mode-grid">
+                {Object.entries(PLAN_DETAILS).map(([key, plan]) => {
+                  const selected = form.mode === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`register-v2-mode ${selected ? "is-selected" : ""}`}
+                      onClick={() => handleModeChange(key)}
+                    >
+                      <strong>{plan.title}</strong>
+                      <span>{plan.description}</span>
+                      <em>{plan.price}</em>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
-          {form.mode === "free" && currentStep === 2 ? (
-            <>
+          {currentStep === 2 && (
+            <section className="register-v2-card register-v2-grid">
               <label>
-                <span>Nome do negócio</span>
-                <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
+                <span>Nome da empresa</span>
+                <input value={form.nome} onChange={(e) => updateField("nome", e.target.value)} />
               </label>
 
-              <div className="register-v2-two">
-                <label>
-                  <span>Categoria</span>
-                  <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
-                    <option value="comida">Comida</option>
-                    <option value="servico">Serviço</option>
-                    <option value="loja">Loja</option>
-                  </select>
-                </label>
-                <label>
-                  <span>WhatsApp</span>
-                  <input value={form.whatsapp} onChange={(event) => updateField("whatsapp", event.target.value)} required />
-                </label>
-              </div>
-
-              <div className="register-v2-two">
-                <label>
-                  <span>CEP</span>
-                  <input value={form.cep} onChange={(event) => updateField("cep", event.target.value)} />
-                </label>
-                <label>
-                  <span>Bairro</span>
-                  <input value={form.bairro} onChange={(event) => updateField("bairro", event.target.value)} />
-                </label>
-              </div>
-
-              {cepLoading ? <p className="register-v2-helper">Buscando CEP...</p> : null}
-              {cepError ? <p className="error-text">{cepError}</p> : null}
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Rua</span>
-                  <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} />
-                </label>
-                <label>
-                  <span>Número</span>
-                  <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} />
-                </label>
-              </div>
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Cidade</span>
-                  <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} />
-                </label>
-                <label>
-                  <span>Resumo rápido</span>
-                  <input value={form.observacoes} onChange={(event) => updateField("observacoes", event.target.value)} />
-                </label>
-              </div>
-
-              <div className="register-v2-note">
-                <strong>Fluxo do plano vitrine:</strong>
-                <span>A central aprova o pedido e o sistema cria automaticamente uma vitrine simples na home. O clique leva direto para o WhatsApp.</span>
-              </div>
-            </>
-          ) : null}
-
-          {form.mode === "paid" && currentStep === 2 ? (
-            <>
-              <div className="register-v2-plan-box register-v2-plan-box-paid">
-                <div>
-                  <strong>{PLAN_DETAILS.paid.label}</strong>
-                  <span>{PLAN_DETAILS.paid.price}</span>
-                </div>
-                <p>Seu cadastro segue para a central. Lá o pagamento pode ser confirmado e a operação aprovada manualmente.</p>
-                <ul className="register-v2-benefits">
-                  <li>Solicitação enviada para análise</li>
-                  <li>Confirmação manual do pagamento</li>
-                  <li>Aprovação manual da conta e da loja</li>
-                </ul>
-              </div>
-
               <label>
-                <span>Nome da loja</span>
-                <input value={form.nome} onChange={(event) => updateField("nome", event.target.value)} required />
+                <span>Categoria</span>
+                <input
+                  value={form.categoria}
+                  onChange={(e) => updateField("categoria", e.target.value)}
+                  placeholder="Hamburgueria, pizzaria, acai..."
+                />
               </label>
 
-              <div className="register-v2-two">
-                <label>
-                  <span>E-mail</span>
-                  <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
-                </label>
-                <label>
-                  <span>Senha</span>
-                  <input type="password" value={form.senha} onChange={(event) => updateField("senha", event.target.value)} required />
-                </label>
-              </div>
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Telefone para login</span>
-                  <input value={form.telefone} onChange={(event) => updateField("telefone", event.target.value)} required />
-                </label>
-                <label>
-                  <span>WhatsApp</span>
-                  <input value={form.whatsapp} onChange={(event) => updateField("whatsapp", event.target.value)} required />
-                </label>
-              </div>
-
-              <label>
-                <span>Descrição curta</span>
-                <textarea value={form.descricaoCurta} onChange={(event) => updateField("descricaoCurta", event.target.value)} required />
-              </label>
-            </>
-          ) : null}
-
-          {form.mode === "paid" && currentStep === 3 ? (
-            <>
-              <div className="register-v2-two">
-                <label>
-                  <span>CEP</span>
-                  <input value={form.cep} onChange={(event) => updateField("cep", event.target.value)} required />
-                </label>
-                <div />
-              </div>
-
-              {cepLoading ? <p className="register-v2-helper">Buscando CEP...</p> : null}
-              {cepError ? <p className="error-text">{cepError}</p> : null}
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Categoria</span>
-                  <select value={form.categoria} onChange={(event) => updateField("categoria", event.target.value)}>
-                    <option value="comida">Comida</option>
-                    <option value="servico">Serviço</option>
-                    <option value="loja">Loja</option>
-                  </select>
-                </label>
-                <label>
-                  <span>Cidade</span>
-                  <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} required />
-                </label>
-              </div>
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Rua</span>
-                  <input value={form.rua} onChange={(event) => updateField("rua", event.target.value)} required />
-                </label>
-                <label>
-                  <span>Número</span>
-                  <input value={form.numero} onChange={(event) => updateField("numero", event.target.value)} required />
-                </label>
-              </div>
-
-              <div className="register-v2-two">
-                <label>
-                  <span>Bairro</span>
-                  <input value={form.bairro} onChange={(event) => updateField("bairro", event.target.value)} required />
-                </label>
-                <label>
-                  <span>Cidade</span>
-                  <input value={form.cidade} onChange={(event) => updateField("cidade", event.target.value)} required />
-                </label>
-              </div>
-
-              <label>
-                <span>Horário de funcionamento</span>
-                <input value={form.horarioFuncionamento} onChange={(event) => updateField("horarioFuncionamento", event.target.value)} />
+              <label className="full">
+                <span>Descricao curta</span>
+                <textarea
+                  rows={3}
+                  value={form.descricaoCurta}
+                  onChange={(e) => updateField("descricaoCurta", e.target.value)}
+                />
               </label>
 
-              <div className="register-v2-two">
-                <label>
-                  <span>URL da logo</span>
-                  <input value={form.logo} onChange={(event) => updateField("logo", event.target.value)} />
-                </label>
-                <label>
-                  <span>Arquivo local da logo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => loadLocalImage(event.target.files?.[0], setLocalLogoName)}
-                  />
-                  {localLogoName ? <small className="register-v2-helper">{localLogoName}</small> : null}
-                </label>
-              </div>
+              <label>
+                <span>WhatsApp</span>
+                <input
+                  value={form.whatsapp}
+                  onChange={(e) => updateField("whatsapp", e.target.value)}
+                />
+              </label>
 
-              <div className="register-v2-two">
-                <label>
-                  <span>URL da capa</span>
-                  <input value={form.capa} onChange={(event) => updateField("capa", event.target.value)} />
-                </label>
-                <label>
-                  <span>Arquivo local da capa</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => loadLocalImage(event.target.files?.[0], setLocalCapaName)}
-                  />
-                  {localCapaName ? <small className="register-v2-helper">{localCapaName}</small> : null}
-                </label>
-              </div>
-            </>
-          ) : null}
+              <label>
+                <span>Telefone</span>
+                <input value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
+              </label>
+            </section>
+          )}
+
+          {currentStep === 3 && form.mode === "free" && (
+            <section className="register-v2-card register-v2-grid">
+              <label className="full">
+                <span>Logo</span>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+              </label>
+
+              <label className="full">
+                <span>Capa</span>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+              </label>
+
+              <label className="full">
+                <span>Observacoes</span>
+                <textarea
+                  rows={4}
+                  value={form.observacoes}
+                  onChange={(e) => updateField("observacoes", e.target.value)}
+                />
+              </label>
+            </section>
+          )}
+
+          {currentStep === 3 && form.mode === "paid" && (
+            <section className="register-v2-card register-v2-grid">
+              <label>
+                <span>E-mail de acesso</span>
+                <input value={form.email} onChange={(e) => updateField("email", e.target.value)} />
+              </label>
+
+              <label>
+                <span>Senha inicial</span>
+                <input
+                  type="password"
+                  value={form.senha}
+                  onChange={(e) => updateField("senha", e.target.value)}
+                />
+              </label>
+
+              <label>
+                <span>CEP</span>
+                <input value={form.cep} onChange={(e) => updateField("cep", e.target.value)} />
+                {loadingCep && <small>Buscando endereco...</small>}
+              </label>
+
+              <label>
+                <span>Rua</span>
+                <input value={form.rua} onChange={(e) => updateField("rua", e.target.value)} />
+              </label>
+
+              <label>
+                <span>Numero</span>
+                <input value={form.numero} onChange={(e) => updateField("numero", e.target.value)} />
+              </label>
+
+              <label>
+                <span>Bairro</span>
+                <input value={form.bairro} onChange={(e) => updateField("bairro", e.target.value)} />
+              </label>
+
+              <label>
+                <span>Cidade</span>
+                <input value={form.cidade} onChange={(e) => updateField("cidade", e.target.value)} />
+              </label>
+
+              <label>
+                <span>Horario de funcionamento</span>
+                <input
+                  value={form.horarioFuncionamento}
+                  onChange={(e) => updateField("horarioFuncionamento", e.target.value)}
+                />
+              </label>
+            </section>
+          )}
+
+          {currentStep === 4 && form.mode === "paid" && (
+            <section className="register-v2-card register-v2-grid">
+              <label className="full">
+                <span>Logo</span>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+              </label>
+
+              <label className="full">
+                <span>Capa</span>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+              </label>
+
+              <label className="full">
+                <span>Observacoes</span>
+                <textarea
+                  rows={4}
+                  value={form.observacoes}
+                  onChange={(e) => updateField("observacoes", e.target.value)}
+                />
+              </label>
+            </section>
+          )}
+
+          {error ? <p className="error-text">{error}</p> : null}
+          {success ? <p className="success-text">{success}</p> : null}
 
           <div className="register-v2-actions">
-            <button type="button" className="btn btn-outline" onClick={handleBack}>
-              {currentStep > 1 ? "Voltar" : "Cancelar"}
+            <button type="button" className="btn btn-outline" onClick={handleBack} disabled={busy}>
+              {currentStep === 1 ? "Cancelar" : "Voltar"}
             </button>
+
+            {currentStep === 1 && form.mode === "paid" ? (
+              <button type="button" className="btn btn-outline" onClick={() => navigate("/pdv")}>
+                Area da empresa
+              </button>
+            ) : null}
+
             {currentStep < totalSteps ? (
-              <button type="button" className="btn btn-primary" onClick={handleAdvance} disabled={loading}>
-                Avançar <MdArrowForward />
+              <button type="button" className="btn btn-primary" onClick={handleAdvance} disabled={busy}>
+                Avancar <MdArrowForward />
               </button>
             ) : (
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Enviando..." : "Enviar solicitação"}
+              <button type="submit" className="btn btn-primary" disabled={busy}>
+                {busy ? "Enviando..." : "Enviar solicitacao"}
               </button>
             )}
           </div>
+
+          {form.mode === "paid" && currentStep === 1 ? (
+            <p className="muted register-v2-login-tip">
+              Ja tem plano pago liberado? Use <strong>Area da empresa</strong> para entrar no painel.
+            </p>
+          ) : null}
         </form>
       </main>
     </div>

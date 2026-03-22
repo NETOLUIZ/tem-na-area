@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { MdClose } from "react-icons/md";
 import AdminLayout from "../components/AdminLayout";
 import ModalConfirm from "../components/ModalConfirm";
 import Table from "../components/Table";
@@ -58,7 +59,8 @@ export default function SuperAdminStoresPage() {
               Bloquear
             </button>
           )}
-          <button className="btn btn-outline" onClick={() => setModal({ type: "EXCLUIR", row })}>
+          <button className="btn btn-danger admin-store-delete" onClick={() => setModal({ type: "EXCLUIR", row })}>
+            <MdClose />
             Excluir
           </button>
         </div>

@@ -115,6 +115,13 @@ h1, h2, h3, h4, h5, h6,
   border: 1px solid rgba(84, 113, 163, 0.22);
 }
 
+.btn-danger {
+  background: linear-gradient(135deg, rgba(140, 22, 41, 0.92), rgba(204, 42, 78, 0.98));
+  color: #fff4f6;
+  border: 1px solid rgba(255, 122, 143, 0.38);
+  box-shadow: 0 14px 28px rgba(140, 22, 41, 0.22);
+}
+
 .prompt-sidebar,
 .merchant-desktop-sidebar {
   background:
@@ -149,6 +156,23 @@ h1, h2, h3, h4, h5, h6,
 
 .table thead th {
   color: var(--primary);
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inline-actions .btn {
+  min-height: 40px;
+}
+
+.admin-store-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
 }
 
 @media (max-width: 760px) {
