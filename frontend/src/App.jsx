@@ -35,7 +35,7 @@ function getPageTitle(pathname) {
   if (pathname === "/sacola") return "Tem na Área | Sacola";
   if (pathname === "/checkout") return "Tem na Área | Finalizar pedido";
   if (pathname === "/cadastrar-loja") return "Tem na Área | Entrar para a rede";
-  if (pathname === "/login-loja") return "Tem na Área | Painel do parceiro";
+  if (pathname === "/pdv" || pathname === "/login-loja") return "Tem na Área | Painel do parceiro";
   if (pathname === "/pedido/sucesso") return "Tem na Área | Pedido confirmado";
   if (pathname === "/admin-temnaarea") return "Tem na Área | Central estratégica";
   if (pathname === "/admin-temnaarea/login") return "Tem na Área | Login da central";
@@ -69,7 +69,8 @@ export default function App() {
       <Route path="/pedido/sucesso" element={<OrderSuccessPage />} />
 
       <Route path="/cadastrar-loja" element={<RegisterStorePage />} />
-      <Route path="/login-loja" element={<LoginStorePage />} />
+      <Route path="/pdv" element={<LoginStorePage />} />
+      <Route path="/login-loja" element={<Navigate to="/pdv" replace />} />
       <Route path="/admin-loja" element={<MerchantEntryRoute />} />
 
       <Route element={<MerchantProtectedRoute />}>

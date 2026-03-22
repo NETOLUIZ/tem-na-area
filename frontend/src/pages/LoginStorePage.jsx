@@ -109,7 +109,7 @@ export default function LoginStorePage() {
 
           <div className="login-v2-pass-row">
             <label>Senha</label>
-            <Link to="/login-loja" className="login-v2-link">Esqueci minha senha</Link>
+            <Link to="/pdv" className="login-v2-link">Esqueci minha senha</Link>
           </div>
 
           <div className="login-v2-input-wrap">

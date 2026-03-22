@@ -6,7 +6,7 @@ export function MerchantEntryRoute() {
   const { state } = useApp();
 
   if (!state.sessions.merchantStoreId) {
-    return <Navigate to="/login-loja" replace />;
+    return <Navigate to="/pdv" replace />;
   }
 
   return <Navigate to={`/admin-loja/${state.sessions.merchantStoreId}`} replace />;
@@ -18,7 +18,7 @@ export function MerchantProtectedRoute() {
   const params = useParams();
 
   if (!state.sessions.merchantStoreId) {
-    return <Navigate to="/login-loja" replace />;
+    return <Navigate to="/pdv" replace />;
   }
 
   if (params.storeId && params.storeId !== state.sessions.merchantStoreId) {

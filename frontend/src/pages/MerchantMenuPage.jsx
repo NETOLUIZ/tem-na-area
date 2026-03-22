@@ -138,7 +138,7 @@ export default function MerchantMenuPage() {
         status={store.status}
         onLogout={() => {
           actions.logoutMerchant();
-          navigate("/login-loja");
+          navigate("/pdv");
         }}
       />
 

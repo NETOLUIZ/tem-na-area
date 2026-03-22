@@ -110,7 +110,7 @@ export default function MerchantOrdersPage() {
         status={store.status}
         onLogout={() => {
           actions.logoutMerchant();
-          navigate("/login-loja");
+          navigate("/pdv");
         }}
       />
 

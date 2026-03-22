@@ -98,7 +98,7 @@ export default function MerchantDashboardPage() {
         status={store.status}
         onLogout={() => {
           actions.logoutMerchant();
-          navigate("/login-loja");
+          navigate("/pdv");
         }}
       />
 
