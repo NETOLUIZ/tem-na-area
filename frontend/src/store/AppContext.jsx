@@ -1063,6 +1063,12 @@ export function AppProvider({ children }) {
       const token = state.sessions.superAdminToken;
       if (!token) return;
 
+      if (actionType === "EXCLUIR") {
+        await api.deleteAdminStore(token, storeId, motivo);
+        await hydrateAdminSession(token);
+        return;
+      }
+
       const mappedStatus = {
         APROVAR: "ATIVA",
         BLOQUEAR: "BLOQUEADA",

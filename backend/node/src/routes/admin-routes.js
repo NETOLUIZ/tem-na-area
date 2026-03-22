@@ -37,6 +37,18 @@ export function registerAdminRoutes(app, dependencies) {
     });
   }));
 
+  app.delete("/api/v1/admin/stores/:id", auth.requireRole("admin"), asyncHandler(async (req, res) => {
+    const storeId = requireIntegerId(req.params.id, "storeId");
+    sendData(res, {
+      result: await adminService.deleteStore(
+        storeId,
+        req.auth.admin_id ? Number(req.auth.admin_id) : null,
+        req.body?.motivo ?? "Loja excluida pelo painel administrativo."
+      ),
+      stores: await storeRepository.adminStores()
+    });
+  }));
+
   app.get("/api/v1/admin/logs", auth.requireRole("admin"), asyncHandler(async (_req, res) => {
     sendData(res, { logs: await adminRepository.logs() });
   }));

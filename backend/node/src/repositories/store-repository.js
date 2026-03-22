@@ -466,6 +466,21 @@ export class StoreRepository {
     );
   }
 
+  async softDeleteStore(storeId, adminId, reason) {
+    await this.db.execute(
+      `
+        UPDATE lojas
+        SET deleted_at = NOW(),
+            status_loja = 'INATIVA',
+            bloqueado_em = NOW(),
+            motivo_status = ?,
+            aprovado_por_admin_id = COALESCE(aprovado_por_admin_id, ?)
+        WHERE id = ?
+      `,
+      [reason ?? "Loja removida pelo painel administrativo.", adminId, storeId]
+    );
+  }
+
   async upsertSettings(storeId, payload) {
     const [rows] = await this.db.execute("SELECT id FROM configuracoes_loja WHERE loja_id = ? LIMIT 1", [storeId]);
     const exists = rows[0]?.id;

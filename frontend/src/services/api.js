@@ -347,5 +347,13 @@ export const api = {
       authScope: "admin",
       body: { status, motivo }
     });
+  },
+  deleteAdminStore(token, id, motivo) {
+    return request(`/admin/stores/${id}`, {
+      method: "DELETE",
+      token,
+      authScope: "admin",
+      body: { motivo }
+    });
   }
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { MdChat } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import CartBar from "../components/CartBar";
@@ -24,13 +24,15 @@ export default function StorePage() {
   const items = store ? selectors.itemsByStore(store.id) : [];
   const cart = selectors.cartDetailed();
   const whatsappUrl = buildWhatsAppUrl(store?.whatsapp);
+  const loadStore = useEffectEvent((nextSlug) => actions.fetchStoreBySlug(nextSlug));
+  const trackStoreVisit = useEffectEvent((storeId) => actions.incrementMetric(storeId, "visitasPagina"));
 
   useEffect(() => {
     let active = true;
 
     setLoading(true);
     setError("");
-    actions.fetchStoreBySlug(slug)
+    loadStore(slug)
       .catch((err) => {
         if (active) setError(getUserErrorMessage(err, "Não foi possível carregar a vitrine agora."));
       })
@@ -41,15 +43,15 @@ export default function StorePage() {
     return () => {
       active = false;
     };
-  }, [actions, slug]);
+  }, [loadStore, slug]);
 
   useEffect(() => {
     if (!store || store.status !== "ATIVA") return;
     if (lastTrackedStoreId.current === store.id) return;
 
     lastTrackedStoreId.current = store.id;
-    actions.incrementMetric(store.id, "visitasPagina");
-  }, [actions, store]);
+    trackStoreVisit(store.id);
+  }, [store, trackStoreVisit]);
 
   useEffect(() => {
     if (cart.storeId !== store?.id) {

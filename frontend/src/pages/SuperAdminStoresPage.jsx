@@ -41,11 +41,11 @@ export default function SuperAdminStoresPage() {
     { key: "createdAt", label: "Criada em", render: (row) => formatDate(row.createdAt) },
     {
       key: "actions",
-      label: "Ações",
+      label: "Acoes",
       render: (row) => (
         <div className="inline-actions">
           {row.status === "PENDENTE" ? (
-            <button className="btn btn-primary" onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovação manual")}>
+            <button className="btn btn-primary" onClick={() => actions.superAdminAction("APROVAR", row.id, "Aprovacao manual")}>
               Aprovar
             </button>
           ) : null}
@@ -58,21 +58,24 @@ export default function SuperAdminStoresPage() {
               Bloquear
             </button>
           )}
+          <button className="btn btn-outline" onClick={() => setModal({ type: "EXCLUIR", row })}>
+            Excluir
+          </button>
         </div>
       )
     }
   ];
 
   const leadColumns = [
-    { key: "nome", label: "Negócio" },
+    { key: "nome", label: "Negocio" },
     { key: "categoria", label: "Categoria" },
     { key: "cidade", label: "Cidade" },
     { key: "whatsapp", label: "WhatsApp" },
-    { key: "createdAt", label: "Solicitação", render: (row) => formatDate(row.createdAt) },
+    { key: "createdAt", label: "Solicitacao", render: (row) => formatDate(row.createdAt) },
     { key: "status", label: "Status" },
     {
       key: "approve",
-      label: "Ações",
+      label: "Acoes",
       render: (row) => (
         row.publishedAsCard ? (
           <button className="btn btn-outline" disabled>Publicado</button>
@@ -86,7 +89,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approveFreePlanLead(row.id);
               } catch (error) {
-                setLeadError(getUserErrorMessage(error, "Não foi possível aprovar a entrada gratuita."));
+                setLeadError(getUserErrorMessage(error, "Nao foi possivel aprovar a entrada gratuita."));
               } finally {
                 setLeadLoadingId(null);
               }
@@ -100,16 +103,16 @@ export default function SuperAdminStoresPage() {
   ];
 
   const paidLeadColumns = [
-    { key: "nome", label: "Negócio" },
+    { key: "nome", label: "Negocio" },
     { key: "categoria", label: "Categoria" },
     { key: "cidade", label: "Cidade" },
     { key: "whatsapp", label: "WhatsApp" },
-    { key: "createdAt", label: "Solicitação", render: (row) => formatDate(row.createdAt) },
+    { key: "createdAt", label: "Solicitacao", render: (row) => formatDate(row.createdAt) },
     { key: "paymentStatus", label: "Pagamento" },
     { key: "status", label: "Status" },
     {
       key: "approve",
-      label: "Ações",
+      label: "Acoes",
       render: (row) => (
         row.status === "APROVADA" ? (
           <button className="btn btn-outline" disabled>Cadastro aprovado</button>
@@ -123,7 +126,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approvePaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(getUserErrorMessage(error, "Não foi possível aprovar o cadastro."));
+                setPaidLeadError(getUserErrorMessage(error, "Nao foi possivel aprovar o cadastro."));
               } finally {
                 setPaidLeadLoadingId(null);
               }
@@ -141,7 +144,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.confirmPaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(getUserErrorMessage(error, "Não foi possível confirmar o pagamento."));
+                setPaidLeadError(getUserErrorMessage(error, "Nao foi possivel confirmar o pagamento."));
               } finally {
                 setPaidLeadLoadingId(null);
               }
@@ -156,32 +159,33 @@ export default function SuperAdminStoresPage() {
 
   async function confirmModal() {
     if (!modal) return;
-    await actions.superAdminAction(modal.type, modal.row.id, `${modal.type} via painel`);
+    const reason = modal.type === "EXCLUIR" ? "Exclusao via painel" : `${modal.type} via painel`;
+    await actions.superAdminAction(modal.type, modal.row.id, reason);
     setModal(null);
   }
 
   return (
-    <AdminLayout title="Rede de lojas" subtitle="Gestão global" links={links} onLogout={actions.logoutSuperAdmin}>
+    <AdminLayout title="Rede de lojas" subtitle="Gestao global" links={links} onLogout={actions.logoutSuperAdmin}>
       <section className="dashboard-kpi-grid neon-gap">
         <article className="dashboard-kpi-card">
           <h4>Resultado atual</h4>
           <strong>{rows.length}</strong>
-          <p>Operações dentro do filtro aplicado.</p>
+          <p>Operacoes dentro do filtro aplicado.</p>
         </article>
         <article className="dashboard-kpi-card">
-          <h4>Pendências</h4>
+          <h4>Pendencias</h4>
           <strong>{state.adminStores.filter((store) => store.status === "PENDENTE").length}</strong>
-          <p>Cadastros aguardando decisão.</p>
+          <p>Cadastros aguardando decisao.</p>
         </article>
         <article className="dashboard-kpi-card">
           <h4>Gastronomia</h4>
           <strong>{state.adminStores.filter((store) => store.categoria === "comida").length}</strong>
-          <p>Negócios do segmento de alimentação.</p>
+          <p>Negocios do segmento de alimentacao.</p>
         </article>
         <article className="dashboard-kpi-card">
           <h4>Outras frentes</h4>
           <strong>{state.adminStores.filter((store) => store.categoria !== "comida").length}</strong>
-          <p>Serviços, varejo e outras operações.</p>
+          <p>Servicos, varejo e outras operacoes.</p>
         </article>
       </section>
 
@@ -196,7 +200,7 @@ export default function SuperAdminStoresPage() {
           <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value="TODAS">Todas as categorias</option>
             <option value="comida">Comida</option>
-            <option value="servico">Serviço</option>
+            <option value="servico">Servico</option>
             <option value="loja">Loja</option>
           </select>
           <input placeholder="Filtrar por cidade" value={cityFilter} onChange={(event) => setCityFilter(event.target.value)} />
@@ -211,7 +215,7 @@ export default function SuperAdminStoresPage() {
           <span>{state.paidLeads.length} pedido(s)</span>
         </div>
         {paidLeadError ? <p className="error-text">{paidLeadError}</p> : null}
-        <Table columns={paidLeadColumns} rows={state.paidLeads} emptyText="Nenhuma solicitação paga cadastrada." />
+        <Table columns={paidLeadColumns} rows={state.paidLeads} emptyText="Nenhuma solicitacao paga cadastrada." />
       </section>
 
       <section className="dashboard-panel neon-gap">
@@ -220,13 +224,15 @@ export default function SuperAdminStoresPage() {
           <span>{state.contactLeads.length} pedido(s)</span>
         </div>
         {leadError ? <p className="error-text">{leadError}</p> : null}
-        <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitação gratuita cadastrada." />
+        <Table columns={leadColumns} rows={state.contactLeads} emptyText="Nenhuma solicitacao gratuita cadastrada." />
       </section>
 
       <ModalConfirm
         open={Boolean(modal)}
-        title="Bloquear loja"
-        description="A loja deixará de aparecer no Tem na Área e ficará indisponível para clientes."
+        title={modal?.type === "EXCLUIR" ? "Excluir loja" : "Bloquear loja"}
+        description={modal?.type === "EXCLUIR"
+          ? "A loja sera removida da listagem administrativa e deixara de aparecer na plataforma."
+          : "A loja deixara de aparecer no Tem na Area e ficara indisponivel para clientes."}
         onCancel={() => setModal(null)}
         onConfirm={confirmModal}
       />

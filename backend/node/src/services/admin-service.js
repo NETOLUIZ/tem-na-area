@@ -21,4 +21,9 @@ export class AdminService {
 
     return store;
   }
+
+  async deleteStore(storeId, adminId, reason) {
+    await this.storeRepository.softDeleteStore(storeId, adminId, reason);
+    return { id: Number(storeId), deleted: true };
+  }
 }
