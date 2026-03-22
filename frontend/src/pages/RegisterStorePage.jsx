@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 
 const initial = {
   mode: "paid",
@@ -117,7 +118,7 @@ export default function RegisterStorePage() {
         if (controller.signal.aborted) {
           return;
         }
-        setCepError(lookupError.message || "Não foi possível buscar o CEP.");
+        setCepError(getUserErrorMessage(lookupError, "Não foi possível buscar o CEP."));
       } finally {
         if (!controller.signal.aborted) {
           setCepLoading(false);
@@ -244,7 +245,7 @@ export default function RegisterStorePage() {
 
       setSuccess(`Solicitação enviada com sucesso. Aguarde confirmação do pagamento e aprovação da central. Protocolo: ${store.id}.`);
     } catch (submitError) {
-      setError(submitError.message || "Não foi possível enviar o cadastro agora.");
+      setError(getUserErrorMessage(submitError, "Não foi possível enviar o cadastro agora."));
     } finally {
       setLoading(false);
     }

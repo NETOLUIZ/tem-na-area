@@ -5,6 +5,7 @@ import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
 import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
 import { api } from "../services/api";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatCurrency, formatDate } from "../utils/format";
 
 const emptyCustomerForm = {
@@ -84,7 +85,7 @@ export default function MerchantCustomersPage() {
           setSelectedCustomerId(nextCustomers[0] ? String(nextCustomers[0].id) : null);
         }
       } catch (error) {
-        setFeedback(error.message || "Nao foi possivel carregar os clientes.");
+        setFeedback(getUserErrorMessage(error, "Nao foi possivel carregar os clientes."));
         setCustomers([]);
       } finally {
         setLoadingList(false);
@@ -121,7 +122,7 @@ export default function MerchantCustomersPage() {
         }
 
         setSelectedCustomer(null);
-        setFeedback(error.message || "Nao foi possivel carregar o cliente.");
+        setFeedback(getUserErrorMessage(error, "Nao foi possivel carregar o cliente."));
       })
       .finally(() => {
         if (active) {
@@ -195,7 +196,7 @@ export default function MerchantCustomersPage() {
         setSelectedCustomer(detail.customer || null);
       }
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel salvar o cliente.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel salvar o cliente."));
     } finally {
       setSaving(false);
     }

@@ -8,6 +8,7 @@ import ProductCustomizationModal from "../components/ProductCustomizationModal";
 import SmartImage from "../components/SmartImage";
 import { useApp } from "../store/AppContext";
 import { buildWhatsAppUrl } from "../utils/contacts";
+import { getUserErrorMessage } from "../utils/errors";
 
 export default function StorePage() {
   const { slug } = useParams();
@@ -31,7 +32,7 @@ export default function StorePage() {
     setError("");
     actions.fetchStoreBySlug(slug)
       .catch((err) => {
-        if (active) setError(err.message);
+        if (active) setError(getUserErrorMessage(err, "Não foi possível carregar a vitrine agora."));
       })
       .finally(() => {
         if (active) setLoading(false);

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MdArrowForward } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 
 function HubIcon() {
   return (
@@ -58,7 +59,7 @@ export default function LoginStorePage() {
     const result = await actions.loginMerchant(telefone, senha);
     setLoading(false);
     if (!result.ok) {
-      setError(result.message);
+      setError(getUserErrorMessage(result.message, "Nao foi possivel entrar no painel agora."));
       return;
     }
 
@@ -91,7 +92,12 @@ export default function LoginStorePage() {
         <h2>Bem-vindo de volta</h2>
         <p>Acesse sua area para atualizar a vitrine, atender pedidos e acompanhar a performance da loja.</p>
 
-        {error ? <p className="error-text">{error}</p> : null}
+        {error ? (
+          <div className="login-v2-inline-alert error-text" role="alert">
+            <strong>Falha no acesso</strong>
+            <span>{error}</span>
+          </div>
+        ) : null}
 
         <form className="login-v2-form" onSubmit={submit}>
           <label>Telefone ou e-mail</label>

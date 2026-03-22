@@ -4,6 +4,7 @@ import { uid } from "../utils/helpers";
 import { api } from "../services/api";
 import { subscribeAuthInvalidated } from "../lib/auth-events";
 import { hasMerchantPermission, isAdminSessionValid, isAuthFailure, isMerchantSessionValid, merchantPermissionsFromSession, merchantProfileFromSession } from "../lib/auth-session";
+import { getUserErrorMessage } from "../utils/errors";
 
 const AppContext = createContext(null);
 
@@ -824,7 +825,7 @@ export function AppProvider({ children }) {
       } catch (error) {
         return {
           ok: false,
-          message: error.message
+          message: getUserErrorMessage(error, "Nao foi possivel entrar no painel agora.")
         };
       }
     },

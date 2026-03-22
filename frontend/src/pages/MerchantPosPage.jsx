@@ -8,6 +8,7 @@ import SmartImage from "../components/SmartImage";
 import { api } from "../services/api";
 import { useApp } from "../store/AppContext";
 import { buildSelectionSummary, serializeSelectionSignature, sumOptionPrices } from "../utils/customization";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatCurrency } from "../utils/format";
 
 const SALE_TYPES = [
@@ -363,7 +364,7 @@ export default function MerchantPosPage() {
         navigate(`/admin-loja/${storeId}/pedidos/${result.order.id}/imprimir?copy=counter&width=80`);
       }
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel finalizar a venda.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel finalizar a venda."));
     } finally {
       setSubmitting(false);
     }

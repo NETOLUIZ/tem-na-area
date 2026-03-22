@@ -5,6 +5,7 @@ import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
 import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
 import { api } from "../services/api";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatCurrency, formatDate } from "../utils/format";
 
 const MOVEMENT_TYPES = [
@@ -49,7 +50,7 @@ export default function MerchantCashRegisterPage() {
         setCurrentSession(result.current || null);
         setHistory(result.history || []);
       } catch (error) {
-        setFeedback(error.message || "Nao foi possivel carregar o caixa.");
+        setFeedback(getUserErrorMessage(error, "Nao foi possivel carregar o caixa."));
       } finally {
         setLoading(false);
       }
@@ -95,7 +96,7 @@ export default function MerchantCashRegisterPage() {
       setFeedback("Caixa aberto com sucesso.");
       await refreshCashRegister();
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel abrir o caixa.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel abrir o caixa."));
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function MerchantCashRegisterPage() {
       setFeedback("Movimentacao registrada com sucesso.");
       await refreshCashRegister();
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel registrar a movimentacao.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel registrar a movimentacao."));
     } finally {
       setLoading(false);
     }
@@ -144,7 +145,7 @@ export default function MerchantCashRegisterPage() {
       setFeedback("Caixa fechado com sucesso.");
       await refreshCashRegister();
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel fechar o caixa.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel fechar o caixa."));
     } finally {
       setLoading(false);
     }

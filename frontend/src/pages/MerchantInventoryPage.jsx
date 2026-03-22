@@ -5,6 +5,7 @@ import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
 import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
 import { api } from "../services/api";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatDate } from "../utils/format";
 
 const MOVEMENT_TYPES = [
@@ -43,7 +44,7 @@ export default function MerchantInventoryPage() {
           setSelectedProductId(String(result.products[0].id));
         }
       } catch (error) {
-        setFeedback(error.message || "Nao foi possivel carregar o estoque.");
+        setFeedback(getUserErrorMessage(error, "Nao foi possivel carregar o estoque."));
       } finally {
         setLoading(false);
       }
@@ -120,7 +121,7 @@ export default function MerchantInventoryPage() {
       const detail = await api.merchantInventoryMovements(token, selectedProductId, 12);
       setProductMovements(detail.movements || []);
     } catch (error) {
-      setFeedback(error.message || "Nao foi possivel registrar a movimentacao.");
+      setFeedback(getUserErrorMessage(error, "Nao foi possivel registrar a movimentacao."));
     } finally {
       setLoading(false);
     }

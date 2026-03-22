@@ -1,23 +1,30 @@
 import { emitAuthInvalidated } from "../lib/auth-events";
+import { getUserErrorMessage } from "../utils/errors";
 
 const defaultApiBaseUrl = import.meta.env.DEV ? "http://127.0.0.1:3001/api/v1" : "/api/v1";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/+$/, "");
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-      ...options.headers
-    },
-    method: options.method || "GET",
-    body: options.body ? JSON.stringify(options.body) : undefined
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...options.headers
+      },
+      method: options.method || "GET",
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
+  } catch (error) {
+    throw new Error(getUserErrorMessage(error, "Nao foi possivel conectar ao servidor agora."));
+  }
 
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok || payload.ok === false) {
-    const message = payload?.error?.message || payload?.message || "Falha na comunicacao com a API.";
+    const rawMessage = payload?.error?.message || payload?.message || "Falha na comunicacao com a API.";
+    const message = getUserErrorMessage(rawMessage, "Nao foi possivel concluir a solicitacao agora.");
     if (response.status === 401 && options.authScope) {
       emitAuthInvalidated({
         scope: options.authScope,

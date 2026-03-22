@@ -1051,6 +1051,27 @@ button:disabled,
   border-color: rgba(255, 91, 122, 0.16);
 }
 
+.login-v2-inline-alert {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.login-v2-inline-alert strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-v2-inline-alert span {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
 .merchant-pos-cart {
   position: sticky;
   top: 16px;

@@ -4,6 +4,7 @@ import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
 import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
 import { api } from "../services/api";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatCurrency, formatDate } from "../utils/format";
 
 function formatInputDate(value) {
@@ -37,7 +38,7 @@ export default function MerchantReportsPage() {
         const result = await api.merchantReports(token, filters);
         setReport(result);
       } catch (error) {
-        setFeedback(error.message || "Nao foi possivel carregar os relatorios.");
+        setFeedback(getUserErrorMessage(error, "Nao foi possivel carregar os relatorios."));
       } finally {
         setLoading(false);
       }

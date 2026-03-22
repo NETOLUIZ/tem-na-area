@@ -3,6 +3,7 @@ import AdminLayout from "../components/AdminLayout";
 import ModalConfirm from "../components/ModalConfirm";
 import Table from "../components/Table";
 import { useApp } from "../store/AppContext";
+import { getUserErrorMessage } from "../utils/errors";
 import { formatDate } from "../utils/format";
 
 export default function SuperAdminStoresPage() {
@@ -85,7 +86,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approveFreePlanLead(row.id);
               } catch (error) {
-                setLeadError(error.message || "Não foi possível aprovar a entrada gratuita.");
+                setLeadError(getUserErrorMessage(error, "Não foi possível aprovar a entrada gratuita."));
               } finally {
                 setLeadLoadingId(null);
               }
@@ -122,7 +123,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.approvePaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(error.message || "Não foi possível aprovar o cadastro.");
+                setPaidLeadError(getUserErrorMessage(error, "Não foi possível aprovar o cadastro."));
               } finally {
                 setPaidLeadLoadingId(null);
               }
@@ -140,7 +141,7 @@ export default function SuperAdminStoresPage() {
               try {
                 await actions.confirmPaidPlanLead(row.id);
               } catch (error) {
-                setPaidLeadError(error.message || "Não foi possível confirmar o pagamento.");
+                setPaidLeadError(getUserErrorMessage(error, "Não foi possível confirmar o pagamento."));
               } finally {
                 setPaidLeadLoadingId(null);
               }
