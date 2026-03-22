@@ -109,6 +109,10 @@ h1, h2, h3, h4, h5, h6,
   padding: 24px;
 }
 
+.home-promo-slide-mobile {
+  width: 100%;
+}
+
 .home-promo-copy,
 .home-promo-visual {
   min-width: 0;

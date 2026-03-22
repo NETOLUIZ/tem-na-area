@@ -13,6 +13,7 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [activePromoIndex, setActivePromoIndex] = useState(0);
+  const [isMobilePromo, setIsMobilePromo] = useState(() => window.innerWidth <= 760);
 
   const stores = useMemo(() => {
     const normalized = search.trim().toLowerCase();
@@ -29,6 +30,16 @@ export default function HomePage() {
   }, [selectors.activeStores, search, category]);
 
   const promotions = useMemo(() => selectors.activeHomePromotions(), [selectors]);
+
+  useEffect(() => {
+    function syncViewport() {
+      setIsMobilePromo(window.innerWidth <= 760);
+    }
+
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, []);
 
   useEffect(() => {
     if (promotions.length <= 1) return undefined;
@@ -79,6 +90,8 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, [stores.length]);
 
+  const activePromotion = promotions[activePromoIndex] || promotions[0] || null;
+
   return (
     <div>
       <header className="topbar sticky">
@@ -113,36 +126,67 @@ export default function HomePage() {
             </div>
 
             <div className="home-promo-carousel">
-              <div className="home-promo-track" style={{ transform: `translateX(-${activePromoIndex * 100}%)` }}>
-                {promotions.map((promotion) => (
-                  <article key={promotion.id} className="home-promo-slide">
+              {isMobilePromo ? (
+                activePromotion ? (
+                  <article key={activePromotion.id} className="home-promo-slide home-promo-slide-mobile">
                     <div className="home-promo-copy">
-                      <span className="home-promo-badge">{promotion.badge}</span>
-                      <h3>{promotion.title}</h3>
-                      <p>{promotion.subtitle}</p>
+                      <span className="home-promo-badge">{activePromotion.badge}</span>
+                      <h3>{activePromotion.title}</h3>
+                      <p>{activePromotion.subtitle}</p>
                       <div className="home-promo-meta">
-                        <strong>{promotion.item.nome}</strong>
-                        <span>{promotion.store.nome}</span>
+                        <strong>{activePromotion.item.nome}</strong>
+                        <span>{activePromotion.store.nome}</span>
                       </div>
                       <div className="home-promo-price">
-                        <strong>{formatCurrency(promotion.item.preco)}</strong>
-                        {promotion.item.precoAntigo ? <small>{formatCurrency(promotion.item.precoAntigo)}</small> : null}
+                        <strong>{formatCurrency(activePromotion.item.preco)}</strong>
+                        {activePromotion.item.precoAntigo ? <small>{formatCurrency(activePromotion.item.precoAntigo)}</small> : null}
                       </div>
                       <Link
                         className="btn btn-primary"
-                        to={`/loja/${promotion.store.slug}`}
-                        onClick={() => actions.incrementMetric(promotion.store.id, "cliquesSite")}
+                        to={`/loja/${activePromotion.store.slug}`}
+                        onClick={() => actions.incrementMetric(activePromotion.store.id, "cliquesSite")}
                       >
                         Ver na vitrine
                       </Link>
                     </div>
 
                     <div className="home-promo-visual">
-                      <img src={promotion.item.imagem} alt={promotion.item.nome} />
+                      <img src={activePromotion.item.imagem} alt={activePromotion.item.nome} />
                     </div>
                   </article>
-                ))}
-              </div>
+                ) : null
+              ) : (
+                <div className="home-promo-track" style={{ transform: `translateX(-${activePromoIndex * 100}%)` }}>
+                  {promotions.map((promotion) => (
+                    <article key={promotion.id} className="home-promo-slide">
+                      <div className="home-promo-copy">
+                        <span className="home-promo-badge">{promotion.badge}</span>
+                        <h3>{promotion.title}</h3>
+                        <p>{promotion.subtitle}</p>
+                        <div className="home-promo-meta">
+                          <strong>{promotion.item.nome}</strong>
+                          <span>{promotion.store.nome}</span>
+                        </div>
+                        <div className="home-promo-price">
+                          <strong>{formatCurrency(promotion.item.preco)}</strong>
+                          {promotion.item.precoAntigo ? <small>{formatCurrency(promotion.item.precoAntigo)}</small> : null}
+                        </div>
+                        <Link
+                          className="btn btn-primary"
+                          to={`/loja/${promotion.store.slug}`}
+                          onClick={() => actions.incrementMetric(promotion.store.id, "cliquesSite")}
+                        >
+                          Ver na vitrine
+                        </Link>
+                      </div>
+
+                      <div className="home-promo-visual">
+                        <img src={promotion.item.imagem} alt={promotion.item.nome} />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
 
               <div className="home-promo-dots">
                 {promotions.map((promotion, index) => (

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { getUserErrorMessage } from "../utils/errors";
 
+const SUPPORT_WHATSAPP_URL = "https://wa.me/5511999999999?text=Ola%2C%20quero%20falar%20com%20o%20suporte%20sobre%20o%20plano%20de%20operacao%20do%20Tem%20na%20Area.";
+
 const initialForm = {
   mode: "free",
   nome: "",
@@ -64,12 +66,54 @@ function sanitizePhone(value) {
   return value.replace(/\D/g, "");
 }
 
+function formatPhone(value) {
+  const digits = sanitizePhone(value).slice(0, 11);
+
+  if (digits.length <= 2) return digits ? `(${digits}` : "";
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 async function loadLocalImage(file) {
   if (!file) return "";
 
+  if (!String(file.type || "").startsWith("image/")) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Nao foi possivel ler a imagem selecionada."));
+      reader.readAsDataURL(file);
+    });
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const maxWidth = 1400;
+        const maxHeight = 1400;
+        const scale = Math.min(maxWidth / image.width, maxHeight / image.height, 1);
+        const width = Math.max(1, Math.round(image.width * scale));
+        const height = Math.max(1, Math.round(image.height * scale));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+          reject(new Error("Nao foi possivel preparar a imagem selecionada."));
+          return;
+        }
+
+        context.drawImage(image, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      image.onerror = () => reject(new Error("Nao foi possivel processar a imagem selecionada."));
+      image.src = String(reader.result ?? "");
+    };
     reader.onerror = () => reject(new Error("Nao foi possivel ler a imagem selecionada."));
     reader.readAsDataURL(file);
   });
@@ -131,10 +175,17 @@ export default function RegisterStorePage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleModeChange(mode) {
+  function updatePhoneField(field, value) {
+    updateField(field, formatPhone(value));
+  }
+
+  function handleModeChange(mode, { advance = false } = {}) {
     setError("");
     setSuccess("");
     setForm((prev) => ({ ...prev, mode }));
+    if (advance) {
+      setCurrentStep(2);
+    }
   }
 
   function handleBack() {
@@ -238,6 +289,7 @@ export default function RegisterStorePage() {
           logo: form.logo,
           capa: form.capa,
           observacoes: form.observacoes.trim(),
+          estado: "SP",
         });
 
         setSuccess("Solicitacao enviada. Depois da aprovacao e do pagamento, a area da empresa sera liberada.");
@@ -306,7 +358,7 @@ export default function RegisterStorePage() {
                         key={key}
                         type="button"
                         className={`register-v2-mode ${selected ? "is-selected" : ""} ${key === "paid" ? "is-paid" : ""}`}
-                        onClick={() => handleModeChange(key)}
+                        onClick={() => handleModeChange(key, { advance: true })}
                       >
                         <span className="register-v2-mode-eyebrow">{plan.eyebrow}</span>
                         <div className="register-v2-mode-head">
@@ -359,7 +411,15 @@ export default function RegisterStorePage() {
                   <div className="register-v2-paid-offer">
                     <div>
                       <span>Plano operacao</span>
-                      <strong>Falar com suporte</strong>
+                      <a
+                        className="register-v2-support-link"
+                        href={SUPPORT_WHATSAPP_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        Falar com suporte
+                      </a>
                     </div>
                     <p>Escolha este plano para liberar uma presenca mais forte e comercial dentro da plataforma.</p>
                   </div>
@@ -408,13 +468,22 @@ export default function RegisterStorePage() {
                     <span>WhatsApp</span>
                     <input
                       value={form.whatsapp}
-                      onChange={(e) => updateField("whatsapp", e.target.value)}
+                      onChange={(e) => updatePhoneField("whatsapp", e.target.value)}
+                      inputMode="tel"
+                      maxLength={16}
+                      placeholder="(11) 99999-9999"
                     />
                   </label>
 
                   <label>
                     <span>Telefone</span>
-                    <input value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
+                    <input
+                      value={form.telefone}
+                      onChange={(e) => updatePhoneField("telefone", e.target.value)}
+                      inputMode="tel"
+                      maxLength={15}
+                      placeholder="(11) 3333-4444"
+                    />
                   </label>
                 </div>
 
@@ -446,12 +515,12 @@ export default function RegisterStorePage() {
                 <div className="register-v2-grid">
                   <label className="full">
                     <span>Logo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
                   </label>
 
                   <label className="full">
                     <span>Capa</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
                   </label>
 
                   <label className="full">
@@ -578,12 +647,12 @@ export default function RegisterStorePage() {
                 <div className="register-v2-grid">
                   <label className="full">
                     <span>Logo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
                   </label>
 
                   <label className="full">
                     <span>Capa</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
                   </label>
 
                   <label className="full">
