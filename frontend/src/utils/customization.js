@@ -58,6 +58,13 @@ export function buildSelectionSummary(selectedGroups = [], customerNote = "") {
   return lines;
 }
 
+export function buildStoredSelectionSummary(rawNotes = "") {
+  return String(rawNotes || "")
+    .split("|")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 export function serializeSelectionSignature(selectedGroups = [], customerNote = "") {
   const normalized = selectedGroups.map((group) => ({
     groupId: group.groupId,

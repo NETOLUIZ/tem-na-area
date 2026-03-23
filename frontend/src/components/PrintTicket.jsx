@@ -1,11 +1,29 @@
 import { formatCurrency, formatDate } from "../utils/format";
-import { buildSelectionSummary } from "../utils/customization";
+import { buildSelectionSummary, buildStoredSelectionSummary } from "../utils/customization";
 
 const COPY_LABEL = {
   customer: "Via do cliente",
   kitchen: "Via da cozinha",
   counter: "Via do balcao"
 };
+
+function classifyDetailLine(line) {
+  const value = String(line || "").trim();
+  if (!value) return { text: "", kind: "default", label: "" };
+  if (value.toLowerCase().startsWith("observacao:")) {
+    return {
+      text: value.slice("observacao:".length).trim(),
+      kind: "note",
+      label: "Obs."
+    };
+  }
+
+  return {
+    text: value,
+    kind: "option",
+    label: "+"
+  };
+}
 
 export default function PrintTicket({ order, store, copyType = "customer", paperWidth = "58" }) {
   const ticketClass = paperWidth === "80" ? "ticket-paper ticket-paper-80" : "ticket-paper ticket-paper-58";
@@ -46,16 +64,23 @@ export default function PrintTicket({ order, store, copyType = "customer", paper
       <section className="ticket-section">
         <p className="ticket-section-title">Itens</p>
         {order.items.map((item) => {
-          const details = buildSelectionSummary(item.selectedGroups, item.customerNote);
+          const details = item.selectedGroups?.length
+            ? buildSelectionSummary(item.selectedGroups, item.customerNote)
+            : buildStoredSelectionSummary(item.rawNotes);
           return (
             <div className="ticket-item-block" key={item.id || item.itemId}>
               <div className="ticket-item">
                 <strong>{item.quantidade}x {item.nome}</strong>
                 {showFinancials ? <span>{formatCurrency(item.unitPrice * item.quantidade)}</span> : null}
               </div>
-              {details.map((line) => (
-                <p key={line} className="ticket-option-line">{line}</p>
-              ))}
+              {details.map((line) => {
+                const detail = classifyDetailLine(line);
+                return (
+                  <p key={line} className={`ticket-option-line ticket-option-line-${detail.kind}`}>
+                    <strong>{detail.label}</strong> {detail.text}
+                  </p>
+                );
+              })}
             </div>
           );
         })}

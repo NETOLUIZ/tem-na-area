@@ -12,12 +12,13 @@ const PAYMENT_METHODS = new Set(["DINHEIRO", "PIX", "DEBITO", "CREDITO", "OUTRO"
 const PAYMENT_STATUSES = new Set(["PENDENTE", "PAGO", "PARCIAL", "CANCELADO", "ESTORNADO"]);
 
 export class OrderService {
-  constructor(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository) {
+  constructor(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository, optionGroupRepository) {
     this.pool = pool;
     this.storeRepository = storeRepository;
     this.catalogRepository = catalogRepository;
     this.orderRepository = orderRepository;
     this.paymentRecordRepository = paymentRecordRepository;
+    this.optionGroupRepository = optionGroupRepository;
   }
 
   async create(payload) {
@@ -42,6 +43,7 @@ export class OrderService {
     }
 
     const products = await this.catalogRepository.productsByStore(Number(store.id), true);
+    const optionGroups = await this.optionGroupRepository.byStore(Number(store.id));
     const catalog = new Map(products.map((item) => [Number(item.id), item]));
     const items = [];
     let subtotal = 0;
@@ -54,9 +56,19 @@ export class OrderService {
         throw new ApiError("Produto invalido ou indisponivel.", 422, { produto_id: productId });
       }
 
-      const unitPrice = product.preco_promocional !== null && product.preco_promocional !== undefined
+      const customization = this.resolveItemCustomization(
+        item,
+        optionGroups.filter((group) => {
+          const active = typeof group.ativo === "boolean" ? group.ativo : Number(group.ativo || 0) === 1;
+          const productIds = Array.isArray(group.links) ? group.links.map((link) => Number(link.product_id)) : [];
+          return active && productIds.includes(productId);
+        })
+      );
+
+      const baseUnitPrice = product.preco_promocional !== null && product.preco_promocional !== undefined
         ? Number(product.preco_promocional)
         : Number(product.preco);
+      const unitPrice = Number((baseUnitPrice + customization.extraPrice).toFixed(2));
       const lineSubtotal = Number((unitPrice * quantity).toFixed(2));
       subtotal += lineSubtotal;
 
@@ -68,7 +80,7 @@ export class OrderService {
         preco_unitario: unitPrice,
         desconto_unitario: 0,
         subtotal: lineSubtotal,
-        observacoes: item.observacoes ?? null
+        observacoes: customization.summaryText || item.observacoes || null
       });
     }
 
@@ -245,5 +257,116 @@ export class OrderService {
     }
 
     return "PARCIAL";
+  }
+
+  resolveItemCustomization(item, groups) {
+    const selectedGroups = Array.isArray(item?.selected_groups) ? item.selected_groups : [];
+    const customerNote = String(item?.customer_note || "").trim();
+    const groupMap = new Map(groups.map((group) => [Number(group.id), group]));
+    const normalizedGroups = [];
+    let extraPrice = 0;
+
+    for (const group of groups) {
+      const incoming = selectedGroups.find((entry) => Number(entry.groupId) === Number(group.id));
+      const type = String(group.tipo || "single");
+      const required = typeof group.obrigatorio === "boolean" ? group.obrigatorio : Number(group.obrigatorio || 0) === 1;
+
+      if (type === "text") {
+        const textValue = String(incoming?.textValue || "").trim();
+        if (required && !textValue) {
+          throw new ApiError(`Preencha "${group.nome}".`, 422);
+        }
+        if (textValue) {
+          normalizedGroups.push({
+            name: group.nome,
+            type,
+            textValue,
+            selectedOptions: []
+          });
+        }
+        continue;
+      }
+
+      const selectedOptionIds = Array.isArray(incoming?.selectedOptions)
+        ? incoming.selectedOptions.map((option) => Number(option.optionId))
+        : [];
+      const activeOptions = Array.isArray(group.options)
+        ? group.options.filter((option) => (typeof option.ativo === "boolean" ? option.ativo : Number(option.ativo || 0) === 1))
+        : [];
+      const chosenOptions = activeOptions.filter((option) => selectedOptionIds.includes(Number(option.id)));
+      const min = required ? Math.max(1, Number(group.minimo_selecoes || 0)) : Number(group.minimo_selecoes || 0);
+      const max = Number(group.maximo_selecoes || (type === "single" ? 1 : activeOptions.length || 99));
+
+      if (chosenOptions.length < min) {
+        throw new ApiError(`Selecione ao menos ${min} opcao(oes) em "${group.nome}".`, 422);
+      }
+
+      if (chosenOptions.length > max) {
+        throw new ApiError(`Selecione no maximo ${max} opcao(oes) em "${group.nome}".`, 422);
+      }
+
+      if (chosenOptions.length !== selectedOptionIds.length) {
+        throw new ApiError(`Revise as opcoes escolhidas em "${group.nome}".`, 422);
+      }
+
+      if (chosenOptions.length) {
+        const selectedOptions = chosenOptions.map((option) => {
+          const priceDelta = Number(option.preco_adicional || 0);
+          extraPrice += priceDelta;
+          return {
+            name: option.nome,
+            priceDelta
+          };
+        });
+
+        normalizedGroups.push({
+          name: group.nome,
+          type,
+          textValue: "",
+          selectedOptions
+        });
+      }
+    }
+
+    for (const incoming of selectedGroups) {
+      if (!groupMap.has(Number(incoming.groupId))) {
+        throw new ApiError("Grupo de personalizacao invalido para este produto.", 422);
+      }
+    }
+
+    const summaryText = this.buildCustomizationSummary(normalizedGroups, customerNote).join(" | ");
+    return {
+      extraPrice: Number(extraPrice.toFixed(2)),
+      summaryText: summaryText || null
+    };
+  }
+
+  buildCustomizationSummary(selectedGroups, customerNote) {
+    const lines = [];
+
+    for (const group of selectedGroups) {
+      if (group.type === "text") {
+        if (group.textValue) {
+          lines.push(`${group.name}: ${group.textValue}`);
+        }
+        continue;
+      }
+
+      if (!Array.isArray(group.selectedOptions) || !group.selectedOptions.length) {
+        continue;
+      }
+
+      const value = group.selectedOptions
+        .map((option) => option.priceDelta > 0 ? `${option.name} (+${option.priceDelta.toFixed(2)})` : option.name)
+        .join(", ");
+
+      lines.push(`${group.name}: ${value}`);
+    }
+
+    if (customerNote) {
+      lines.push(`Observacao: ${customerNote}`);
+    }
+
+    return lines;
   }
 }

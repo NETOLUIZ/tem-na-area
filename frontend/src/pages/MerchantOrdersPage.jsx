@@ -12,7 +12,7 @@ import {
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import MerchantPanelShell from "../components/merchant/MerchantPanelShell";
 import { MerchantPanelMissingState } from "../components/merchant/MerchantPanelState";
-import { buildSelectionSummary } from "../utils/customization";
+import { buildSelectionSummary, buildStoredSelectionSummary } from "../utils/customization";
 import { formatCurrency, formatDate } from "../utils/format";
 import { useApp } from "../store/AppContext";
 
@@ -253,7 +253,9 @@ export default function MerchantOrdersPage() {
 
                   <div className="orders-v2-order-lines">
                     {order.items.map((item) => {
-                      const details = buildSelectionSummary(item.selectedGroups, item.customerNote);
+                      const details = item.selectedGroups?.length
+                        ? buildSelectionSummary(item.selectedGroups, item.customerNote)
+                        : buildStoredSelectionSummary(item.rawNotes);
                       return (
                         <div key={item.id || `${order.id}-${item.itemId}`} className="orders-v2-order-line">
                           <div>

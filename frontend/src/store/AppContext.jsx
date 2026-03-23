@@ -239,7 +239,8 @@ function mapOrder(order) {
           quantidade: Number(item.quantidade || 1),
           unitPrice: toNumber(item.preco_unitario),
           selectedGroups: [],
-          customerNote: item.observacoes || ""
+          customerNote: "",
+          rawNotes: item.observacoes || ""
         }))
       : []
   };
@@ -693,7 +694,9 @@ export function AppProvider({ children }) {
         itens: cart.items.map((item) => ({
           produto_id: Number(item.itemId),
           quantidade: Number(item.quantidade),
-          observacoes: item.customerNote || ""
+          observacoes: buildSelectionSummary(item.selectedGroups, item.customerNote).join(" | "),
+          customer_note: item.customerNote || "",
+          selected_groups: item.selectedGroups || []
         }))
       };
 

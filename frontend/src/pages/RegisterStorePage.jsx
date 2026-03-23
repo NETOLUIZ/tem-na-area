@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MdArrowBack, MdArrowForward, MdCampaign, MdCheckCircle, MdDashboardCustomize, MdImage, MdPlace, MdRocketLaunch, MdSchedule, MdStorefront, MdVerifiedUser } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdCampaign, MdCheckCircle, MdDashboardCustomize, MdImage, MdPlace, MdRocketLaunch, MdSchedule, MdStorefront, MdVerifiedUser, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { getUserErrorMessage } from "../utils/errors";
@@ -129,6 +129,7 @@ export default function RegisterStorePage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loadingCep, setLoadingCep] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const totalSteps = getTotalSteps(form.mode);
 
@@ -297,6 +298,7 @@ export default function RegisterStorePage() {
 
       setCurrentStep(1);
       setForm(initialForm);
+      setShowPassword(false);
     } catch (submitError) {
       setError(getUserErrorMessage(submitError));
     } finally {
@@ -313,14 +315,12 @@ export default function RegisterStorePage() {
 
   return (
     <div className="register-v2-page">
-      <header className="register-v2-topbar">
-        <button type="button" className="btn btn-ghost" onClick={() => navigate("/")}>
-          Voltar para home
-        </button>
-      </header>
-
       <main className="register-v2-main">
         <section className="register-v2-progress-box">
+          <button type="button" className="register-v2-inline-back" onClick={() => navigate("/")}>
+            <MdArrowBack aria-hidden="true" />
+            <span>Voltar para home</span>
+          </button>
           <p className="eyebrow">Entrada da rede</p>
           <h1>{getStepTitle(form.mode, currentStep)}</h1>
           <p className="muted">
@@ -566,11 +566,21 @@ export default function RegisterStorePage() {
 
                   <label>
                     <span>Senha inicial</span>
-                    <input
-                      type="password"
-                      value={form.senha}
-                      onChange={(e) => updateField("senha", e.target.value)}
-                    />
+                    <div className="register-v2-password-wrap">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={form.senha}
+                        onChange={(e) => updateField("senha", e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="register-v2-password-toggle"
+                        onClick={() => setShowPassword((current) => !current)}
+                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                      >
+                        {showPassword ? <MdVisibilityOff aria-hidden="true" /> : <MdVisibility aria-hidden="true" />}
+                      </button>
+                    </div>
                   </label>
 
                   <label>

@@ -65,7 +65,7 @@ const commerceRepository = new CommerceRepository(pool);
 
 const authService = new AuthService(authRepository, authToken);
 const catalogService = new CatalogService(catalogRepository);
-const orderService = new OrderService(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository);
+const orderService = new OrderService(pool, storeRepository, catalogRepository, orderRepository, paymentRecordRepository, optionGroupRepository);
 const registrationService = new RegistrationService(registrationRepository, pool);
 const adminService = new AdminService(storeRepository);
 const storesController = new StoresController(commerceRepository);

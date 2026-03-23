@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MdArrowBack, MdArrowForward, MdSearch } from "react-icons/md";
 import { Link } from "react-router-dom";
 import StoreCard from "../components/StoreCard";
 import heroImage from "../img/hero-temnaarea.png";
 import { useApp } from "../store/AppContext";
 import { formatCurrency } from "../utils/format";
 
-const CATEGORIES = ["todas", "comida", "serviço", "loja"];
+const CATEGORIES = ["todas", "comida", "servico", "loja"];
 
 export default function HomePage() {
   const { selectors, actions } = useApp();
   const cardsSectionRef = useRef(null);
+  const promoTouchStartRef = useRef(null);
+  const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [activePromoIndex, setActivePromoIndex] = useState(0);
@@ -92,24 +95,61 @@ export default function HomePage() {
 
   const activePromotion = promotions[activePromoIndex] || promotions[0] || null;
 
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+    setSearch(searchDraft);
+  }
+
+  function goToPromo(direction) {
+    if (!promotions.length) return;
+
+    setActivePromoIndex((current) => {
+      const total = promotions.length;
+      return (current + direction + total) % total;
+    });
+  }
+
+  function handlePromoTouchStart(event) {
+    promoTouchStartRef.current = event.touches[0]?.clientX ?? null;
+  }
+
+  function handlePromoTouchEnd(event) {
+    const startX = promoTouchStartRef.current;
+    const endX = event.changedTouches[0]?.clientX ?? null;
+    promoTouchStartRef.current = null;
+
+    if (startX === null || endX === null) return;
+
+    const deltaX = endX - startX;
+    if (Math.abs(deltaX) < 40) return;
+
+    goToPromo(deltaX < 0 ? 1 : -1);
+  }
+
   return (
     <div>
       <header className="topbar sticky">
         <div className="topbar-content">
-          <h1>Tem na Área</h1>
-          <input
-            placeholder="Buscar loja, serviço ou categoria..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <h1>Tem na Area</h1>
+          <form className="topbar-search" onSubmit={handleSearchSubmit}>
+            <input
+              placeholder="Buscar loja, servico ou categoria..."
+              value={searchDraft}
+              onChange={(e) => setSearchDraft(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary topbar-search-button" aria-label="Confirmar busca">
+              <MdSearch aria-hidden="true" />
+              <span>Buscar</span>
+            </button>
+          </form>
         </div>
       </header>
 
       <main className="container page-space">
         <section className="hero-card" style={{ "--hero-image": `url(${heroImage})` }}>
           <div className="hero-card-text">
-            <h2>O comércio local com presença forte, simples e profissional.</h2>
-            <p>Descubra negócios da sua região, faça pedidos com agilidade e acompanhe tudo em uma experiência única da Tem na Área.</p>
+            <h2>O comercio local com presenca forte, simples e profissional.</h2>
+            <p>Descubra negocios da sua regiao, faca pedidos com agilidade e acompanhe tudo em uma experiencia unica da Tem na Area.</p>
             <div style={{ marginTop: "1rem" }}>
               <Link className="btn btn-primary" to="/cadastrar-loja">
                 Quero minha marca na rede
@@ -125,7 +165,11 @@ export default function HomePage() {
               <span>{promotions.length} ativa(s) agora</span>
             </div>
 
-            <div className="home-promo-carousel">
+            <div
+              className="home-promo-carousel"
+              onTouchStart={handlePromoTouchStart}
+              onTouchEnd={handlePromoTouchEnd}
+            >
               {isMobilePromo ? (
                 activePromotion ? (
                   <article key={activePromotion.id} className="home-promo-slide home-promo-slide-mobile">
@@ -188,6 +232,17 @@ export default function HomePage() {
                 </div>
               )}
 
+              {promotions.length > 1 ? (
+                <div className="home-promo-nav">
+                  <button type="button" className="home-promo-arrow" aria-label="Campanha anterior" onClick={() => goToPromo(-1)}>
+                    <MdArrowBack aria-hidden="true" />
+                  </button>
+                  <button type="button" className="home-promo-arrow" aria-label="Proxima campanha" onClick={() => goToPromo(1)}>
+                    <MdArrowForward aria-hidden="true" />
+                  </button>
+                </div>
+              ) : null}
+
               <div className="home-promo-dots">
                 {promotions.map((promotion, index) => (
                   <button
@@ -234,8 +289,8 @@ export default function HomePage() {
 
           {!stores.length ? (
             <div className="empty-state">
-              <h4>Nenhum negócio encontrado</h4>
-              <p>Ajuste a busca ou troque o filtro para encontrar mais opções na sua área.</p>
+              <h4>Nenhum negocio encontrado</h4>
+              <p>Ajuste a busca ou troque o filtro para encontrar mais opcoes na sua area.</p>
             </div>
           ) : (
             <div className="store-grid" ref={cardsSectionRef}>
