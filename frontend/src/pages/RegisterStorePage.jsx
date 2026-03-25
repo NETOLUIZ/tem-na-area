@@ -328,6 +328,23 @@ export default function RegisterStorePage() {
             confirmacao do pagamento e da aprovacao da central, o painel e liberado.
           </p>
 
+          <div className="register-v2-hero-points" aria-label="Destaques do cadastro">
+            <div className="register-v2-hero-point">
+              <MdRocketLaunch aria-hidden="true" />
+              <div>
+                <strong>Entrada guiada</strong>
+                <span>Cadastro em etapas, sem mudar seu fluxo.</span>
+              </div>
+            </div>
+            <div className="register-v2-hero-point">
+              <MdVerifiedUser aria-hidden="true" />
+              <div>
+                <strong>Analise central</strong>
+                <span>Plano operacao liberado apos aprovacao.</span>
+              </div>
+            </div>
+          </div>
+
           <div className="register-v2-steps" aria-label="Etapas do cadastro">
             {Array.from({ length: totalSteps }).map((_, index) => {
               const step = index + 1;
@@ -347,6 +364,17 @@ export default function RegisterStorePage() {
         </section>
 
         <form className="register-v2-form" onSubmit={handleSubmit}>
+          <div className="register-v2-form-head">
+            <div>
+              <span className="register-v2-mini-kicker">Cadastro comercial</span>
+              <h2>{PLAN_DETAILS[form.mode].title}</h2>
+            </div>
+            <div className="register-v2-form-badge">
+              <span>Etapa {currentStep}</span>
+              <strong>de {totalSteps}</strong>
+            </div>
+          </div>
+
           {currentStep === 1 && (
             <section className="register-v2-card">
               <div className="register-v2-entry-layout">
