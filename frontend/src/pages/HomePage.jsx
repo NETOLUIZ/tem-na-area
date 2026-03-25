@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MdArrowBack, MdArrowForward, MdSearch } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdLocationOn, MdSearch, MdStorefront, MdTrendingUp } from "react-icons/md";
 import { Link } from "react-router-dom";
 import StoreCard from "../components/StoreCard";
 import heroImage from "../img/hero-temnaarea.png";
@@ -33,6 +33,14 @@ export default function HomePage() {
   }, [selectors.activeStores, search, category]);
 
   const promotions = useMemo(() => selectors.activeHomePromotions(), [selectors]);
+  const highlightStats = useMemo(
+    () => [
+      { id: "stores", icon: MdStorefront, value: selectors.activeStores.length, label: "lojas ativas" },
+      { id: "promotions", icon: MdTrendingUp, value: promotions.length, label: "campanhas no ar" },
+      { id: "city", icon: MdLocationOn, value: "local", label: "comercios da sua area" }
+    ],
+    [promotions.length, selectors.activeStores.length]
+  );
 
   useEffect(() => {
     function syncViewport() {
@@ -127,10 +135,13 @@ export default function HomePage() {
   }
 
   return (
-    <div>
+    <div className="home-page">
       <header className="topbar sticky">
         <div className="topbar-content">
-          <h1>Tem na Area</h1>
+          <div className="home-topbar-brand">
+            <span className="home-topbar-badge">Marketplace local</span>
+            <h1>Tem na Area</h1>
+          </div>
           <form className="topbar-search" onSubmit={handleSearchSubmit}>
             <input
               placeholder="Buscar loja, servico ou categoria..."
@@ -148,20 +159,48 @@ export default function HomePage() {
       <main className="container page-space">
         <section className="hero-card" style={{ "--hero-image": `url(${heroImage})` }}>
           <div className="hero-card-text">
+            <span className="hero-card-kicker">Descubra, compare e compre perto de voce</span>
             <h2>O comercio local com presenca forte, simples e profissional.</h2>
             <p>Descubra negocios da sua regiao, faca pedidos com agilidade e acompanhe tudo em uma experiencia unica da Tem na Area.</p>
-            <div style={{ marginTop: "1rem" }}>
+            <div className="hero-card-actions">
               <Link className="btn btn-primary" to="/cadastrar-loja">
                 Quero minha marca na rede
               </Link>
+            </div>
+            <div className="hero-card-highlights" aria-label="Destaques da plataforma">
+              {highlightStats.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.id} className="hero-highlight-card">
+                    <div className="hero-highlight-icon">
+                      <Icon aria-hidden="true" />
+                    </div>
+                    <div>
+                      <strong>{item.value}</strong>
+                      <span>{item.label}</span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="hero-card-visual" aria-hidden="true">
+            <div className="hero-visual-panel">
+              <span className="hero-visual-pill">Entrega, vitrine e contato direto</span>
+              <strong>Mais descoberta para quem vende. Mais praticidade para quem compra.</strong>
+              <p>Uma home pensada para promover negocios locais com cara de plataforma comercial de verdade.</p>
             </div>
           </div>
         </section>
 
         {promotions.length ? (
           <section className="home-promo-shell">
-            <div className="section-title">
-              <h3>Campanhas em destaque</h3>
+            <div className="section-title home-section-title">
+              <div>
+                <p>Ofertas do momento</p>
+                <h3>Campanhas em destaque</h3>
+              </div>
               <span>{promotions.length} ativa(s) agora</span>
             </div>
 
@@ -258,8 +297,11 @@ export default function HomePage() {
           </section>
         ) : (
           <section className="home-promo-shell">
-            <div className="section-title">
-              <h3>Campanhas em destaque</h3>
+            <div className="section-title home-section-title">
+              <div>
+                <p>Ofertas do momento</p>
+                <h3>Campanhas em destaque</h3>
+              </div>
               <span>0 ativa(s)</span>
             </div>
             <div className="empty-state">
@@ -269,7 +311,7 @@ export default function HomePage() {
           </section>
         )}
 
-        <section className="chips-row">
+        <section className="chips-row home-chips-row">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -282,8 +324,11 @@ export default function HomePage() {
         </section>
 
         <section>
-          <div className="section-title">
-            <h3>Vitrines em destaque</h3>
+          <div className="section-title home-section-title">
+            <div>
+              <p>Comercios recomendados</p>
+              <h3>Vitrines em destaque</h3>
+            </div>
             <span>{stores.length} resultado(s)</span>
           </div>
 

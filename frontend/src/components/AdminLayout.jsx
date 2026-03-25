@@ -28,7 +28,7 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
   ];
 
   return (
-    <div className="prompt-admin-shell">
+    <div className="prompt-admin-shell super-admin-shell">
       <aside className="prompt-sidebar">
         <div className="prompt-sidebar-brand">
           <div className="prompt-brand-mark" aria-hidden="true">T</div>
@@ -50,15 +50,15 @@ export default function AdminLayout({ title, subtitle, links, onLogout, children
         </div>
       </aside>
 
-      <main className="prompt-admin-main">
-        <header className="prompt-topbar">
+      <main className="prompt-admin-main super-admin-main">
+        <header className="prompt-topbar super-admin-topbar">
           <div>
             <p className="prompt-breadcrumb">CENTRAL TEM NA ÁREA / VISÃO GERAL</p>
             <h1>{title}</h1>
           </div>
         </header>
 
-        <section className="prompt-stage">{children}</section>
+        <section className="prompt-stage super-admin-stage">{children}</section>
       </main>
     </div>
   );

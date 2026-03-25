@@ -26,7 +26,7 @@ export default function SuperAdminDashboardPage() {
 
   return (
     <AdminLayout title="Painel estratégico" subtitle="Super Admin" links={links} onLogout={actions.logoutSuperAdmin}>
-      <div className="prompt-dashboard-grid">
+      <div className="prompt-dashboard-grid super-admin-dashboard-grid">
         <div className="prompt-donut-row">
           <DonutCard value={summary.lojas_ativas || 0} tone="cyan" label="Lojas ativas" />
           <DonutCard value={summary.lojas_pendentes || 0} tone="amber" label="Pendências" />

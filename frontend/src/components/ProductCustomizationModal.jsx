@@ -76,7 +76,7 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
     });
 
     if (!result?.ok) {
-      setError(result?.message || "Revise a personalização do item.");
+      setError(result?.message || "Revise a personalizacao do item.");
       return;
     }
 
@@ -85,19 +85,20 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
 
   return (
     <div className="customization-modal-overlay" role="dialog" aria-modal="true" aria-label={`Personalizar pedido de ${item.nome}`}>
-      <button type="button" className="customization-modal-backdrop" onClick={onClose} aria-label="Fechar personalização" />
+      <button type="button" className="customization-modal-backdrop" onClick={onClose} aria-label="Fechar personalizacao" />
 
       <section className="customization-modal-panel">
         <header className="customization-modal-header">
           <div className="customization-modal-product">
             <SmartImage src={item.imagem} alt={item.nome} className="customization-modal-thumb" />
-            <div>
+            <div className="customization-modal-product-copy">
               <small>Personalize seu pedido</small>
               <h2>{item.nome}</h2>
               <p>{item.descricao}</p>
               <strong>{formatCurrency(item.preco)}</strong>
             </div>
           </div>
+
           <button type="button" className="customization-modal-close" onClick={onClose} aria-label="Fechar">
             <MdClose />
           </button>
@@ -109,7 +110,7 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
               <div className="customization-group-head">
                 <div>
                   <h3>{group.name}</h3>
-                  <p>{GROUP_TYPE_LABEL[group.type]} {group.required ? "· Obrigatório" : "· Opcional"}</p>
+                  <p>{GROUP_TYPE_LABEL[group.type]} {group.required ? "- Obrigatorio" : "- Opcional"}</p>
                 </div>
                 {group.type !== "text" ? (
                   <span>
@@ -158,14 +159,14 @@ export default function ProductCustomizationModal({ item, groups, open, onClose,
             </section>
           )) : (
             <div className="customization-empty">
-              <p>Este item não possui grupos de personalização. Ajuste a quantidade e adicione ao carrinho.</p>
+              <p>Este item nao possui grupos de personalizacao. Ajuste a quantidade e adicione ao carrinho.</p>
             </div>
           )}
 
           <section className="customization-group-card">
             <div className="customization-group-head">
               <div>
-                <h3>Observação do cliente</h3>
+                <h3>Observacao do cliente</h3>
                 <p>Campo adicional para recados ao estabelecimento</p>
               </div>
             </div>

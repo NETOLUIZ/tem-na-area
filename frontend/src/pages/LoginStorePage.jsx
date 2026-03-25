@@ -69,87 +69,117 @@ export default function LoginStorePage() {
   return (
     <main className="login-v2-page merchant-login-page">
       <section className="login-v2-card">
-        <div className="login-v2-brand">
-          <div className="login-v2-brand-icon" aria-hidden="true">
-            <HubIcon />
+        <div className="merchant-login-layout">
+          <div className="merchant-login-main">
+            <div className="login-v2-brand">
+              <div className="login-v2-brand-icon" aria-hidden="true">
+                <HubIcon />
+              </div>
+              <div>
+                <h1>Tem na Area</h1>
+                <p className="merchant-login-brand-copy">Painel de operacao para comercios locais</p>
+              </div>
+            </div>
+
+            <div className="login-v2-hero" aria-hidden="true">
+              <div className="login-v2-hero-copy">
+                <span className="login-v2-hero-kicker">Painel do parceiro</span>
+                <strong>Sua operacao local com padrao premium e resposta rapida.</strong>
+                <p>Pedidos, catalogo, vitrine e gestao em um fluxo unico, direto e profissional.</p>
+              </div>
+              <div className="login-v2-hero-stack">
+                <span>Operacao ativa</span>
+                <span>Vitrine online</span>
+                <span>Gestao diaria</span>
+              </div>
+            </div>
+
+            <h2>Bem-vindo de volta</h2>
+            <p>Acesse sua area para atualizar a vitrine, atender pedidos e acompanhar a performance da loja.</p>
+
+            {error ? (
+              <div className="login-v2-inline-alert error-text" role="alert">
+                <strong>Falha no acesso</strong>
+                <span>{error}</span>
+              </div>
+            ) : null}
+
+            <form className="login-v2-form" onSubmit={submit}>
+              <label>Telefone ou e-mail</label>
+              <div className="login-v2-input-wrap">
+                <span className="login-v2-input-icon" aria-hidden="true">
+                  <UserIcon />
+                </span>
+                <input
+                  placeholder="Digite seu e-mail ou telefone"
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="login-v2-pass-row">
+                <label>Senha</label>
+                <Link to="/pdv" className="login-v2-link">Esqueci minha senha</Link>
+              </div>
+
+              <div className="login-v2-input-wrap">
+                <span className="login-v2-input-icon" aria-hidden="true">
+                  <LockIcon />
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Digite sua senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                />
+                <button type="button" className="login-v2-eye" onClick={() => setShowPassword((v) => !v)}>
+                  <EyeIcon open={showPassword} />
+                </button>
+              </div>
+
+              <button className="btn btn-primary login-v2-submit" type="submit">
+                {loading ? "Entrando..." : "Entrar no painel"}
+                <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
+              </button>
+            </form>
+
+            <div className="login-v2-divider"><span>ou continue com</span></div>
+
+            <div className="login-v2-social">
+              <button type="button" className="btn btn-outline">Google</button>
+              <button type="button" className="btn btn-outline">Facebook</button>
+            </div>
+
+            <p className="login-v2-foot">
+              Ainda nao faz parte da rede? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar empresa</Link>
+            </p>
           </div>
-          <h1>Tem na Area</h1>
+
+          <aside className="merchant-login-aside" aria-hidden="true">
+            <div className="merchant-login-aside-panel">
+              <span className="merchant-login-aside-kicker">Sua rotina em um painel</span>
+              <strong>Controle a vitrine, acompanhe pedidos e mantenha sua operacao com cara de produto premium.</strong>
+              <p>Uma interface pensada para transmitir confianca, velocidade e organizacao desde o primeiro acesso.</p>
+            </div>
+
+            <div className="merchant-login-metrics">
+              <article>
+                <small>Operacao</small>
+                <strong>Pedidos, catalogo e clientes</strong>
+              </article>
+              <article>
+                <small>Experiencia</small>
+                <strong>Fluxo direto para o parceiro</strong>
+              </article>
+              <article>
+                <small>Presenca</small>
+                <strong>Vitrine publica integrada</strong>
+              </article>
+            </div>
+          </aside>
         </div>
-
-        <div className="login-v2-hero" aria-hidden="true">
-          <div className="login-v2-hero-copy">
-            <span className="login-v2-hero-kicker">Painel do parceiro</span>
-            <strong>Sua operacao local com padrao premium e resposta rapida.</strong>
-            <p>Pedidos, catalogo, vitrine e gestao em um fluxo unico, direto e profissional.</p>
-          </div>
-          <div className="login-v2-hero-stack">
-            <span>Operacao ativa</span>
-            <span>Vitrine online</span>
-            <span>Gestao diaria</span>
-          </div>
-        </div>
-
-        <h2>Bem-vindo de volta</h2>
-        <p>Acesse sua area para atualizar a vitrine, atender pedidos e acompanhar a performance da loja.</p>
-
-        {error ? (
-          <div className="login-v2-inline-alert error-text" role="alert">
-            <strong>Falha no acesso</strong>
-            <span>{error}</span>
-          </div>
-        ) : null}
-
-        <form className="login-v2-form" onSubmit={submit}>
-          <label>Telefone ou e-mail</label>
-          <div className="login-v2-input-wrap">
-            <span className="login-v2-input-icon" aria-hidden="true">
-              <UserIcon />
-            </span>
-            <input
-              placeholder="Digite seu e-mail ou telefone"
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="login-v2-pass-row">
-            <label>Senha</label>
-            <Link to="/pdv" className="login-v2-link">Esqueci minha senha</Link>
-          </div>
-
-          <div className="login-v2-input-wrap">
-            <span className="login-v2-input-icon" aria-hidden="true">
-              <LockIcon />
-            </span>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Digite sua senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-            />
-            <button type="button" className="login-v2-eye" onClick={() => setShowPassword((v) => !v)}>
-              <EyeIcon open={showPassword} />
-            </button>
-          </div>
-
-          <button className="btn btn-primary login-v2-submit" type="submit">
-            {loading ? "Entrando..." : "Entrar no painel"}
-            <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
-          </button>
-        </form>
-
-        <div className="login-v2-divider"><span>ou continue com</span></div>
-
-        <div className="login-v2-social">
-          <button type="button" className="btn btn-outline">Google</button>
-          <button type="button" className="btn btn-outline">Facebook</button>
-        </div>
-
-        <p className="login-v2-foot">
-          Ainda nao faz parte da rede? <Link to="/cadastrar-loja" className="login-v2-link">Cadastrar empresa</Link>
-        </p>
       </section>
     </main>
   );

@@ -33,7 +33,7 @@ function DashboardAlertCard({ alert }) {
 
 function DashboardRecentOrders({ orders }) {
   return (
-    <article className="dashboard-panel">
+    <article className="dashboard-panel merchant-dashboard-panel">
       <div className="dashboard-panel-head">
         <div>
           <p className="prompt-card-kicker">ULTIMOS PEDIDOS</p>
@@ -66,7 +66,7 @@ function DashboardRecentOrders({ orders }) {
 
 function DashboardPaymentSummary({ rows }) {
   return (
-    <article className="dashboard-panel">
+    <article className="dashboard-panel merchant-dashboard-panel">
       <div className="dashboard-panel-head">
         <div>
           <p className="prompt-card-kicker">PAGAMENTOS</p>
@@ -95,7 +95,7 @@ function DashboardPaymentSummary({ rows }) {
 
 function DashboardAlerts({ alerts }) {
   return (
-    <article className="dashboard-panel">
+    <article className="dashboard-panel merchant-dashboard-panel">
       <div className="dashboard-panel-head">
         <div>
           <p className="prompt-card-kicker">ALERTAS</p>
@@ -112,7 +112,7 @@ function DashboardAlerts({ alerts }) {
 
 function DashboardQuickLinks({ storeId, slug }) {
   return (
-    <article className="dashboard-panel">
+    <article className="dashboard-panel merchant-dashboard-panel merchant-dashboard-links">
       <div className="dashboard-panel-head">
         <div>
           <p className="prompt-card-kicker">ATALHOS</p>
@@ -188,6 +188,10 @@ export default function MerchantDashboardPage() {
           <div className="merchant-dashboard-store-chip">
             <span>Categoria</span>
             <strong>{store.categoria || "Loja"}</strong>
+          </div>
+          <div className="merchant-dashboard-store-chip merchant-dashboard-store-chip-accent">
+            <span>Vitrine</span>
+            <strong>{store.slug ? "Online" : "Interna"}</strong>
           </div>
         </div>
       )}

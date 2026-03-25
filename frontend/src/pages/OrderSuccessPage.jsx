@@ -11,7 +11,7 @@ export default function OrderSuccessPage() {
   const store = order ? state.stores.find((item) => item.id === order.storeId) || null : null;
 
   return (
-    <main className="success-v2-page">
+    <main className="success-v2-page public-flow-page success-v2-page-public">
       <div className="success-v2-top-space" />
 
       <section className="success-v2-wrap">
@@ -21,11 +21,11 @@ export default function OrderSuccessPage() {
         </div>
 
         <div className="success-v2-head">
-          <p className="success-v2-kicker">Pedido confirmado no Tem na Área</p>
+          <p className="success-v2-kicker">Pedido confirmado no Tem na Area</p>
           <h1>Pedido realizado com sucesso</h1>
           <p>
-            Seu pedido <strong>{order?.id || orderId || "#----"}</strong> já foi enviado para{" "}
-            <strong>{store?.nome || "a operação selecionada"}</strong>.
+            Seu pedido <strong>{order?.id || orderId || "#----"}</strong> ja foi enviado para{" "}
+            <strong>{store?.nome || "a operacao selecionada"}</strong>.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export default function OrderSuccessPage() {
           <div className="success-v2-row">
             <div className="success-v2-badge mint"><MdLocalShipping /></div>
             <div>
-              <small>TEMPO ESTIMADO</small>
+              <small>Tempo estimado</small>
               <strong>35 a 50 minutos</strong>
             </div>
           </div>
@@ -43,8 +43,8 @@ export default function OrderSuccessPage() {
           <div className="success-v2-row">
             <div className="success-v2-badge blue"><MdHome /></div>
             <div>
-              <small>ENTREGA EM</small>
-              <strong>{order?.cliente?.enderecoEntrega || "Endereço não informado"}</strong>
+              <small>Entrega em</small>
+              <strong>{order?.cliente?.enderecoEntrega || "Endereco nao informado"}</strong>
             </div>
           </div>
         </article>
@@ -54,7 +54,7 @@ export default function OrderSuccessPage() {
             <MdStorefront aria-hidden="true" />
             Voltar para a vitrine <span aria-hidden="true"><MdArrowForward /></span>
           </Link>
-          <Link className="success-v2-secondary" to="/">Ir para o início</Link>
+          <Link className="success-v2-secondary" to="/">Ir para o inicio</Link>
         </div>
       </section>
     </main>

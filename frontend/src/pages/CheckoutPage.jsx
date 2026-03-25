@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MdArrowForward } from "react-icons/md";
+import { MdArrowForward, MdLocationOn, MdPerson } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { formatCurrency } from "../utils/format";
@@ -34,10 +34,10 @@ export default function CheckoutPage() {
 
   function validate() {
     if (form.nome.trim().length < 3) return "Informe o nome completo.";
-    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone inválido.";
-    if (form.cep.replace(/\D/g, "").length !== 8) return "Informe um CEP válido.";
+    if (form.telefone.replace(/\D/g, "").length < 10) return "Telefone invalido.";
+    if (form.cep.replace(/\D/g, "").length !== 8) return "Informe um CEP valido.";
     if (form.rua.trim().length < 3) return "Informe a rua de entrega.";
-    if (form.numero.trim().length < 1) return "Informe o número da entrega.";
+    if (form.numero.trim().length < 1) return "Informe o numero da entrega.";
     if (form.bairro.trim().length < 2) return "Informe o bairro da entrega.";
     if (form.cidade.trim().length < 2) return "Informe a cidade da entrega.";
     return "";
@@ -56,7 +56,7 @@ export default function CheckoutPage() {
     setLoading(false);
 
     if (!order) {
-      setError("Não foi possível finalizar agora. Revise a sacola e tente novamente.");
+      setError("Nao foi possivel finalizar agora. Revise a sacola e tente novamente.");
       return;
     }
 
@@ -68,18 +68,18 @@ export default function CheckoutPage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Sacola vazia</h3>
-          <p>Você precisa adicionar itens antes de concluir o pedido.</p>
-          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
+          <p>Voce precisa adicionar itens antes de concluir o pedido.</p>
+          <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="checkout-v2-page">
+    <main className="checkout-v2-page public-flow-page">
       <header className="checkout-v2-header">
         <div className="checkout-v2-title-block">
-          <p className="checkout-v2-kicker">Confirmação final no Tem na Área</p>
+          <p className="checkout-v2-kicker">Confirmacao final no Tem na Area</p>
           <h1>Finalizar pedido</h1>
           <p>{cart.store?.nome}</p>
         </div>
@@ -87,18 +87,29 @@ export default function CheckoutPage() {
 
       <section className="checkout-v2-body">
         <form className="checkout-v2-form" onSubmit={submit} id="checkout-form">
-          <div className="checkout-v2-card">
-            <h2>Dados de entrega</h2>
+          <div className="checkout-v2-card checkout-v2-card-form">
+            <div className="checkout-v2-section-head">
+              <div className="checkout-v2-icon-badge">
+                <MdPerson aria-hidden="true" />
+              </div>
+              <div>
+                <h2>Dados de entrega</h2>
+                <p>Preencha os dados para confirmar o pedido sem alterar o fluxo atual.</p>
+              </div>
+            </div>
 
-            <input placeholder="Nome completo" value={form.nome} onChange={(e) => updateField("nome", e.target.value)} />
-            <input placeholder="Telefone" value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
-            <input placeholder="CEP" value={form.cep} onChange={(e) => updateField("cep", e.target.value)} />
-            <input placeholder="Rua" value={form.rua} onChange={(e) => updateField("rua", e.target.value)} />
-            <input placeholder="Casa / número" value={form.numero} onChange={(e) => updateField("numero", e.target.value)} />
-            <input placeholder="Bairro" value={form.bairro} onChange={(e) => updateField("bairro", e.target.value)} />
-            <input placeholder="Cidade" value={form.cidade} onChange={(e) => updateField("cidade", e.target.value)} />
+            <div className="checkout-v2-grid">
+              <input placeholder="Nome completo" value={form.nome} onChange={(e) => updateField("nome", e.target.value)} />
+              <input placeholder="Telefone" value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
+              <input placeholder="CEP" value={form.cep} onChange={(e) => updateField("cep", e.target.value)} />
+              <input placeholder="Rua" value={form.rua} onChange={(e) => updateField("rua", e.target.value)} />
+              <input placeholder="Casa / numero" value={form.numero} onChange={(e) => updateField("numero", e.target.value)} />
+              <input placeholder="Bairro" value={form.bairro} onChange={(e) => updateField("bairro", e.target.value)} />
+              <input placeholder="Cidade" value={form.cidade} onChange={(e) => updateField("cidade", e.target.value)} />
+            </div>
+
             <textarea
-              placeholder="Observações do pedido (opcional)"
+              placeholder="Observacoes do pedido (opcional)"
               value={form.observacoes}
               onChange={(e) => updateField("observacoes", e.target.value)}
               rows={3}
@@ -108,9 +119,14 @@ export default function CheckoutPage() {
           </div>
 
           <div className="checkout-v2-card summary">
-            <div className="checkout-v2-summary-head">
-              <h3>Resumo do pedido</h3>
-              <span>{totalItems} item(ns)</span>
+            <div className="checkout-v2-section-head">
+              <div className="checkout-v2-icon-badge">
+                <MdLocationOn aria-hidden="true" />
+              </div>
+              <div className="checkout-v2-summary-head">
+                <h3>Resumo do pedido</h3>
+                <span>{totalItems} item(ns)</span>
+              </div>
             </div>
 
             <div className="checkout-v2-summary-list">
@@ -127,6 +143,11 @@ export default function CheckoutPage() {
                   <strong>{formatCurrency(row.subtotal)}</strong>
                 </div>
               ))}
+            </div>
+
+            <div className="checkout-v2-summary-total">
+              <span>Total do pedido</span>
+              <strong>{formatCurrency(cart.total)}</strong>
             </div>
           </div>
         </form>

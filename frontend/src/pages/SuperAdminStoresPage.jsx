@@ -210,7 +210,7 @@ export default function SuperAdminStoresPage() {
       </section>
 
       <section className="dashboard-panel neon-gap">
-        <div className="filters-row">
+        <div className="filters-row super-admin-filters-row">
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
             <option value="TODOS">Todos os status</option>
             <option value="PENDENTE">Pendente</option>

@@ -1,5 +1,5 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { MdChat } from "react-icons/md";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { MdChat, MdDeliveryDining, MdLocationOn, MdSchedule, MdStorefront } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import CartBar from "../components/CartBar";
 import CartDrawer from "../components/CartDrawer";
@@ -26,6 +26,47 @@ export default function StorePage() {
   const whatsappUrl = buildWhatsAppUrl(store?.whatsapp);
   const loadStore = useEffectEvent((nextSlug) => actions.fetchStoreBySlug(nextSlug));
   const trackStoreVisit = useEffectEvent((storeId) => actions.incrementMetric(storeId, "visitasPagina"));
+  const storeHighlights = useMemo(() => {
+    if (!store) return [];
+
+    const highlights = [
+      {
+        id: "category",
+        icon: MdStorefront,
+        label: "Categoria",
+        value: store.categoria || "Loja local"
+      }
+    ];
+
+    if (store.horarioFuncionamento) {
+      highlights.push({
+        id: "hours",
+        icon: MdSchedule,
+        label: "Funcionamento",
+        value: store.horarioFuncionamento
+      });
+    }
+
+    if (store.config.aceitaEntrega || store.config.aceitaRetirada) {
+      highlights.push({
+        id: "operation",
+        icon: MdDeliveryDining,
+        label: "Operacao",
+        value: [store.config.aceitaEntrega ? "Entrega" : null, store.config.aceitaRetirada ? "Retirada" : null].filter(Boolean).join(" e ")
+      });
+    }
+
+    if (store.endereco.bairro || store.endereco.cidade) {
+      highlights.push({
+        id: "region",
+        icon: MdLocationOn,
+        label: "Regiao",
+        value: [store.endereco.bairro, store.endereco.cidade].filter(Boolean).join(", ")
+      });
+    }
+
+    return highlights.slice(0, 4);
+  }, [store]);
 
   useEffect(() => {
     let active = true;
@@ -34,7 +75,7 @@ export default function StorePage() {
     setError("");
     loadStore(slug)
       .catch((err) => {
-        if (active) setError(getUserErrorMessage(err, "Não foi possível carregar a vitrine agora."));
+        if (active) setError(getUserErrorMessage(err, "Nao foi possivel carregar a vitrine agora."));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -65,7 +106,7 @@ export default function StorePage() {
       <div className="container page-space">
         <div className="empty-state">
           <h3>Carregando vitrine</h3>
-          <p>Buscando dados atualizados do catálogo no servidor.</p>
+          <p>Buscando dados atualizados do catalogo no servidor.</p>
         </div>
       </div>
     );
@@ -75,53 +116,79 @@ export default function StorePage() {
     return (
       <div className="container page-space">
         <div className="empty-state">
-          <h3>Vitrine indisponível</h3>
-          <p>{error || "Esta operação está temporariamente inacessível na Tem na Área."}</p>
-          <Link className="btn btn-primary" to="/">Voltar para o início</Link>
+          <h3>Vitrine indisponivel</h3>
+          <p>{error || "Esta operacao esta temporariamente inacessivel na Tem na Area."}</p>
+          <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="store-page-v2">
       <header className="store-hero" style={{ backgroundImage: `url(${store.imagens.capa})` }}>
         <div className="overlay" />
         <div className="store-hero-content container">
-          <SmartImage src={store.imagens.logo} alt={store.nome} className="hero-logo" />
-          <div>
-            <h1>{store.nome}</h1>
-            <p>{store.descricaoCurta}</p>
-            <small>{store.horarioFuncionamento}</small>
+          <div className="store-hero-main">
+            <SmartImage src={store.imagens.logo} alt={store.nome} className="hero-logo" />
+            <div className="store-hero-copy">
+              <span className="store-hero-kicker">Vitrine oficial</span>
+              <h1>{store.nome}</h1>
+              <p>{store.descricaoCurta}</p>
+              {store.horarioFuncionamento ? <small>{store.horarioFuncionamento}</small> : null}
+            </div>
           </div>
-          <button
-            className="btn btn-outline-light"
-            disabled={!whatsappUrl}
-            onClick={() => {
-              if (!whatsappUrl) return;
-              actions.incrementMetric(store.id, "cliquesWhatsapp");
-              window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-            }}
-          >
-            <MdChat aria-hidden="true" />
-            Atendimento no WhatsApp
-          </button>
+
+          <div className="store-hero-side">
+            <button
+              className="btn btn-outline-light"
+              disabled={!whatsappUrl}
+              onClick={() => {
+                if (!whatsappUrl) return;
+                actions.incrementMetric(store.id, "cliquesWhatsapp");
+                window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+              }}
+            >
+              <MdChat aria-hidden="true" />
+              Atendimento no WhatsApp
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="container page-space">
-        <div className="section-title">
-          <h3>Catálogo da loja</h3>
+        <section className="store-hero-highlights" aria-label="Informacoes da loja">
+          {storeHighlights.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.id} className="store-highlight-card">
+                <div className="store-highlight-icon">
+                  <Icon aria-hidden="true" />
+                </div>
+                <div>
+                  <small>{item.label}</small>
+                  <strong>{item.value}</strong>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+
+        <div className="section-title store-catalog-title">
+          <div>
+            <p>Cardapio e produtos</p>
+            <h3>Catalogo da loja</h3>
+          </div>
           <span>{items.length} item(ns)</span>
         </div>
 
         {!items.length ? (
           <div className="empty-state">
-            <h4>Catálogo em atualização</h4>
-            <p>Esta loja ainda não publicou produtos na vitrine.</p>
+            <h4>Catalogo em atualizacao</h4>
+            <p>Esta loja ainda nao publicou produtos na vitrine.</p>
           </div>
         ) : (
-          <div className="menu-grid">
+          <div className="menu-grid store-menu-grid">
             {items.map((item) => (
               <ProductCard
                 key={item.id}

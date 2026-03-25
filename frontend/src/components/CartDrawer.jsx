@@ -18,7 +18,7 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
       <aside className="cart-drawer-panel">
         <header className="cart-drawer-header">
           <div className="cart-drawer-header-copy">
-            <span className="cart-drawer-kicker">Sua compra no Tem na Área</span>
+            <span className="cart-drawer-kicker">Sua compra no Tem na Area</span>
             <h3>{cart.store?.nome || "Sua sacola"}</h3>
             <div className="cart-drawer-store-meta">
               <span>
@@ -31,6 +31,7 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
               </span>
             </div>
           </div>
+
           <button type="button" className="cart-drawer-close" aria-label="Fechar" onClick={onClose}>
             <MdClose />
           </button>
@@ -43,7 +44,7 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
           </div>
           <div>
             <small>Total parcial</small>
-            <strong>{formatCurrency(visibleItems.reduce((sum, row) => sum + row.subtotal, 0))}</strong>
+            <strong>{formatCurrency(visibleTotal)}</strong>
           </div>
         </section>
 
@@ -53,28 +54,33 @@ export default function CartDrawer({ cart, open, onClose, onDecrease, onIncrease
               <SmartImage src={row.item.imagem} alt={row.item.nome} className="cart-drawer-thumb" />
 
               <div className="cart-drawer-item-main">
-                <strong>{row.item.nome}</strong>
-                <span>{formatCurrency(row.unitPrice)} por unidade</span>
+                <div className="cart-drawer-item-top">
+                  <div>
+                    <strong>{row.item.nome}</strong>
+                    <span>{formatCurrency(row.unitPrice)} por unidade</span>
+                  </div>
+                  <strong className="cart-drawer-subtotal">{formatCurrency(row.subtotal)}</strong>
+                </div>
+
                 {row.summaryLines?.length ? (
                   <div className="cart-line-summary">
                     {row.summaryLines.map((line) => <small key={line}>{line}</small>)}
                   </div>
                 ) : null}
+
                 <div className="cart-drawer-stepper">
                   <button type="button" onClick={() => onDecrease(row.id, 0)} className="cart-drawer-stepper-remove" aria-label="Remover item">
                     <MdClose />
                   </button>
-                  <button type="button" onClick={() => onDecrease(row.id, row.quantidade - 1)}>
+                  <button type="button" onClick={() => onDecrease(row.id, row.quantidade - 1)} aria-label="Diminuir quantidade">
                     -
                   </button>
                   <span>{row.quantidade}</span>
-                  <button type="button" onClick={() => onIncrease(row.id, row.quantidade + 1)}>
+                  <button type="button" onClick={() => onIncrease(row.id, row.quantidade + 1)} aria-label="Aumentar quantidade">
                     +
                   </button>
                 </div>
               </div>
-
-              <strong className="cart-drawer-subtotal">{formatCurrency(row.subtotal)}</strong>
             </article>
           ))}
         </div>
