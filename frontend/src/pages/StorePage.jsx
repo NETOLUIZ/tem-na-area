@@ -1,11 +1,20 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { MdChat, MdDeliveryDining, MdLocationOn, MdSchedule, MdStorefront } from "react-icons/md";
+import {
+  ChatBubbleLeftIcon,
+  TruckIcon,
+  MapPinIcon,
+  ClockIcon,
+  BuildingStorefrontIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 import { Link, useParams } from "react-router-dom";
 import CartBar from "../components/CartBar";
 import CartDrawer from "../components/CartDrawer";
 import ProductCard from "../components/ProductCard";
 import ProductCustomizationModal from "../components/ProductCustomizationModal";
 import SmartImage from "../components/SmartImage";
+import Navigation, { BottomNav } from "../components/Navigation";
+import Button from "../components/Button";
 import { useApp } from "../store/AppContext";
 import { buildWhatsAppUrl } from "../utils/contacts";
 import { getUserErrorMessage } from "../utils/errors";
@@ -26,13 +35,14 @@ export default function StorePage() {
   const whatsappUrl = buildWhatsAppUrl(store?.whatsapp);
   const loadStore = useEffectEvent((nextSlug) => actions.fetchStoreBySlug(nextSlug));
   const trackStoreVisit = useEffectEvent((storeId) => actions.incrementMetric(storeId, "visitasPagina"));
+
   const storeHighlights = useMemo(() => {
     if (!store) return [];
 
     const highlights = [
       {
         id: "category",
-        icon: MdStorefront,
+        icon: BuildingStorefrontIcon,
         label: "Categoria",
         value: store.categoria || "Loja local"
       }
@@ -41,7 +51,7 @@ export default function StorePage() {
     if (store.horarioFuncionamento) {
       highlights.push({
         id: "hours",
-        icon: MdSchedule,
+        icon: ClockIcon,
         label: "Funcionamento",
         value: store.horarioFuncionamento
       });
@@ -50,7 +60,7 @@ export default function StorePage() {
     if (store.config.aceitaEntrega || store.config.aceitaRetirada) {
       highlights.push({
         id: "operation",
-        icon: MdDeliveryDining,
+        icon: TruckIcon,
         label: "Operacao",
         value: [store.config.aceitaEntrega ? "Entrega" : null, store.config.aceitaRetirada ? "Retirada" : null].filter(Boolean).join(" e ")
       });
@@ -59,7 +69,7 @@ export default function StorePage() {
     if (store.endereco.bairro || store.endereco.cidade) {
       highlights.push({
         id: "region",
-        icon: MdLocationOn,
+        icon: MapPinIcon,
         label: "Regiao",
         value: [store.endereco.bairro, store.endereco.cidade].filter(Boolean).join(", ")
       });
@@ -103,153 +113,184 @@ export default function StorePage() {
 
   if (loading) {
     return (
-      <div className="container page-space">
-        <div className="empty-state">
-          <h3>Carregando vitrine</h3>
-          <p>Buscando dados atualizados do catalogo no servidor.</p>
+      <>
+        <Navigation userRole="customer" cartCount={0} />
+        <div className="store-page-v2">
+          <div className="empty-state" style={{ padding: "60px 20px", minHeight: "60vh", display: "grid", placeItems: "center" }}>
+            <div>
+              <h3>Carregando vitrine</h3>
+              <p>Buscando dados atualizados do catalogo no servidor.</p>
+            </div>
+          </div>
         </div>
-      </div>
+        <BottomNav userRole="customer" />
+      </>
     );
   }
 
   if (error || !store || store.status !== "ATIVA") {
     return (
-      <div className="container page-space">
-        <div className="empty-state">
-          <h3>Vitrine indisponivel</h3>
-          <p>{error || "Esta operacao esta temporariamente inacessivel na Tem na Area."}</p>
-          <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
+      <>
+        <Navigation userRole="customer" cartCount={0} />
+        <div className="store-page-v2">
+          <div className="empty-state" style={{ padding: "60px 20px", minHeight: "60vh", display: "grid", placeItems: "center" }}>
+            <div>
+              <h3>Vitrine indisponivel</h3>
+              <p>{error || "Esta operacao esta temporariamente inacessivel na Tem na Area."}</p>
+              <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
+            </div>
+          </div>
         </div>
-      </div>
+        <BottomNav userRole="customer" />
+      </>
     );
   }
 
   return (
-    <div className="store-page-v2">
-      <header className="store-hero" style={{ backgroundImage: `url(${store.imagens.capa})` }}>
-        <div className="overlay" />
-        <div className="store-hero-content container">
-          <div className="store-hero-main">
-            <SmartImage src={store.imagens.logo} alt={store.nome} className="hero-logo" />
-            <div className="store-hero-copy">
-              <span className="store-hero-kicker">Vitrine oficial</span>
-              <h1>{store.nome}</h1>
-              <p>{store.descricaoCurta}</p>
-              {store.horarioFuncionamento ? <small>{store.horarioFuncionamento}</small> : null}
+    <>
+      <Navigation userRole="customer" cartCount={cart.items.length} />
+
+      <div className="store-page-v2">
+        {/* Hero Header */}
+        <header className="store-hero" style={{ backgroundImage: `url(${store.imagens.capa})` }}>
+          <div className="store-hero-overlay" />
+          <div className="store-hero-content">
+            <Link to="/" className="store-hero-back">
+              <ArrowLeftIcon width={24} height={24} strokeWidth={1.5} />
+              <span>Voltar</span>
+            </Link>
+
+            <div className="store-hero-main">
+              <SmartImage src={store.imagens.logo} alt={store.nome} className="store-hero-logo" />
+              <div className="store-hero-copy">
+                <span className="store-hero-kicker">Vitrine oficial</span>
+                <h1>{store.nome}</h1>
+                <p>{store.descricaoCurta}</p>
+                {store.horarioFuncionamento ? <small>{store.horarioFuncionamento}</small> : null}
+              </div>
             </div>
-          </div>
 
-          <div className="store-hero-side">
-            <button
-              className="btn btn-outline-light"
-              disabled={!whatsappUrl}
-              onClick={() => {
-                if (!whatsappUrl) return;
-                actions.incrementMetric(store.id, "cliquesWhatsapp");
-                window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-              }}
-            >
-              <MdChat aria-hidden="true" />
-              Atendimento no WhatsApp
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container page-space">
-        <section className="store-hero-highlights" aria-label="Informacoes da loja">
-          {storeHighlights.map((item) => {
-            const Icon = item.icon;
-            return (
-              <article key={item.id} className="store-highlight-card">
-                <div className="store-highlight-icon">
-                  <Icon aria-hidden="true" />
-                </div>
-                <div>
-                  <small>{item.label}</small>
-                  <strong>{item.value}</strong>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-
-        <div className="section-title store-catalog-title">
-          <div>
-            <p>Cardapio e produtos</p>
-            <h3>Catalogo da loja</h3>
-          </div>
-          <span>{items.length} item(ns)</span>
-        </div>
-
-        {!items.length ? (
-          <div className="empty-state">
-            <h4>Catalogo em atualizacao</h4>
-            <p>Esta loja ainda nao publicou produtos na vitrine.</p>
-          </div>
-        ) : (
-          <div className="menu-grid store-menu-grid">
-            {items.map((item) => (
-              <ProductCard
-                key={item.id}
-                item={item}
-                hasCustomization={selectors.optionGroupsByProduct(item.id).length > 0}
-                onAdd={() => {
-                  if (selectors.optionGroupsByProduct(item.id).length > 0) {
-                    setSelectedItem(item);
-                    return;
-                  }
-
-                  const result = actions.addToCart(store.id, item.id, {});
-                  if (result.ok) {
-                    setHighlightedCartItemId(result.cartItemId);
-                    setIsCartOpen(true);
-                  }
+            {whatsappUrl && (
+              <Button
+                variant="secondary"
+                icon={ChatBubbleLeftIcon}
+                onClick={() => {
+                  actions.incrementMetric(store.id, "cliquesWhatsapp");
+                  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
                 }}
-              />
-            ))}
+              >
+                Chamar no WhatsApp
+              </Button>
+            )}
           </div>
-        )}
-      </main>
+        </header>
 
-      <ProductCustomizationModal
-        item={selectedItem}
-        groups={selectedItem ? selectors.optionGroupsByProduct(selectedItem.id) : []}
-        open={Boolean(selectedItem)}
-        onClose={() => setSelectedItem(null)}
-        onSubmit={(configuration) => {
-          if (!selectedItem || !store) return { ok: false };
-          const result = actions.addToCart(store.id, selectedItem.id, configuration);
-          if (result.ok) {
-            setHighlightedCartItemId(result.cartItemId);
-            setIsCartOpen(true);
-          }
-          return result;
-        }}
-      />
+        {/* Main Content */}
+        <main className="store-main">
+          {/* Highlights */}
+          <section className="store-highlights-section">
+            <div className="store-highlights-grid">
+              {storeHighlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.id} className="store-highlight-card">
+                    <div className="store-highlight-icon">
+                      <Icon width={28} height={28} strokeWidth={1.5} />
+                    </div>
+                    <div className="store-highlight-content">
+                      <small>{item.label}</small>
+                      <strong>{item.value}</strong>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
 
-      {cart.storeId === store.id ? (
-        <>
-          <CartBar
-            count={cart.items.length}
-            total={cart.total}
-            onOpen={() => {
-              setHighlightedCartItemId(null);
+          {/* Catalog Section */}
+          <section className="store-catalog-section">
+            <div className="store-catalog-header">
+              <div>
+                <p>Cardapio e Produtos</p>
+                <h2>Catalogo da Loja</h2>
+              </div>
+              <span className="store-item-count">{items.length} item(ns)</span>
+            </div>
+
+            {!items.length ? (
+              <div className="empty-state">
+                <h4>Catalogo em atualizacao</h4>
+                <p>Esta loja ainda nao publicou produtos na vitrine.</p>
+              </div>
+            ) : (
+              <div className="store-menu-grid">
+                {items.map((item) => (
+                  <ProductCard
+                    key={item.id}
+                    item={item}
+                    hasCustomization={selectors.optionGroupsByProduct(item.id).length > 0}
+                    onAdd={() => {
+                      if (selectors.optionGroupsByProduct(item.id).length > 0) {
+                        setSelectedItem(item);
+                        return;
+                      }
+
+                      const result = actions.addToCart(store.id, item.id, {});
+                      if (result.ok) {
+                        setHighlightedCartItemId(result.cartItemId);
+                        setIsCartOpen(true);
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </main>
+
+        {/* Product Customization Modal */}
+        <ProductCustomizationModal
+          item={selectedItem}
+          groups={selectedItem ? selectors.optionGroupsByProduct(selectedItem.id) : []}
+          open={Boolean(selectedItem)}
+          onClose={() => setSelectedItem(null)}
+          onSubmit={(configuration) => {
+            if (!selectedItem || !store) return { ok: false };
+            const result = actions.addToCart(store.id, selectedItem.id, configuration);
+            if (result.ok) {
+              setHighlightedCartItemId(result.cartItemId);
               setIsCartOpen(true);
-            }}
-          />
-          <CartDrawer
-            cart={{ ...cart, highlightedCartItemId }}
-            open={isCartOpen}
-            onClose={() => {
-              setIsCartOpen(false);
-              setHighlightedCartItemId(null);
-            }}
-            onDecrease={(itemId, quantity) => actions.setCartQuantity(itemId, quantity)}
-            onIncrease={(itemId, quantity) => actions.setCartQuantity(itemId, quantity)}
-          />
-        </>
-      ) : null}
-    </div>
+            }
+            return result;
+          }}
+        />
+
+        {/* Cart Bar and Drawer */}
+        {cart.storeId === store.id ? (
+          <>
+            <CartBar
+              count={cart.items.length}
+              total={cart.total}
+              onOpen={() => {
+                setHighlightedCartItemId(null);
+                setIsCartOpen(true);
+              }}
+            />
+            <CartDrawer
+              cart={{ ...cart, highlightedCartItemId }}
+              open={isCartOpen}
+              onClose={() => {
+                setIsCartOpen(false);
+                setHighlightedCartItemId(null);
+              }}
+              onDecrease={(itemId, quantity) => actions.setCartQuantity(itemId, quantity)}
+              onIncrease={(itemId, quantity) => actions.setCartQuantity(itemId, quantity)}
+            />
+          </>
+        ) : null}
+      </div>
+
+      <BottomNav userRole="customer" activeRoute={`/store/${slug}`} />
+    </>
   );
 }

@@ -1,6 +1,8 @@
-import { MdArrowForward, MdClose, MdOutlineShoppingBag } from "react-icons/md";
+import { XMarkIcon, ShoppingBagIcon, ArrowRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import SmartImage from "../components/SmartImage";
+import Navigation, { BottomNav } from "../components/Navigation";
+import Button from "../components/Button";
 import { useApp } from "../store/AppContext";
 import { formatCurrency } from "../utils/format";
 
@@ -11,117 +13,174 @@ export default function CartPage() {
 
   if (!cart.items.length) {
     return (
-      <div className="container page-space">
-        <div className="empty-state">
-          <h3>Sacola vazia</h3>
-          <p>Adicione produtos para continuar a compra.</p>
-          <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
+      <>
+        <Navigation userRole="customer" cartCount={0} />
+        <div className="cart-page-v2">
+          <div className="empty-state" style={{ padding: "80px 20px", minHeight: "60vh", display: "grid", placeItems: "center" }}>
+            <div style={{ textAlign: "center" }}>
+              <ShoppingBagIcon style={{ width: "64px", height: "64px", margin: "0 auto 20px", opacity: 0.5 }} />
+              <h3>Sacola vazia</h3>
+              <p>Adicione produtos para continuar a compra.</p>
+              <Link className="btn btn-primary" to="/">Voltar para o inicio</Link>
+            </div>
+          </div>
         </div>
-      </div>
+        <BottomNav userRole="customer" activeRoute="/cart" />
+      </>
     );
   }
 
   return (
-    <main className="cart-v2-page public-flow-page">
-      <header className="cart-v2-header">
-        <div className="cart-v2-title-row">
-          <div>
-            <p className="cart-v2-kicker">Sua compra no Tem na Area</p>
-            <h1>Sacola</h1>
-            <p className="cart-v2-subtitle">Revise os itens antes de seguir para a confirmacao final.</p>
-          </div>
-          <span>{cart.store.nome}</span>
-        </div>
-      </header>
+    <>
+      <Navigation userRole="customer" cartCount={cart.items.length} />
 
-      <section className="cart-v2-body">
-        <div className="cart-v2-items">
-          {cart.items.map((row) => (
-            <article key={row.id} className="cart-v2-item">
-              <SmartImage src={row.item.imagem} alt={row.item.nome} className="cart-v2-thumb" />
-
-              <div className="cart-v2-item-content">
-                <div className="cart-v2-item-top">
-                  <div>
-                    <small className="cart-v2-item-label">Item selecionado</small>
-                    <h3>{row.item.nome}</h3>
-                    <p>{formatCurrency(row.unitPrice)} por unidade</p>
-                    {row.summaryLines?.length ? (
-                      <div className="cart-line-summary">
-                        {row.summaryLines.map((line) => <small key={line}>{line}</small>)}
-                      </div>
-                    ) : null}
-                  </div>
-                  <strong>{formatCurrency(row.subtotal)}</strong>
-                </div>
-
-                <div className="cart-v2-item-actions">
-                  <button
-                    type="button"
-                    className="cart-v2-item-remove"
-                    onClick={() => actions.setCartQuantity(row.id, 0)}
-                    aria-label="Remover item"
-                  >
-                    <MdClose />
-                  </button>
-
-                  <div className="cart-v2-stepper">
-                    <button type="button" onClick={() => actions.setCartQuantity(row.id, row.quantidade - 1)}>
-                      -
-                    </button>
-                    <span>{row.quantidade}</span>
-                    <button type="button" onClick={() => actions.setCartQuantity(row.id, row.quantidade + 1)}>
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <aside className="cart-v2-summary-panel">
-          <div className="checkout-v2-card summary">
-            <div className="checkout-v2-summary-head">
-              <h3>Resumo rapido</h3>
-              <span>{cart.items.length} item(ns)</span>
+      <main className="cart-page-v2">
+        {/* Header */}
+        <header className="cart-header">
+          <div className="cart-header-content">
+            <div>
+              <p className="cart-kicker">Sua compra no Tem na Area</p>
+              <h1>Sacola</h1>
+              <p className="cart-subtitle">Revise os itens antes de seguir para a confirmação final.</p>
             </div>
+            <span className="cart-store-badge">{cart.store.nome}</span>
+          </div>
+        </header>
 
-            <div className="checkout-v2-summary-list">
+        {/* Body */}
+        <section className="cart-body">
+          {/* Items List */}
+          <div className="cart-items-section">
+            <h2 className="cart-section-title">{cart.items.length} item(ns) na sacola</h2>
+
+            <div className="cart-items-list">
               {cart.items.map((row) => (
-                <div key={row.id} className="checkout-v2-summary-row checkout-v2-summary-row-stack">
-                  <div>
-                    <span>{row.quantidade}x {row.item.nome}</span>
+                <article key={row.id} className="cart-item-card">
+                  <div className="cart-item-media">
+                    <SmartImage src={row.item.imagem} alt={row.item.nome} />
                   </div>
-                  <strong>{formatCurrency(row.subtotal)}</strong>
-                </div>
+
+                  <div className="cart-item-content">
+                    <div>
+                      <small className="cart-item-label">Item selecionado</small>
+                      <h3>{row.item.nome}</h3>
+                      <p className="cart-item-price">{formatCurrency(row.unitPrice)} por unidade</p>
+
+                      {row.summaryLines?.length ? (
+                        <div className="cart-item-notes">
+                          {row.summaryLines.map((line) => (
+                            <small key={line} className="cart-item-note">{line}</small>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="cart-item-actions">
+                      <strong className="cart-item-subtotal">{formatCurrency(row.subtotal)}</strong>
+
+                      <div className="cart-item-controls">
+                        <button
+                          type="button"
+                          className="cart-item-remove"
+                          onClick={() => actions.setCartQuantity(row.id, 0)}
+                          title="Remover item"
+                          aria-label="Remover item"
+                        >
+                          <TrashIcon width={20} height={20} strokeWidth={1.5} />
+                        </button>
+
+                        <div className="cart-stepper">
+                          <button
+                            type="button"
+                            onClick={() => actions.setCartQuantity(row.id, row.quantidade - 1)}
+                            title="Diminuir quantidade"
+                          >
+                            −
+                          </button>
+                          <span>{row.quantidade}</span>
+                          <button
+                            type="button"
+                            onClick={() => actions.setCartQuantity(row.id, row.quantidade + 1)}
+                            title="Aumentar quantidade"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
               ))}
             </div>
-
-            <div className="cart-v2-summary-total">
-              <span>Total do pedido</span>
-              <strong>{formatCurrency(cart.total)}</strong>
-            </div>
-
-            <button className="cart-v2-checkout" onClick={() => navigate("/checkout")}>
-              <MdOutlineShoppingBag aria-hidden="true" />
-              Avancar para confirmacao
-              <span aria-hidden="true"><MdArrowForward /></span>
-            </button>
           </div>
-        </aside>
-      </section>
 
-      <footer className="cart-v2-footer">
-        <div className="cart-v2-total-row">
-          <span>Total do pedido</span>
-          <strong>{formatCurrency(cart.total)}</strong>
-        </div>
-        <button className="cart-v2-checkout" onClick={() => navigate("/checkout")}>
-          Avancar para confirmacao <span aria-hidden="true"><MdArrowForward /></span>
-        </button>
-        <div className="cart-v2-handle" />
-      </footer>
-    </main>
+          {/* Summary Panel */}
+          <aside className="cart-summary-panel">
+            <div className="cart-summary-card">
+              <div className="cart-summary-head">
+                <h2>Resumo do Pedido</h2>
+                <span className="cart-summary-count">{cart.items.length} item(ns)</span>
+              </div>
+
+              <div className="cart-summary-body">
+                {cart.items.map((row) => (
+                  <div key={row.id} className="cart-summary-row">
+                    <span className="cart-summary-description">
+                      {row.quantidade}x <strong>{row.item.nome}</strong>
+                    </span>
+                    <strong className="cart-summary-amount">{formatCurrency(row.subtotal)}</strong>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-summary-divider" />
+
+              <div className="cart-summary-total">
+                <span>Total do Pedido</span>
+                <strong>{formatCurrency(cart.total)}</strong>
+              </div>
+
+              <Button
+                variant="primary"
+                size="lg"
+                icon={ShoppingBagIcon}
+                iconPosition="left"
+                onClick={() => navigate("/checkout")}
+                style={{ width: "100%" }}
+              >
+                Avançar para Confirmação
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => navigate(-1)}
+                style={{ width: "100%" }}
+              >
+                Continuar Comprando
+              </Button>
+            </div>
+          </aside>
+        </section>
+
+        {/* Mobile Footer */}
+        <footer className="cart-footer-mobile">
+          <div className="cart-footer-total">
+            <small>Total</small>
+            <strong>{formatCurrency(cart.total)}</strong>
+          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => navigate("/checkout")}
+            style={{ width: "100%" }}
+          >
+            Continuar
+          </Button>
+        </footer>
+      </main>
+
+      <BottomNav userRole="customer" activeRoute="/cart" />
+    </>
   );
 }

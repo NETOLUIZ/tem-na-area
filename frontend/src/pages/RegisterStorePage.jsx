@@ -75,6 +75,11 @@ function formatPhone(value) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
+function getFileLabel(value) {
+  if (!value) return "Nenhum arquivo selecionado";
+  return "Arquivo preparado para envio";
+}
+
 async function loadLocalImage(file) {
   if (!file) return "";
 
@@ -369,10 +374,6 @@ export default function RegisterStorePage() {
               <span className="register-v2-mini-kicker">Cadastro comercial</span>
               <h2>{PLAN_DETAILS[form.mode].title}</h2>
             </div>
-            <div className="register-v2-form-badge">
-              <span>Etapa {currentStep}</span>
-              <strong>de {totalSteps}</strong>
-            </div>
           </div>
 
           {currentStep === 1 && (
@@ -543,12 +544,30 @@ export default function RegisterStorePage() {
                 <div className="register-v2-grid">
                   <label className="full">
                     <span>Logo</span>
-                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                    <label className="register-v2-upload-field">
+                      <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                      <span className="register-v2-upload-button">Escolher logo</span>
+                      <span className="register-v2-upload-meta">{getFileLabel(form.logo)}</span>
+                    </label>
+                    {form.logo ? (
+                      <div className="register-v2-upload-preview">
+                        <img src={form.logo} alt="Preview da logo" />
+                      </div>
+                    ) : null}
                   </label>
 
                   <label className="full">
                     <span>Capa</span>
-                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                    <label className="register-v2-upload-field">
+                      <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                      <span className="register-v2-upload-button">Escolher capa</span>
+                      <span className="register-v2-upload-meta">{getFileLabel(form.capa)}</span>
+                    </label>
+                    {form.capa ? (
+                      <div className="register-v2-upload-preview register-v2-upload-preview-cover">
+                        <img src={form.capa} alt="Preview da capa" />
+                      </div>
+                    ) : null}
                   </label>
 
                   <label className="full">
@@ -685,12 +704,30 @@ export default function RegisterStorePage() {
                 <div className="register-v2-grid">
                   <label className="full">
                     <span>Logo</span>
-                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                    <label className="register-v2-upload-field">
+                      <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("logo", e)} />
+                      <span className="register-v2-upload-button">Escolher logo</span>
+                      <span className="register-v2-upload-meta">{getFileLabel(form.logo)}</span>
+                    </label>
+                    {form.logo ? (
+                      <div className="register-v2-upload-preview">
+                        <img src={form.logo} alt="Preview da logo" />
+                      </div>
+                    ) : null}
                   </label>
 
                   <label className="full">
                     <span>Capa</span>
-                    <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                    <label className="register-v2-upload-field">
+                      <input className="register-v2-file-input" type="file" accept="image/*" onChange={(e) => handleImageChange("capa", e)} />
+                      <span className="register-v2-upload-button">Escolher capa</span>
+                      <span className="register-v2-upload-meta">{getFileLabel(form.capa)}</span>
+                    </label>
+                    {form.capa ? (
+                      <div className="register-v2-upload-preview register-v2-upload-preview-cover">
+                        <img src={form.capa} alt="Preview da capa" />
+                      </div>
+                    ) : null}
                   </label>
 
                   <label className="full">

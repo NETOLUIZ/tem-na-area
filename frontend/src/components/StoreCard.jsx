@@ -21,6 +21,11 @@ export default function StoreCard({ store, onOpen, className = "", style }) {
     <article className={`store-card ${className}`.trim()} style={style}>
       <SmartImage src={store.imagens.capa} alt={store.nome} className="store-cover" />
       <div className="store-body">
+        <div className="store-card-topline">
+          <span className="store-card-pill">{isWhatsappOnly ? "Contato direto" : "Vitrine online"}</span>
+          <span className="store-card-city">{store.endereco.cidade}</span>
+        </div>
+
         <div className="store-head">
           <SmartImage src={store.imagens.logo} alt={store.nome} className="store-logo" />
           <div>
@@ -61,16 +66,23 @@ export default function StoreCard({ store, onOpen, className = "", style }) {
           <span>{isWhatsappOnly ? "Contato direto" : `${store.metrics.visitasPagina} visitas`}</span>
         </div>
 
-        {isWhatsappOnly ? (
-          <button type="button" className="btn btn-primary" onClick={handleOpenWhatsapp} disabled={!whatsappUrl}>
-            Chamar no WhatsApp
-          </button>
-        ) : (
-          <Link to={`/loja/${store.slug}`} className="btn btn-primary" onClick={onOpen}>
-            <MdOutlineStorefront aria-hidden="true" />
-            Abrir vitrine
-          </Link>
-        )}
+        <div className="store-card-footer">
+          <div className="store-card-rating-badge">
+            <strong>{averageRating ? averageRating.toFixed(1) : "--"}</strong>
+            <span>{ratingCount ? `${ratingCount} avaliacoes` : "nova loja"}</span>
+          </div>
+
+          {isWhatsappOnly ? (
+            <button type="button" className="btn btn-primary store-card-action" onClick={handleOpenWhatsapp} disabled={!whatsappUrl}>
+              Chamar no WhatsApp
+            </button>
+          ) : (
+            <Link to={`/loja/${store.slug}`} className="btn btn-primary store-card-action" onClick={onOpen}>
+              <MdOutlineStorefront aria-hidden="true" />
+              Abrir vitrine
+            </Link>
+          )}
+        </div>
       </div>
     </article>
   );

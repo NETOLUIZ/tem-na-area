@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  /* ===== PALETA PRINCIPAL - LARANJA VIBRANTE ===== */
+  --home-primary: #FF6B35;
+  --home-primary-strong: #E55100;
+  --home-primary-soft: #FFE8D6;
+  --home-primary-lighter: #FFF3E0;
+
+  /* ===== PALETA SECUNDÁRIA - AZUL PROFUNDO ===== */
+  --home-secondary: #004E89;
+  --home-secondary-strong: #003366;
+  --home-secondary-soft: #D4E8F7;
+
+  /* ===== PALETA ACCENT - VERDE/TURQUESA VIBRANTE ===== */
+  --home-accent: #00D4AA;
+  --home-accent-strong: #00A87B;
+  --home-accent-soft: #D4F8F0;
+
+  /* ===== PALETA SUPORTE - AMARELO DOURADO ===== */
+  --home-support: #FFD23F;
+  --home-support-soft: #FFF5D6;
+
+  /* ===== PALETA STATUS ===== */
+  --home-success: #00D4AA;
+  --home-warning: #FFD23F;
+  --home-danger: #FF4444;
+  --home-info: #004E89;
+
+  /* ===== BACKGROUND - GRADIENTE MODERNO ===== */
+  --home-bg-outer: #FFF3E0;
+  --home-bg-outer-2: #E8F5F4;
+
+  /* ===== SUPERFÍCIES ===== */
+  --home-surface: #ffffff;
+  --home-surface-soft: #FAFAFA;
+  --home-surface-muted: #F5F5F5;
+
+  /* ===== TIPOGRAFIA ===== */
+  --home-text: #1A1A1A;
+  --home-text-muted: #6B7280;
+  --home-text-light: #9CA3AF;
+
+  /* ===== BORDAS & SHADOWS ===== */
+  --home-border: rgba(0, 0, 0, 0.08);
+  --home-shadow: 0 20px 40px rgba(255, 107, 53, 0.15);
+  --home-shadow-soft: 0 10px 20px rgba(0, 0, 0, 0.08);
+  --home-shadow-hover: 0 15px 35px rgba(255, 107, 53, 0.2);
+
+  /* ===== BORDER RADIUS ===== */
+  --home-radius-sm: 0.5rem;
+  --home-radius-md: 0.75rem;
+  --home-radius-lg: 1.25rem;
+  --home-radius-xl: 1.75rem;
+  --home-radius-2xl: 2.25rem;
+  --home-radius-full: 999px;
+
+  /* ===== TRANSIÇÕES & ANIMAÇÕES ===== */
+  --home-transition: 180ms cubic-bezier(.4, 0, .2, 1);
+  --home-transition-fast: 100ms cubic-bezier(.4, 0, .2, 1);
+  --home-transition-slow: 300ms cubic-bezier(.4, 0, .2, 1);
+
+  /* ===== TIPOGRAFIA ===== */
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* ===== ESPAÇAMENTO ===== */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 2.5rem;
+  --spacing-3xl: 3rem;
+  --spacing-4xl: 4rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: linear-gradient(180deg, var(--home-bg-outer) 0%, var(--home-bg-outer-2) 100%);
+  color: var(--home-text);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}

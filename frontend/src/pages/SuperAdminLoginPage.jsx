@@ -61,7 +61,7 @@ export default function SuperAdminLoginPage() {
     setLoading(false);
 
     if (!ok) {
-      setError("Credenciais inválidas.");
+      setError("Credenciais invalidas.");
       return;
     }
 
@@ -71,77 +71,102 @@ export default function SuperAdminLoginPage() {
   return (
     <main className="login-v2-page super-admin-login-page">
       <section className="login-v2-card super-admin-login-card">
-        <div className="login-v2-brand">
-          <div className="login-v2-brand-icon" aria-hidden="true">
-            <HubIcon />
+        <div className="super-admin-login-shell">
+          <div className="super-admin-login-main">
+            <div className="login-v2-brand">
+              <div className="login-v2-brand-icon" aria-hidden="true">
+                <HubIcon />
+              </div>
+              <div className="super-admin-brand-copy">
+                <h1>Tem na Area</h1>
+                <small>Central administrativa</small>
+              </div>
+            </div>
+
+            <div className="login-v2-hero super-admin-login-hero">
+              <span>Central estrategica</span>
+              <strong>Controle total da rede, da marca e da operacao.</strong>
+              <p>Uma area unica para aprovacoes, pagamentos, bloqueios e acompanhamento operacional.</p>
+            </div>
+
+            <div className="super-admin-login-inline-copy">
+              <h2>Acesso administrativo</h2>
+              <p>Entre com sua credencial para operar a central e supervisionar a plataforma com visao completa.</p>
+            </div>
+
+            {error ? <p className="error-text">{error}</p> : null}
+
+            <form className="login-v2-form super-admin-login-form" onSubmit={submit}>
+              <label>Usuario</label>
+              <div className="login-v2-input-wrap">
+                <span className="login-v2-input-icon" aria-hidden="true">
+                  <UserIcon />
+                </span>
+                <input
+                  type="email"
+                  placeholder="admin@temnaarea.com"
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
+                  required
+                />
+              </div>
+
+              <label>Senha</label>
+              <div className="login-v2-input-wrap">
+                <span className="login-v2-input-icon" aria-hidden="true">
+                  <LockIcon />
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Digite sua senha"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  required
+                />
+                <button type="button" className="login-v2-eye" onClick={() => setShowPassword((v) => !v)}>
+                  <EyeIcon open={showPassword} />
+                </button>
+              </div>
+
+              <button className="btn btn-primary login-v2-submit" type="submit">
+                {loading ? "Entrando..." : "Entrar na central"}
+                <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
+              </button>
+            </form>
           </div>
-          <div className="super-admin-brand-copy">
-            <h1>Tem na Área</h1>
-            <small>Central administrativa</small>
-          </div>
+
+          <aside className="super-admin-login-aside" aria-hidden="true">
+            <div className="super-admin-login-panel">
+              <span className="super-admin-login-panel-kicker">Visao de comando</span>
+              <strong>Uma central desenhada para decisoes rapidas, leitura clara e controle da operacao.</strong>
+              <p>O acesso administrativo concentra os pontos criticos da plataforma em um fluxo unico.</p>
+            </div>
+
+            <div className="super-admin-login-grid">
+              <div className="super-admin-login-hint">
+                <strong>Acesso padrao</strong>
+                <span>Login: admin@temnaarea.com</span>
+                <span>Senha: admin123</span>
+              </div>
+
+              <div className="super-admin-login-hint super-admin-login-hint-alt">
+                <strong>Escopo</strong>
+                <span>Aprovar entradas e pagamentos</span>
+                <span>Monitorar a saude operacional da rede</span>
+              </div>
+
+              <div className="super-admin-login-metric">
+                <small>Operacao</small>
+                <strong>Cadastros, bloqueios e financeiro</strong>
+              </div>
+
+              <div className="super-admin-login-metric">
+                <small>Leitura rapida</small>
+                <strong>Central unica para supervisao da rede</strong>
+              </div>
+            </div>
+          </aside>
         </div>
-
-        <div className="login-v2-hero super-admin-login-hero">
-          <span>Central estratégica</span>
-          <strong>Controle total da rede, da marca e da operação.</strong>
-        </div>
-
-        <h2>Acesso administrativo</h2>
-        <p>Gerencie aprovações, pagamentos, bloqueios e visibilidade da plataforma em um painel unificado.</p>
-
-        <div className="super-admin-login-grid">
-          <div className="super-admin-login-hint">
-            <strong>Acesso padrão</strong>
-            <span>Login: admin@temnaarea.com</span>
-            <span>Senha: admin123</span>
-          </div>
-
-          <div className="super-admin-login-hint super-admin-login-hint-alt">
-            <strong>Escopo</strong>
-            <span>Aprovar entradas e pagamentos</span>
-            <span>Monitorar a saúde operacional da rede</span>
-          </div>
-        </div>
-
-        {error ? <p className="error-text">{error}</p> : null}
-
-        <form className="login-v2-form" onSubmit={submit}>
-          <label>Usuário</label>
-          <div className="login-v2-input-wrap">
-            <span className="login-v2-input-icon" aria-hidden="true">
-              <UserIcon />
-            </span>
-            <input
-              type="email"
-              placeholder="admin@temnaarea.com"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              required
-            />
-          </div>
-
-          <label>Senha</label>
-          <div className="login-v2-input-wrap">
-            <span className="login-v2-input-icon" aria-hidden="true">
-              <LockIcon />
-            </span>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Digite sua senha"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              required
-            />
-            <button type="button" className="login-v2-eye" onClick={() => setShowPassword((v) => !v)}>
-              <EyeIcon open={showPassword} />
-            </button>
-          </div>
-
-          <button className="btn btn-primary login-v2-submit" type="submit">
-            {loading ? "Entrando..." : "Entrar na central"}
-            <span className="login-v2-submit-arrow" aria-hidden="true"><MdArrowForward /></span>
-          </button>
-        </form>
       </section>
     </main>
   );

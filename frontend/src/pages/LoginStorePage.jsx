@@ -166,16 +166,28 @@ export default function LoginStorePage() {
 
             <div className="merchant-login-metrics">
               <article>
-                <small>Operacao</small>
+                <div className="merchant-login-metric-head">
+                  <small>Operacao</small>
+                  <span className="merchant-login-metric-dot" />
+                </div>
                 <strong>Pedidos, catalogo e clientes</strong>
+                <p>Organize atendimento, cardapio e rotina comercial em um painel unico.</p>
               </article>
               <article>
-                <small>Experiencia</small>
+                <div className="merchant-login-metric-head">
+                  <small>Experiencia</small>
+                  <span className="merchant-login-metric-dot" />
+                </div>
                 <strong>Fluxo direto para o parceiro</strong>
+                <p>Entrada simples para quem precisa resolver a operacao sem perder tempo.</p>
               </article>
               <article>
-                <small>Presenca</small>
+                <div className="merchant-login-metric-head">
+                  <small>Presenca</small>
+                  <span className="merchant-login-metric-dot" />
+                </div>
                 <strong>Vitrine publica integrada</strong>
+                <p>Sua area interna conversa com a vitrine e fortalece a apresentacao da marca.</p>
               </article>
             </div>
           </aside>

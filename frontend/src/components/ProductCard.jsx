@@ -9,6 +9,11 @@ export default function ProductCard({ item, hasCustomization, onAdd }) {
       </div>
 
       <div className="product-info">
+        <div className="product-card-kicker-row">
+          <span className="product-card-kicker">{item.tipoProduto || "Produto"}</span>
+          {item.precoAntigo ? <span className="product-card-offer">Oferta</span> : null}
+        </div>
+
         <div className="product-top">
           <div className="product-top-copy">
             <h4>{item.nome}</h4>
@@ -24,12 +29,12 @@ export default function ProductCard({ item, hasCustomization, onAdd }) {
         <p>{item.descricao}</p>
 
         <div className="product-footer">
-          <div>
+          <div className="product-price-block">
             {item.precoAntigo ? <small>{formatCurrency(item.precoAntigo)}</small> : null}
             <strong>{formatCurrency(item.preco)}</strong>
           </div>
 
-          <button className="btn btn-primary" onClick={onAdd}>
+          <button className="btn btn-primary product-card-action" onClick={onAdd}>
             {hasCustomization ? "Personalizar" : "Adicionar"}
           </button>
         </div>
